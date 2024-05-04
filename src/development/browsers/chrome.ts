@@ -88,7 +88,7 @@ export const permissions = [
   'accessibilityFeatures.read',
   
 ] as const
-type Permission = Str & keyof typeof permissions
+type Permission = Str & typeof permissions[number]
 
 export type ChromeBrowserManifest = {
   /**

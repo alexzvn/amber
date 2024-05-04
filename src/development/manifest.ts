@@ -11,5 +11,5 @@ export type GeneralManifest = ChromeBrowserManifest | {
   options_page?: string|Page
   action?: { default_popup?: Page }
   background: ChromeBrowserManifest['content_scripts'] | BackgroundScript
-  icons: ChromeBrowserManifest['content_scripts']| Icons
+  icons: ChromeBrowserManifest['content_scripts']|Icons
 }

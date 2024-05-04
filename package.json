@@ -11,16 +11,17 @@
   "bin": {
     "amber": "dist/cli.js"
   },
+  "dependencies": {
+    "defu": "^6.1.4",
+    "sharp": "^0.33.3",
+    "tsx": "^4.9.0",
+    "dotenv": "^16.4.5",
+    "mri": "^1.2.0",
+    "vite": "^5.2.11"
+  },
   "devDependencies": {
     "@types/bun": "latest",
-    "defu": "^6.1.4",
-    "lightningcss": "^1.24.1",
-    "mri": "^1.2.0",
-    "sharp": "^0.33.3",
-    "tsup": "^8.0.2",
-    "tsx": "^4.9.0",
-    "vite": "^5.2.11",
-    "dotenv": "^16.4.5"
+    "tsup": "^8.0.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
