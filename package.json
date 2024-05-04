@@ -1,5 +1,5 @@
 {
-  "name": "@amber/tooling",
+  "name": "@alexzvn/amber",
   "version": "0.0.1",
   "module": "index.ts",
   "type": "module",
@@ -19,7 +19,8 @@
     "sharp": "^0.33.3",
     "tsup": "^8.0.2",
     "tsx": "^4.9.0",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "dotenv": "^16.4.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -27,7 +28,21 @@
   "engines": {
     "node": ">= 18.x"
   },
-  "dependencies": {
-    "dotenv": "^16.4.5"
-  }
+  "description": "To install dependencies:",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexzvn/amber.git"
+  },
+  "keywords": [
+    "amber",
+    "extension",
+    "chrome-extension",
+    "tool"
+  ],
+  "author": "Alexzvn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alexzvn/amber/issues"
+  },
+  "homepage": "https://github.com/alexzvn/amber#readme"
 }
