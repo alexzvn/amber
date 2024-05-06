@@ -90,6 +90,8 @@ export const permissions = [
 ] as const
 type Permission = Str & typeof permissions[number]
 
+type MaybeScriptString = string|String
+
 export type ChromeBrowserManifest = {
   /**
    * An integer specifying the version of the manifest
@@ -170,7 +172,7 @@ export type ChromeBrowserManifest = {
     /**
      * @example { "default_popup": "src/popup.html"  }
      */
-    default_popup: string
+    default_popup: MaybeScriptString
   }>
 
   /**
@@ -378,21 +380,21 @@ export type ChromeBrowserManifest = {
    *
    * @see [Embedded options](https://developer.chrome.com/docs/extensions/develop/ui/options-page#embedded_options)
    */
-  options_ui?: string
+  options_ui?: MaybeScriptString
   
   /**
    * Specifies a path to an options.html file for the extension to use as an options page.
    *
    * @see [Give users options](https://developer.chrome.com/docs/extensions/develop/ui/options-page)
    */
-  options_page?: string
+  options_page?: MaybeScriptString
   
   /**
    * Identifies an HTML file to display in a sidePanel.
    *
    * @see [Side panel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)
    */
-  side_panel?: { default_path: string }
+  side_panel?: { default_path: MaybeScriptString }
   
   /**
    * Lists technologies required to use the extension. For a list of supported requirements, see Requirements.
@@ -467,4 +469,4 @@ export type ChromeBrowserManifest = {
       is_default: boolean
     }>
   }>
-} & Record<string, unknown>
+}
