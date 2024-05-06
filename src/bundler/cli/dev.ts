@@ -3,7 +3,6 @@ import { program, loadAmberConfig, cwd } from './program'
 import { writeManifest } from '~/bundler/ViteExtensionPlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import { server } from '~/bundler/hot/server'
-import { watchFile } from 'fs'
 import defu from 'defu'
 
 
@@ -33,6 +32,7 @@ const start = async () => {
   const watcherScripts: any[] = scripts ? await Promise.all(scripts.map(build)) : []
 
   return () => {
+    // this not working, fix later
     watcherModule?.map(it => it.close())
     watcherScripts.map(it => it.close())
   }
@@ -44,12 +44,7 @@ program.command('dev')
   program.dev = true
   server.listen(4321, '0.0.0.0')
 
-  let stop = await start()
-
-  watchFile('amber.config.ts', { persistent: true }, async () => {
-    stop()
-    stop = await start()
-  })
+  const _stop = await start()
 
   await ProcessIcon(cwd, 'dist')
 })
