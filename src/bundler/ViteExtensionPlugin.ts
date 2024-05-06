@@ -36,22 +36,33 @@ export const writeManifest = async (manifest: Record<any, unknown>, options: Par
 }
 
 export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}): PluginOption => {
+  const dev = options.dev
 
   const matchBackgroundFile = (id: string|((script: BackgroundScript) => boolean)) => {
     const items = [... BackgroundScript.$registers.values()]
-    
+
     return typeof id === 'string'
-      ? items.some(script => script.file === id)
+      ? items.some(script => id.endsWith(script.file))
       : items.some(id)
   }
 
   return {
     name: 'ViteExtension',
 
-    watchChange(id) {
-      console.log(matchBackgroundFile(script => id.endsWith(script.file)));
+    transform(code, id) {
+      if (!dev || !matchBackgroundFile(id)) {
+        return
+      }
 
-      if (!matchBackgroundFile(script => id.endsWith(script.file))) {
+      const inject = "import '@alexzvn/amber/hot/client-reload-helper'\n"
+
+      return {
+        code: inject + code
+      }
+    },
+
+    watchChange(id) {
+      if (!dev || !matchBackgroundFile(id)) {
         return
       }
 

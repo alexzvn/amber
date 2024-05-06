@@ -9,7 +9,7 @@ export const loadAmberConfig = async () => await import(join(cwd, 'amber.config.
   .then(mod => mod.default as DefinedConfig)
 
 export const program = new Command('amber')
-  .version(version)
   .description('Amber CLI for building browser chrome extension')
+  .version(version) as Command & { dev: boolean }
 
 export default program

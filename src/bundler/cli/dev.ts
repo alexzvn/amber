@@ -8,12 +8,13 @@ import defu from 'defu'
 program.command('dev')
 .description('Start process to develop browser extension')
 .action(async () => {
+  program.dev = true
   const config = await loadAmberConfig()
 
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   config.manifest.host_permissions ??= []
-  config.manifest.host_permissions.push('*://localhost:4321/*')
+  config.manifest.host_permissions.push('ws://localhost:4321/*')
 
   const scripts = config.scripts?.map(cfg => {
     return mergeConfig(cfg, {

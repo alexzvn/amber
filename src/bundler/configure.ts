@@ -4,7 +4,8 @@ import type {GeneralManifest} from '~/bundler/browsers/manifest'
 import ViteExtensionPlugin from '~/bundler/ViteExtensionPlugin'
 import ContentScript from '~/bundler/components/ContentScript'
 import Page from '~/bundler/components/Page'
-import BackgroundScript from "~/bundler/components/BackgroundScript";
+import BackgroundScript from '~/bundler/components/BackgroundScript'
+import program from './cli/program'
 
 export type ExtensionOptions = {
   devManifest?: Partial<GeneralManifest>
@@ -18,7 +19,8 @@ export const defineConfig = (options: ExtensionOptions) => {
     devManifest = {},
     manifest
   } = options
-  const extension = ViteExtensionPlugin(manifest)
+
+  const extension = ViteExtensionPlugin(manifest, { dev: program.dev || false })
 
   const scripts = ContentScript.$registers.map(script => {
     const config = mergeConfig(vite, {
