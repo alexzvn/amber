@@ -10,12 +10,12 @@ program.command('dev')
 
   const scripts = config.scripts?.map(cfg => {
     return mergeConfig(cfg, {
-      build: { watch: {} }
+      build: { watch: {}, minify: false }
     }) as UserConfig
   })
 
   const module = config.modules && mergeConfig(config.modules, {
-    build: { watch: {} }
+    build: { watch: {}, minify: false }
   })
 
   if (!module && !scripts) {
