@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup-node index.ts cli.ts --format esm --dts --target ES2022"
+    "up": "bun scripts/build.ts",
+    "publish": "cd dist && npm publish --access public"
   },
   "bin": {
     "amber": "dist/cli.js"
