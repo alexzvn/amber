@@ -6,10 +6,8 @@ import type BackgroundScript from '~/bundler/components/BackgroundScript'
 import type Icons from '../components/Icons'
 
 
-export type GeneralManifest = ChromeBrowserManifest | {
+export type GeneralManifest = ChromeBrowserManifest & {
   content_scripts?: Array<Unpacked<ChromeBrowserManifest['content_scripts']>|ContentScript>
-  options_page?: string|Page
-  action?: { default_popup?: Page }
   background: ChromeBrowserManifest['content_scripts'] | BackgroundScript
-  icons: ChromeBrowserManifest['content_scripts']|Icons
+  icons: ChromeBrowserManifest['content_scripts'] | Icons
 }
