@@ -2,11 +2,14 @@ import { build, mergeConfig, type UserConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import { writeManifest } from '~/bundler/ViteExtensionPlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
+import defu from 'defu'
 
 program.command('dev')
 .description('Start process to develop browser extension')
 .action(async () => {
   const config = await loadAmberConfig()
+
+  Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   const scripts = config.scripts?.map(cfg => {
     return mergeConfig(cfg, {

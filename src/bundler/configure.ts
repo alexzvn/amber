@@ -5,10 +5,9 @@ import ViteExtensionPlugin from '~/bundler/ViteExtensionPlugin'
 import ContentScript from '~/bundler/components/ContentScript'
 import Page from '~/bundler/components/Page'
 import BackgroundScript from "~/bundler/components/BackgroundScript";
-import defu from 'defu'
 
-type ExtensionOptions = {
-  devManifest: Partial<GeneralManifest>
+export type ExtensionOptions = {
+  devManifest?: Partial<GeneralManifest>
   manifest: GeneralManifest
   vite?: UserConfig
 }
@@ -17,9 +16,8 @@ export const defineConfig = (options: ExtensionOptions) => {
   const {
     vite = {},
     devManifest = {},
+    manifest
   } = options
-
-  const manifest = defu(options.manifest, devManifest)
   const extension = ViteExtensionPlugin(manifest)
 
   const scripts = ContentScript.$registers.map(script => {
@@ -72,6 +70,7 @@ export const defineConfig = (options: ExtensionOptions) => {
 
   return {
     manifest,
+    devManifest,
     modules: Object.keys(inputModules).length ? modules as UserConfig : undefined,
     scripts: scripts.length ? scripts : undefined
   }

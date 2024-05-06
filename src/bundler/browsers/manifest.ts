@@ -10,6 +10,6 @@ export type GeneralManifest = ChromeBrowserManifest | {
   content_scripts?: Array<Unpacked<ChromeBrowserManifest['content_scripts']>|ContentScript>
   options_page?: string|Page
   action?: { default_popup?: Page }
-  background: ChromeBrowserManifest['content_scripts'] | BackgroundScript
+  background?: ChromeBrowserManifest['content_scripts'] | BackgroundScript
   icons: ChromeBrowserManifest['content_scripts']|Icons
 }

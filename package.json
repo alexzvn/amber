@@ -1,6 +1,6 @@
 {
   "name": "@alexzvn/amber",
-  "version": "0.0.2-alpha8",
+  "version": "0.0.3-alpha0",
   "module": "index.ts",
   "type": "module",
   "main": "dist/index.js",
@@ -13,6 +13,7 @@
     "amber": "dist/cli.js"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "commander": "^12.0.0",
     "defu": "^6.1.4",
     "dotenv": "^16.4.5",
@@ -21,6 +22,7 @@
     "vite": "^5.2.11"
   },
   "devDependencies": {
+    "@types/archiver": "^6.0.2",
     "@types/bun": "latest",
     "tsup": "^8.0.2"
   },
