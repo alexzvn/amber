@@ -2,6 +2,7 @@ import { build, mergeConfig, type UserConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import { writeManifest } from '~/bundler/ViteExtensionPlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
+import { server } from '~/bundler/hot/server'
 import defu from 'defu'
 
 program.command('dev')
@@ -10,6 +11,9 @@ program.command('dev')
   const config = await loadAmberConfig()
 
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
+
+  config.manifest.host_permissions ??= []
+  config.manifest.host_permissions.push('*://localhost:4321/*')
 
   const scripts = config.scripts?.map(cfg => {
     return mergeConfig(cfg, {
@@ -24,6 +28,9 @@ program.command('dev')
   if (!module && !scripts) {
     await writeManifest(config.manifest)
   }
+
+  server.listen(4321, '0.0.0.0')
+  console.log('dev server started')
 
   module && await build(module)
   scripts && await Promise.all(scripts.map(build))

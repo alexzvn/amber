@@ -62,8 +62,8 @@ export const defineConfig = (options: ExtensionOptions) => {
   ].reduce((carry, input) => {
     carry[input.path.name!] = input.file
     return carry
-  }, {} as Record<string, unknown>)
-  
+  }, {} as Record<string, string>)
+
   if (Object.keys(inputModules).length) {
     Object.assign(modules.build.rollupOptions.input, inputModules)
   }
