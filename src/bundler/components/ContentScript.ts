@@ -37,6 +37,8 @@ export default class ContentScript {
 
   public readonly options: Option
 
+  public readonly matches: string[]
+
   constructor(
     public readonly file: string,
     options: Partial<Option> & { matches: Matches }
@@ -45,6 +47,7 @@ export default class ContentScript {
     options.scriptDir ??= 'scripts'
 
     this.options = options as any
+    this.matches = options.matches
 
     this.path = pathDiscover(file)
     ContentScript.$registers.push(this)

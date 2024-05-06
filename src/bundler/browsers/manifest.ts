@@ -5,20 +5,14 @@ import type Page from "~/bundler/components/Page"
 import type BackgroundScript from '~/bundler/components/BackgroundScript'
 import type Icons from '../components/Icons'
 
-type PartialManifest = ChromeBrowserManifest
+type CBM = ChromeBrowserManifest
 
-// export type GeneralManifest = ChromeBrowserManifest | {
-//   content_scripts?: Array<Unpacked<ChromeBrowserManifest['content_scripts']>|ContentScript>
-//   options_page?: string|Page
-//   action?: { default_popup?: Page }
-//   background?: ChromeBrowserManifest['content_scripts'] | BackgroundScript
-//   icons: ChromeBrowserManifest['content_scripts']|Icons
-// }
+type CS = Unpacked<NonNullable<ChromeBrowserManifest['content_scripts']>>
 
-export type GeneralManifest = Prettify<PartialManifest> & {
-  content_scripts?: Array<Unpacked<ChromeBrowserManifest['content_scripts']>|ContentScript>
+export type GeneralManifest = Prettify<CBM> & Prettify<{
+  content_scripts?: Array<CS|ContentScript>
   options_page?: string|Page
   action?: { default_popup?: Page }
-  background?: ChromeBrowserManifest['content_scripts'] | BackgroundScript
-  icons: ChromeBrowserManifest['content_scripts']|Icons
-}
+  background?: ChromeBrowserManifest['background'] | BackgroundScript
+  icons: ChromeBrowserManifest['icons']|Icons
+}>
