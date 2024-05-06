@@ -1,6 +1,6 @@
 import { build, mergeConfig, type UserConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import { writeManifest } from '~/ViteExtensionPlugin'
+import { writeManifest } from '~/tool/ViteExtensionPlugin'
 import ProcessIcon from '~/tool/build/ProcessIcon'
 
 program.command('dev')

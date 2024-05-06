@@ -1,7 +1,7 @@
 import {type UserConfig, defineConfig as defineVite, mergeConfig} from 'vite'
 import {join} from 'path'
 import type {GeneralManifest} from '~/tool/browsers/manifest'
-import ViteExtensionPlugin from '~/ViteExtensionPlugin.ts'
+import ViteExtensionPlugin from '~/tool/ViteExtensionPlugin'
 import ContentScript from '~/tool/components/ContentScript'
 import Page from '~/tool/components/Page'
 import BackgroundScript from "~/tool/components/BackgroundScript";
