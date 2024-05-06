@@ -14,7 +14,7 @@ program.command('archive [name]')
 
   const meta = await readFile('package.json')
   const pkg = JSON.parse(meta.toString())
-  const archive = archiver(opt.format, { zlib: { level: 9 } })
+  const archive = archiver('zip', { zlib: { level: 9 } })
 
   const filename = name.replaceAll('[name]', pkg.name)
     .replaceAll('[version]', pkg.version)
