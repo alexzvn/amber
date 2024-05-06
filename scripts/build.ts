@@ -7,3 +7,5 @@ await $`npx tsup-node src/bundler/bundler.ts src/bundler/cli/index.ts --format e
 pkg.types = 'bundler.d.ts'
 pkg.main = 'bundler.js'
 pkg.bin = { amber: 'cli/index.js' }
+
+Bun.write(Bun.file('dist/package.json'), JSON.stringify(pkg, null, 2))
