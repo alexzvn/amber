@@ -7,8 +7,8 @@ import { join } from 'path'
 
 program.command('archive [name]')
 .description('Zip dist folder to a file in release folder')
-.option('--level', 'Compression level', '9')
-.option('--outDir', 'Specify output folder other than release', 'release')
+.option('--level <level>', 'Compression level', '9')
+.option('--outDir <path>', 'Specify output folder other than release', 'release')
 .action(async (name: string = '[name]-[version].[format]', opt) => {
   await mkdir(opt.outDir)
 
