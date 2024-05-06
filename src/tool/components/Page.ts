@@ -1,4 +1,4 @@
-import {pathDiscover} from '~/development/helper.ts'
+import {pathDiscover} from '~/tool/helper'
 
 export default class Page extends String {
   static readonly $registers = new Set<Page>()

@@ -3,7 +3,7 @@ import type { Prettify } from './type'
 
 export const mkdir = async (path: string) => {
   try {
-    return await MakeDirectory(path)
+    return await MakeDirectory(path, { recursive: true })
   } catch {
     // shhhh
   }

@@ -1,11 +1,10 @@
-import {type UserConfig, defineConfig as defineVite} from 'vite'
-import defu from 'defu'
+import {type UserConfig, defineConfig as defineVite, mergeConfig} from 'vite'
 import {join} from 'path'
-import type {GeneralManifest} from '~/development/manifest.ts'
+import type {GeneralManifest} from '~/tool/browsers/manifest'
 import ViteExtensionPlugin from '~/ViteExtensionPlugin.ts'
-import ContentScript from '~/development/components/ContentScript.ts'
-import Page from '~/development/components/Page.ts'
-import BackgroundScript from "~/development/components/BackgroundScript.ts";
+import ContentScript from '~/tool/components/ContentScript'
+import Page from '~/tool/components/Page'
+import BackgroundScript from "~/tool/components/BackgroundScript";
 
 type ExtensionOptions = {
   manifest: GeneralManifest
@@ -21,7 +20,7 @@ export const defineConfig = (options: ExtensionOptions) => {
   const extension = ViteExtensionPlugin(manifest)
 
   const scripts = ContentScript.$registers.map(script => {
-    const config = defu(vite, {
+    const config = mergeConfig(vite, {
       plugins: [extension],
       build: {
         emptyOutDir: false,
@@ -40,7 +39,7 @@ export const defineConfig = (options: ExtensionOptions) => {
     return defineVite(config as any)
   })
 
-  const modules = defu(vite, {
+  const modules = mergeConfig(vite, {
     plugins: [extension],
     build: {
       emptyOutDir: false,
@@ -70,7 +69,7 @@ export const defineConfig = (options: ExtensionOptions) => {
 
   return {
     manifest,
-    modules: Object.keys(inputModules).length ? modules : undefined,
+    modules: Object.keys(inputModules).length ? modules as UserConfig : undefined,
     scripts: scripts.length ? scripts : undefined
   }
 }
