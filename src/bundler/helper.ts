@@ -1,5 +1,5 @@
 import { mkdir as MakeDirectory } from 'fs/promises'
-import type { Prettify } from './type'
+import type { GenericFunc, Prettify } from './type'
 
 export const mkdir = async (path: string) => {
   try {
@@ -47,4 +47,19 @@ export const pathDiscover = (path: string) => {
   const name = names?.join('.')
 
   return { dir, filename, name, ext }
+}
+
+export const invokeOnce = <A extends any[], R>(handler: GenericFunc<A, R>) => {
+
+  let isCalled = false
+
+  return (...args: A) => {
+    if (isCalled) {
+      return undefined
+    }
+
+    isCalled = true
+
+    return handler(...args)
+  }
 }

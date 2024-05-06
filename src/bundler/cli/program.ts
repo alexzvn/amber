@@ -5,7 +5,7 @@ import type { DefinedConfig } from '~/bundler/configure'
 
 export const cwd = process.cwd()
 
-export const loadAmberConfig = async () => await import(join(cwd, 'amber.config.ts'))
+export const loadAmberConfig = async () => await import(join(cwd, 'amber.config.ts') + '?' + Date.now())
   .then(mod => mod.default as DefinedConfig)
 
 export const program = new Command('amber')

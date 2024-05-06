@@ -3,8 +3,8 @@ import { join } from 'path'
 import { mkdir } from 'fs/promises'
 import type {PluginOption} from 'vite'
 import { BackgroundScript } from './bundler'
-import { broadcast, connections } from './hot/server'
-import fs from 'fs/promises'
+import { broadcast } from './hot/server'
+import { invokeOnce } from './helper'
 
 type ExtOption = {
   /**
@@ -46,6 +46,8 @@ export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}
       : items.some(id)
   }
 
+  const saveManifest = invokeOnce(() => writeManifest(manifest, options))
+
   return {
     name: 'ViteExtension',
 
@@ -61,16 +63,13 @@ export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}
       }
     },
 
-    watchChange(id) {
-      if (!dev || !matchBackgroundFile(id)) {
-        return
-      }
+    writeBundle: async (opts, bundle) => {
+      const isMatchBackgroundScript = Object.values(bundle).some((output: any) => {
+        return matchBackgroundFile(output.facadeModuleId)
+      })
 
-      setTimeout(() => broadcast('reload-extension'), 1_000)
-    },
-
-    writeBundle: async () => {
-      writeManifest(manifest, options)
+      isMatchBackgroundScript && broadcast('reload-extension')
+      await saveManifest()
     }
   }
 }

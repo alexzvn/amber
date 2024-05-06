@@ -3,12 +3,11 @@ import { program, loadAmberConfig, cwd } from './program'
 import { writeManifest } from '~/bundler/ViteExtensionPlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import { server } from '~/bundler/hot/server'
+import { watchFile } from 'fs'
 import defu from 'defu'
 
-program.command('dev')
-.description('Start process to develop browser extension')
-.action(async () => {
-  program.dev = true
+
+const start = async () => {
   const config = await loadAmberConfig()
 
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
@@ -30,11 +29,27 @@ program.command('dev')
     await writeManifest(config.manifest)
   }
 
-  server.listen(4321, '0.0.0.0')
-  console.log('dev server started')
+  const watcherModule: any = module && await build(module)
+  const watcherScripts: any[] = scripts ? await Promise.all(scripts.map(build)) : []
 
-  module && await build(module)
-  scripts && await Promise.all(scripts.map(build))
+  return () => {
+    watcherModule?.close()
+    watcherScripts.map(it => it.close())
+  }
+}
+
+program.command('dev')
+.description('Start process to develop browser extension')
+.action(async () => {
+  program.dev = true
+  server.listen(4321, '0.0.0.0')
+
+  let stop = await start()
+
+  watchFile('amber.config.ts', { persistent: true }, async () => {
+    stop()
+    stop = await start()
+  })
 
   await ProcessIcon(cwd, 'dist')
 })
