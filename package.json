@@ -1,13 +1,13 @@
 {
   "name": "@alexzvn/amber",
-  "version": "0.0.2-alpha4",
+  "version": "0.0.2-alpha5",
   "module": "index.ts",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "up": "bun scripts/build.ts",
-    "publish": "cd dist && npm publish --access public"
+    "stream": "cd dist && npm publish --access public"
   },
   "bin": {
     "amber": "dist/cli.js"
