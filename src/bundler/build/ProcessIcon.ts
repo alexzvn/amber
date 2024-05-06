@@ -1,7 +1,7 @@
 import sharp from 'sharp'
 import { join } from 'path'
-import Icons from '~/tool/components/Icons'
-import { mkdir } from '~/tool/helper'
+import Icons from '~/bundler/components/Icons'
+import { mkdir } from '~/bundler/helper'
 
 const resize = async (icon: Icons, cwd: string, outDir: string) => {
   const image = sharp(join(cwd, icon.file))

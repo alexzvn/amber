@@ -1,8 +1,8 @@
-import type {Unpacked} from '~/tool/type'
-import type {ChromeBrowserManifest} from '~/tool/browsers/chrome'
-import type ContentScript from '~/tool/components/ContentScript'
-import type Page from "~/tool/components/Page"
-import type BackgroundScript from '~/tool/components/BackgroundScript'
+import type {Unpacked} from '~/bundler/type'
+import type {ChromeBrowserManifest} from '~/bundler/browsers/chrome'
+import type ContentScript from '~/bundler/components/ContentScript'
+import type Page from "~/bundler/components/Page"
+import type BackgroundScript from '~/bundler/components/BackgroundScript'
 import type Icons from '../components/Icons'
 
 

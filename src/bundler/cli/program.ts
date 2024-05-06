@@ -1,7 +1,7 @@
 import { Command } from 'commander'
 import { version } from '~/../package.json'
 import { join } from 'path'
-import type { DefinedConfig } from '~/tool/configure'
+import type { DefinedConfig } from '~/bundler/configure'
 
 export const cwd = process.cwd()
 

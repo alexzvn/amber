@@ -1,4 +1,4 @@
-import type {Str} from '~/tool/type'
+import type {Str} from '~/bundler/type'
 
 /**
  * @example { "48": "images/icon-48.png", "128": "images/icon-128.png" }

@@ -1,6 +1,6 @@
-import type {ChromeBrowserManifest, Matches} from '~/tool/browsers/chrome'
-import type {RequireAtLeastOne, Str, Unpacked} from '~/tool/type'
-import {pathDiscover, pick} from '~/tool/helper'
+import type {ChromeBrowserManifest, Matches} from '~/bundler/browsers/chrome'
+import type {RequireAtLeastOne, Str, Unpacked} from '~/bundler/type'
+import {pathDiscover, pick} from '~/bundler/helper'
 import { join } from 'path'
 
 type Option = NonNullable<Unpacked<ChromeBrowserManifest['content_scripts']>> & {

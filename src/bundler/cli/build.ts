@@ -1,7 +1,7 @@
 import { build, mergeConfig, type UserConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import { writeManifest } from '~/tool/ViteExtensionPlugin'
-import ProcessIcon from '~/tool/build/ProcessIcon'
+import { writeManifest } from '~/bundler/ViteExtensionPlugin'
+import ProcessIcon from '~/bundler/build/ProcessIcon'
 
 program.command('build')
 .description('Start process to build browser extension')

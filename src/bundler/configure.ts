@@ -1,10 +1,10 @@
 import {type UserConfig, defineConfig as defineVite, mergeConfig} from 'vite'
 import {join} from 'path'
-import type {GeneralManifest} from '~/tool/browsers/manifest'
-import ViteExtensionPlugin from '~/tool/ViteExtensionPlugin'
-import ContentScript from '~/tool/components/ContentScript'
-import Page from '~/tool/components/Page'
-import BackgroundScript from "~/tool/components/BackgroundScript";
+import type {GeneralManifest} from '~/bundler/browsers/manifest'
+import ViteExtensionPlugin from '~/bundler/ViteExtensionPlugin'
+import ContentScript from '~/bundler/components/ContentScript'
+import Page from '~/bundler/components/Page'
+import BackgroundScript from "~/bundler/components/BackgroundScript";
 
 type ExtensionOptions = {
   manifest: GeneralManifest
