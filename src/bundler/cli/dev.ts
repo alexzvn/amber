@@ -29,11 +29,11 @@ const start = async () => {
     await writeManifest(config.manifest)
   }
 
-  const watcherModule: any = module && await build(module)
+  const watcherModule = module && [await build(module)].flat() as any[]
   const watcherScripts: any[] = scripts ? await Promise.all(scripts.map(build)) : []
 
   return () => {
-    watcherModule?.close()
+    watcherModule?.map(it => it.close())
     watcherScripts.map(it => it.close())
   }
 }

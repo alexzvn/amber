@@ -39,6 +39,10 @@ export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}
   const dev = options.dev
 
   const matchBackgroundFile = (id: string|((script: BackgroundScript) => boolean)) => {
+    if (!id) {
+      return false
+    }
+
     const items = [... BackgroundScript.$registers.values()]
 
     return typeof id === 'string'
