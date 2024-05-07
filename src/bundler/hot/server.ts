@@ -1,23 +1,31 @@
 import { createServer } from 'http'
-import { WebSocket, WebSocketServer } from 'ws'
 
-export const connections = new Set<WebSocket>()
-
-export const broadcast = (data: string) => {
-  for (const ws of connections) {
-    ws.send(data)
-  }
+type DevServer = ReturnType<typeof createServer> & {
+  port?: number
 }
 
-export const server = createServer()
-export const wss = new WebSocketServer({ server })
+const target = new EventTarget()
+let id = 0
 
-wss.on('connection', (ws: WebSocket) => {
-  connections.add(ws)
-
-  ws.on('open', () => {
-    ws.send('reload-extension')
+export const server = createServer((req, res) => {
+  res.writeHead(200, {
+    'X-Accel-Buffering': 'no',
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
   })
 
-  ws.on('close', () => connections.delete(ws))
-})
+  res.write('data: hello\n\n')
+
+  target.addEventListener('broadcast', () => {
+    const data = [
+      'event: reload',
+      'data: ' + Date.now(),
+      'id: ' + id++
+    ]
+
+    res.write(data.join('\n') + '\n\n')
+  })
+}) as DevServer
+
+export const broadcast = () => target.dispatchEvent(new Event('broadcast'))

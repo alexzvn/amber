@@ -12,7 +12,7 @@ const start = async () => {
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   config.manifest.host_permissions ??= []
-  config.manifest.host_permissions.push('ws://localhost:4321/*')
+  config.manifest.host_permissions.push(`http://localhost:${server.port}/*`)
 
   const scripts = config.scripts?.map(cfg => {
     return mergeConfig(cfg, {
@@ -42,7 +42,9 @@ program.command('dev')
 .description('Start process to develop browser extension')
 .action(async () => {
   program.dev = true
-  server.listen(4321, '0.0.0.0')
+
+  server.listen(4321)
+  server.port = 4321
 
   const _stop = await start()
 

@@ -1,31 +1,26 @@
+declare global {
+  var __reload_event_url__: string
+}
 
-const createConnect = () => {
-  const socket = new WebSocket('ws://localhost:4321/events')
+setTimeout(() => {
+  const source = new EventSource(__reload_event_url__)
 
-  socket.addEventListener('open', () => console.log('Dev server events connected'))
+  source.addEventListener('reload', (event) => {
+    chrome.runtime.reload()
+  })
 
-  socket.addEventListener('message', ({ data }) => {
-    console.log(data)
-
-    if (data.toString() === 'reload-extension') {
+  source.addEventListener('message', (event) => {
+    if (event.data === 'reload-extension') {
       chrome.runtime.reload()
     }
   })
 
-  return socket
-}
-
-const connect = () => {
-  const ws = createConnect()
-
-  ws.addEventListener('error', (err: any) => {
-    ws.close()
+  source.addEventListener('open', () => {
+    console.log('Dev server events connected')
   })
 
-  ws.addEventListener('close', (e) => {
-    setTimeout(connect, 10_000)
+  source.addEventListener('error', () => {
+    source.readyState === source.CONNECTING && console.log('Reconnecting to dev server')
   })
-}
 
-
-connect()
+}, 1)

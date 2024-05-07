@@ -3,7 +3,7 @@ import { join } from 'path'
 import { mkdir } from 'fs/promises'
 import type {PluginOption} from 'vite'
 import { BackgroundScript } from './bundler'
-import { broadcast } from './hot/server'
+import { broadcast, server } from './hot/server'
 import { invokeOnce } from './helper'
 
 type ExtOption = {
@@ -60,10 +60,14 @@ export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}
         return
       }
 
-      const inject = "import '@alexzvn/amber/hot/client-reload-helper'\n"
+      const inject = [
+        `import '@alexzvn/amber/hot/client-reload-helper'`,
+        code,
+        `;globalThis.__reload_event_url__ = "http://localhost:${server.port}"`
+      ]
 
       return {
-        code: inject + code
+        code: inject.join('\n')
       }
     },
 
@@ -72,7 +76,7 @@ export default (manifest: Record<any, unknown>, options: Partial<ExtOption> = {}
         return matchBackgroundFile(output.facadeModuleId)
       })
 
-      isMatchBackgroundScript && broadcast('reload-extension')
+      isMatchBackgroundScript && broadcast()
       await saveManifest()
     }
   }
