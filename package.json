@@ -1,6 +1,6 @@
 {
   "name": "@alexzvn/amber",
-  "version": "0.1.2-alpha2",
+  "version": "0.1.2-alpha4",
   "module": "index.ts",
   "type": "module",
   "main": "dist/index.js",
