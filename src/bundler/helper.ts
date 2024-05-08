@@ -1,5 +1,6 @@
 import { mkdir as MakeDirectory } from 'fs/promises'
 import type { GenericFunc, Prettify } from './type'
+import type {PluginOption} from 'vite'
 
 export const mkdir = async (path: string) => {
   try {
@@ -35,6 +36,7 @@ export const pick = <
   return out
 }
 
+export const defineVitePlugin = <const A extends any[]>(option: GenericFunc<A, PluginOption>) => option
 
 export const pathDiscover = (path: string) => {
   const explode = path.split('/')

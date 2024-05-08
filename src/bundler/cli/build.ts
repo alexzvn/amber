@@ -1,7 +1,12 @@
-import { build, mergeConfig, type UserConfig } from 'vite'
+import { build, mergeConfig, type UserConfig,defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import { writeManifest } from '~/bundler/ViteExtensionPlugin'
+import { writeManifest } from '~/bundler/VitePlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
+import defu from "defu";
+import AmberPlugin from '~/bundler/plugins'
+import ContentScript from '~/bundler/components/ContentScript'
+import Page from '~/bundler/components/Page'
+import BackgroundScript from '~/bundler/components/BackgroundScript'
 
 program.command('build')
 .description('Start process to build browser extension')
@@ -11,27 +16,44 @@ program.command('build')
 .option('-w, --watch', 'Enter watch mode')
 .action(async (options) => {
   const config = await loadAmberConfig()
+  Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   const watch = options.watch ? {} : undefined
   const minify = options.prod || options.minify
-  const sourcemap = options.sourcemap ? options.sourcemap : false
+  const sourcemap: boolean = options.sourcemap ? options.sourcemap : false
 
-  const scripts = config.scripts?.map(cfg => {
-    return mergeConfig(cfg, {
-      build: { watch, minify, sourcemap }
-    }) as UserConfig
-  })
+  const inputs = {} as Record<string, string>
 
-  const module = config.modules && mergeConfig(config.modules, {
-    build: { watch, minify, sourcemap }
-  })
-
-  if (!module && !scripts) {
-    await writeManifest(config.manifest)
+  for (const script of ContentScript.$registers) {
+    inputs[script.moduleName] = script.file
   }
 
-  module && await build(module)
-  scripts && await Promise.all(scripts.map(build))
+  for (const page of Page.$registers) {
+    inputs[page.path.name!] = page.file
+  }
 
+  for (const script of BackgroundScript.$registers) {
+    inputs[script.path.name!] = script.file
+  }
+
+  let vite: UserConfig = defineConfig({
+    plugins: [AmberPlugin(config.manifest)],
+    build: {
+      sourcemap,
+      minify,
+      watch,
+      emptyOutDir: false,
+      rollupOptions: {
+        input: inputs,
+        output: {
+          entryFileNames: 'entries/[name].js',
+          chunkFileNames: 'shared/[name].js',
+          assetFileNames: 'assets/[name].[ext]',
+        },
+      }
+    }
+  })
+
+  await build(mergeConfig(vite, config.vite))
   await ProcessIcon(cwd, 'dist')
 })

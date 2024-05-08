@@ -53,6 +53,10 @@ export default class ContentScript {
     ContentScript.$registers.push(this)
   }
 
+  get moduleName() {
+    return `cs-${this.path.name}`
+  }
+
   toJSON() {
     const { scriptDir, assetDir, cssCodeSplit } = this.options
 
