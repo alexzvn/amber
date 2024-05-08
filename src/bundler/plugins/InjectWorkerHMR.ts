@@ -1,6 +1,8 @@
 import { defineVitePlugin } from '~/bundler/helper.ts'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import MagicString from "magic-string";
+import type {ViteDevServer} from "vite";
+import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
 
 export default  defineVitePlugin(() => {
   const get = (id: string) => {
@@ -10,22 +12,24 @@ export default  defineVitePlugin(() => {
   }
 
   let port = 5173
+  let server: ViteDevServer|undefined
 
   return {
     name: 'amber:inject-hmr-worker',
 
     buildStart() {
-      
+      server ??= DevServer.value
     },
 
-    configureServer({ config }) {
-      port = config.server.port || 5173
+    configureServer(srv) {
+      port = srv.config.server.port || 5173
+      server = srv
     },
 
     transform(code, id) {
       const script = get(id)
 
-      if (script) {
+      if (server && script) {
         const magic = new MagicString(code, { filename: script.path.filename })
         magic.prepend(`import '@alexzvn/amber/client/worker.esm';\n`)
 
@@ -34,7 +38,7 @@ export default  defineVitePlugin(() => {
 
       if (id.endsWith('/client/worker.esm.js')) {
         console.warn(id)
-        
+
         code = code.replace(/__HMR_PORT__/g, port.toString())
 
         return { code }
