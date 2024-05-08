@@ -8,9 +8,19 @@ import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
 export default defineVitePlugin((manifest: GeneralManifest) => {
   let dir: string
 
-  manifest.web_accessible_resources ??= []
+  const resources = (manifest.web_accessible_resources ??= [])
 
-  manifest.web_accessible_resources.push({
+  const isMatchAll = resources.some(item => {
+    if (!item.matches.includes('<all_urls>')) {
+      return false
+    }
+
+    item.resources.push('shared/*', 'entries/*')
+
+    return true
+  })
+
+  !isMatchAll && resources.push({
     matches: ['<all_urls>'],
     resources: ['shared/*', 'entries/*']
   })
