@@ -16,7 +16,6 @@ program.command('build')
 .option('-w, --watch', 'Enter watch mode')
 .action(async (options) => {
   const config = await loadAmberConfig()
-  Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   const watch = options.watch ? {} : undefined
   const minify = options.prod || options.minify
