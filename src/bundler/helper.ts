@@ -33,7 +33,7 @@ export const version = (version: string = '1.0.0') => {
 }
 
 export const pick = <
-  Obj extends Record<any, unknown>,
+  const Obj extends Record<any, any>,
   const Keys extends Array<keyof Obj>
 >(obj: Obj, ...keys: Keys) => {
   type PickedKey = typeof keys[number]
