@@ -1,6 +1,5 @@
 import { build, mergeConfig, type UserConfig,defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import { writeManifest } from '~/bundler/VitePlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import defu from "defu";
 import AmberPlugin from '~/bundler/plugins'
