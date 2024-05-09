@@ -57,7 +57,7 @@ const transformPackage = (_pkg: string) => {
 
   pkg.description ??= ''
   pkg.devDependencies ??= {}
-  pkg.devDependencies[PackageName] = PackageVersion
+  pkg.devDependencies[PackageName] = `^${PackageVersion}`
 
   pkg.scripts.dev = 'amber dev'
   pkg.scripts.build = 'amber build --prod'
