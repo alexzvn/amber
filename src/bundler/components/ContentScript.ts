@@ -85,4 +85,12 @@ export default class ContentScript {
       css: css.length ? css: undefined
     }
   }
+
+  static get map() {
+    return this.$registers.reduce((carry, script) => {
+      carry[script.moduleName] = script.file
+
+      return carry
+    }, {} as Record<string, string>)
+  }
 }

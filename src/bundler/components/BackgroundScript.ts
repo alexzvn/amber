@@ -17,4 +17,11 @@ export default class BackgroundScript {
       type: 'module'
     }
   }
+
+  static get map() {
+    return [... this.$registers].reduce((carry, script) => {
+      carry[script.path.name!] = script.file
+      return carry
+    }, {} as Record<string, string>)
+  }
 }

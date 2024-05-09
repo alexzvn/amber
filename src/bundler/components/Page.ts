@@ -20,4 +20,11 @@ export default class Page extends String {
   toString() {
     return this.toJSON()
   }
+
+  static get map() {
+    return [... this.$registers].reduce((carry, page) => {
+      carry[page.path.name!] = page.file
+      return carry
+    }, {} as Record<string, string>)
+  }
 }
