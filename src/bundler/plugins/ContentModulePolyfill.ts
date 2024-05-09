@@ -1,9 +1,9 @@
 import {defineVitePlugin, mkdir} from '~/bundler/helper.ts'
 import type {ViteDevServer} from 'vite'
-import {dirname, join} from 'path'
+import {join} from 'path'
 import ContentScript from '~/bundler/components/ContentScript'
-import ContentScriptIIFE from '~/bundler/client/content-script.iife.js?raw'
-import MagicString from "magic-string"
+import CSPolyfillDev from '~/bundler/client/content-script.iife.dev.js?raw'
+import CSPolyfillProd from '~/bundler/client/content-script.iife.prod.js?raw'
 import fs from "fs/promises"
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
 
@@ -52,7 +52,7 @@ export default defineVitePlugin(() => {
         script: host ? `"${host}${script.file}"` :`"/entries/${script.moduleName}.js"`
       }
 
-      const polyfill = ContentScriptIIFE
+      const polyfill = (host ? CSPolyfillDev : CSPolyfillProd)
         .replace(/__PRE_SCRIPT__/g, fill.prescript)
         .replace(/__SCRIPT__/g, fill.script)
 

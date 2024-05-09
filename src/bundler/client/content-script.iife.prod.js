@@ -1,0 +1,1 @@
+(async () => await import(__SCRIPT__))()

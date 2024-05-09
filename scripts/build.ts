@@ -5,6 +5,7 @@ const scripts = [
   'src/bundler/bundler.ts',
   'src/bundler/cli/index.ts',
   'src/bundler/client/worker.esm.ts',
+  'src/bundler/client/worker-bypass-csp.esm.ts'
 ]
 
 await $`rm -rf dist`

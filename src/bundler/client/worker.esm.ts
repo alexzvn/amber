@@ -1,19 +1,6 @@
 // injected during build process
 declare const __HMR_PORT__: string
 
-// const log = (... args: any) => {
-//   const style = [
-//     'background-color: #e0005a',
-//     'color: #ffffff',
-//     'padding: 4px 6px',
-//     'border-radius: 3px',
-//     'font-weight: bold'
-//   ]
-
-//   console.log('%cAmber 🐰', style.join(';'), ...args)
-// }
-
-
 const extensionOrigin = new URL(chrome.runtime.getURL('/')).origin
 const proxy = async (url: URL) => {
   url.protocol = 'http:'

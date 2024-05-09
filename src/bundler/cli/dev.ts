@@ -1,6 +1,5 @@
 import { mergeConfig, type UserConfig, createServer, build, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import { writeManifest } from '~/bundler/VitePlugin'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import defu from 'defu'
 import ContentScript from '~/bundler/components/ContentScript'
@@ -29,7 +28,7 @@ const start = async () => {
   }
 
   let vite: UserConfig = defineConfig({
-    plugins: [AmberPlugin(config.manifest)],
+    plugins: [AmberPlugin(config.manifest, config.amber)],
     build: {
       sourcemap: false,
       minify: false,
@@ -70,6 +69,8 @@ const start = async () => {
   await dev.listen()
   dev.printUrls()
   dev.bindCLIShortcuts()
+
+  return { config: vite, server: dev, manifest: config.manifest }
 }
 
 program.command('dev')
@@ -77,7 +78,24 @@ program.command('dev')
 .action(async () => {
   program.dev = true
 
-  await start()
+  const { server, config, manifest } = await start()
+
+  server.watcher.on('change', async (file) => {
+    /\.env$/.test(file) && await build(config)
+  })
+
+  server.watcher.on('change', async file => {
+    if (! /amber\.config\.ts/.test(file)) {
+      return
+    }
+
+    const _config = await loadAmberConfig()
+
+    Object.assign(_config.manifest, _config.devManifest)
+    Object.assign(manifest, _config.manifest)
+
+    await build(config)
+  })
 
   await ProcessIcon(cwd, 'dist')
 })

@@ -2,9 +2,10 @@ import { defineVitePlugin } from '~/bundler/helper.ts'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import MagicString from "magic-string";
 import type {ViteDevServer} from "vite";
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
+import {DevServer} from '~/bundler/plugins/BuildEnv.ts'
+import type {AmberOptions} from '~/bundler/configure.ts'
 
-export default  defineVitePlugin(() => {
+export default  defineVitePlugin((amber: AmberOptions = {}) => {
   const get = (id: string) => {
     return [...BackgroundScript.$registers].find(script => {
       return id.endsWith(script.file) || script.file === id || script.file.endsWith(id)
@@ -37,11 +38,14 @@ export default  defineVitePlugin(() => {
       }
 
       if (id.endsWith('/client/worker.esm.js')) {
-        console.warn(id)
+        const magic = new MagicString(code.replace(/__HMR_PORT__/g, port.toString()))
 
-        code = code.replace(/__HMR_PORT__/g, port.toString())
+        amber.bypassCSP && magic.prepend('import "./worker-bypass-csp.esm";\n')
 
-        return { code }
+        return {
+          code: magic.toString(),
+          map: magic.generateMap()
+        }
       }
     }
   }

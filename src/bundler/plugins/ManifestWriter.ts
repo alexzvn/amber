@@ -4,12 +4,10 @@ import {defineVitePlugin, invokeOnce, mkdir} from '~/bundler/helper.ts'
 import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
 import type {ViteDevServer} from "vite";
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
+import type {AmberOptions} from "~/bundler/configure.ts";
 
-export default defineVitePlugin((manifest: GeneralManifest) => {
-  let dir: string
-
+const bindAccessibleResouce = (manifest: GeneralManifest) => {
   const resources = (manifest.web_accessible_resources ??= [])
-
   const isMatchAll = resources.some(item => {
     if (!item.matches.includes('<all_urls>')) {
       return false
@@ -24,6 +22,21 @@ export default defineVitePlugin((manifest: GeneralManifest) => {
     matches: ['<all_urls>'],
     resources: ['shared/*', 'entries/*']
   })
+}
+
+const bindBypassSCP = (manifest: GeneralManifest) => {
+  const perms = new Set(manifest.permissions || [])
+
+  perms.add('declarativeNetRequest')
+
+  manifest.permissions = [...perms]
+}
+
+export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
+  let dir: string
+
+  bindAccessibleResouce(manifest)
+  amber.bypassCSP && bindBypassSCP(manifest)
 
   const writeManifest = async (outdir?: string) => {
     const location = outdir ?? dir ?? 'dist'
