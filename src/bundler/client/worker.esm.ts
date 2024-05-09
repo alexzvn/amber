@@ -24,7 +24,13 @@ type UpdateEvent = {
   }>
 }
 
-type HMR = FullReloadEvent | UpdateEvent
+type CustomEvent = {
+  type: 'custom'
+  event?: 'amber:background.reload' | (string & {}),
+  data?: unknown
+}
+
+type HMR = FullReloadEvent | UpdateEvent | CustomEvent
 
 const extensionOrigin = new URL(chrome.runtime.getURL('/')).origin
 const proxy = async (url: URL) => {
@@ -50,27 +56,38 @@ self.addEventListener('fetch', (event: any) => {
   }
 })
 
-let socket = new WebSocket(`ws://localhost:${port}`, 'vite-hmr')
+const target = new EventTarget()
+let shouldReload = false
 
-socket.addEventListener('open', () => {
-  console.log('[Amber] dev server connected')
+target.addEventListener('connect', () => {
+  let socket: WebSocket|undefined = new WebSocket(`ws://localhost:${port}`, 'vite-hmr')
 
-  const timer = setInterval(() => {
-    socket ? socket.send('keepalive') : clearInterval(timer)
-  }, 10 * 1000)
+  socket.addEventListener('open', () => {
+    console.log('[Amber] dev server connected')
 
-  // Trigger watch event for background file
-  background && fetch(new URL(background, `http://localhost:${port}`))
+    shouldReload && chrome.runtime.reload()
+
+    const timer = setInterval(() => {
+      socket ? socket.send('keepalive') : clearInterval(timer)
+    }, 10 * 1000)
+
+    // Trigger watch event for background file
+    background && fetch(new URL(background, `http://localhost:${port}`))
+  })
+
+  socket.addEventListener('message', (event) => {
+    const data = JSON.parse(event.data) as HMR
+
+    if (data.type === 'custom' && data.event === 'amber:background.reload') {
+      chrome.runtime.reload()
+    }
+  })
+
+  socket.addEventListener('close', () => {
+    socket = undefined
+    shouldReload = true
+    setTimeout(() => target.dispatchEvent(new Event('connect')), 3_000)
+  })
 })
 
-socket.addEventListener('message', (event) => {
-  const data = JSON.parse(event.data) as HMR
-
-  if (data.type !== 'full-reload') {
-    return
-  }
-
-  if (background && data.triggeredBy.endsWith(background)) {
-    chrome.runtime.reload()
-  }
-})
+target.dispatchEvent(new Event('connect'))

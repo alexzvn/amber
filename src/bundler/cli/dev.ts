@@ -7,25 +7,18 @@ import Page from '~/bundler/components/Page'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import AmberPlugin from '~/bundler/plugins'
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
+import { pick } from '~/bundler/helper'
 
 
 const start = async () => {
   const config = await loadAmberConfig()
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
-  const inputs = {} as Record<string, string>
-
-  for (const script of ContentScript.$registers) {
-    inputs[script.moduleName] = script.file
-  }
-
-  for (const page of Page.$registers) {
-    inputs[page.path.name!] = page.file
-  }
-
-  for (const script of BackgroundScript.$registers) {
-    inputs[script.path.name!] = script.file
-  }
+  const inputs = {
+    ...ContentScript.map,
+    ...BackgroundScript.map,
+    ...Page.map,
+  } as Record<string, string>
 
   let vite: UserConfig = defineConfig({
     plugins: [AmberPlugin(config.manifest, config.amber)],
@@ -63,8 +56,21 @@ const start = async () => {
 
   const dev = await createServer({ ...vite, configFile: false })
 
+  
   DevServer.value = dev
   await build(vite)
+  await build({
+    ...pick(vite, 'plugins'),
+    build: {
+      ...pick(vite.build!, 'sourcemap', 'minify', 'emptyOutDir'),
+      watch: {},
+      rollupOptions: {
+        input: BackgroundScript.map,
+        output: vite.build!.rollupOptions!.output
+      }
+    }
+  })
+
 
   await dev.listen()
   dev.printUrls()

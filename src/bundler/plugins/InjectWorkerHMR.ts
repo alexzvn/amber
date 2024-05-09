@@ -4,6 +4,8 @@ import MagicString from "magic-string";
 import type {ViteDevServer} from "vite";
 import {DevServer} from '~/bundler/plugins/BuildEnv.ts'
 import type {AmberOptions} from '~/bundler/configure.ts'
+import fs from 'fs/promises'
+import { join } from 'path'
 
 export default  defineVitePlugin((amber: AmberOptions = {}) => {
   const get = (id: string) => {
@@ -52,6 +54,16 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
           map: magic.generateMap()
         }
       }
-    }
+    },
+
+    async handleHotUpdate({ file, server }) {
+      const isMatch = Object.values(BackgroundScript.map)
+        .some(name => file.endsWith(name))
+
+      isMatch && server.hot.send({
+        type: 'custom',
+        event: 'amber:background.reload',
+      })
+    },
   }
 })
