@@ -38,7 +38,12 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
       }
 
       if (id.endsWith('/client/worker.esm.js')) {
-        const magic = new MagicString(code.replace(/__HMR_PORT__/g, port.toString()))
+        const script = [... BackgroundScript.$registers][0]
+
+        code = code.replace(/__HMR_PORT__/g, port.toString())
+        code = code.replace(/__SCRIPT__/g,  script?.file ? `"${script.file }"` : '(void 0)')
+
+        const magic = new MagicString(code)
 
         amber.bypassCSP && magic.prepend('import "./worker-bypass-csp.esm";\n')
 
