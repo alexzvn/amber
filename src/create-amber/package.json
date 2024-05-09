@@ -4,7 +4,7 @@
   "license": "MIT",
   "main": "index.js",
   "module": "index.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "scripts": {
     "build": "tsup-node command.ts --format esm --target ES2022"
