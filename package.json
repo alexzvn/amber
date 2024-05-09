@@ -1,6 +1,8 @@
 {
   "name": "@alexzvn/amber",
   "version": "0.3.1",
+  "author": "Alexzvn",
+  "license": "MIT",
   "module": "index.ts",
   "type": "module",
   "main": "dist/index.js",
@@ -46,10 +48,9 @@
     "chrome-extension",
     "tool"
   ],
-  "author": "Alexzvn",
-  "license": "MIT",
+  
+  "homepage": "https://github.com/alexzvn/amber#readme",
   "bugs": {
     "url": "https://github.com/alexzvn/amber/issues"
-  },
-  "homepage": "https://github.com/alexzvn/amber#readme"
+  }
 }
