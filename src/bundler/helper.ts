@@ -1,4 +1,4 @@
-import { mkdir as MakeDirectory } from 'fs/promises'
+import { mkdir as MakeDirectory, access } from 'fs/promises'
 import type { GenericFunc, Prettify } from './type'
 import type {PluginOption} from 'vite'
 
@@ -7,6 +7,17 @@ export const mkdir = async (path: string) => {
     return await MakeDirectory(path, { recursive: true })
   } catch {
     // shhhh
+  }
+}
+
+/**
+ * Check if given path is existed (file/folder)
+ */
+export const exists = async (path: string) => {
+  try {
+    return await access(path).then(() => true)
+  } catch {
+    return false
   }
 }
 
