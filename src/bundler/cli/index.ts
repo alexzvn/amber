@@ -7,5 +7,6 @@ import './dev'
 import './build'
 import './archive'
 import './clean'
+import './create'
 
 program.parse()

@@ -1,0 +1,32 @@
+import pkg from './package.json'
+import {
+  defineConfig,
+  ContentScript,
+  Page,
+  BackgroundScript,
+  version,
+  Icons
+} from '@alexzvn/amber/bundler'
+
+export default defineConfig({
+  manifest: {
+    manifest_version: 3,
+    version: version(pkg.version).short,
+    version_name: pkg.version,
+
+    name: pkg.name,
+    description: pkg.description,
+    icons: new Icons('public/vite.svg'),
+    action: {
+      default_popup: new Page('index.html')
+    },
+    content_scripts: [
+      new ContentScript(__CONTENT_SCRIPT__, {
+        matches: ['<all_urls>'],
+      }),
+    ],
+
+    background: new BackgroundScript(__BACKGROUND_SCRIPT__),
+  },
+  __VITE__
+})

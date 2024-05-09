@@ -5,6 +5,7 @@ import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
 import type {ViteDevServer} from "vite";
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
 import type {AmberOptions} from "~/bundler/configure.ts";
+import BackgroundScript from '~/bundler/components/BackgroundScript'
 
 const bindAccessibleResouce = (manifest: GeneralManifest) => {
   const resources = (manifest.web_accessible_resources ??= [])
@@ -30,6 +31,14 @@ const bindBypassSCP = (manifest: GeneralManifest) => {
   perms.add('declarativeNetRequest')
 
   manifest.permissions = [...perms]
+}
+
+const injectBackgroundWorker = (manifest: GeneralManifest) => {
+  if (manifest.background) {
+    return
+  }
+
+  manifest.background = new BackgroundScript('@alexzvn/amber/client/worker.esm')
 }
 
 export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
@@ -59,12 +68,15 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
       matches: ['<all_urls>'],
       resources: ['/*']
     })
+
+    injectBackgroundWorker(manifest)
   })
 
   return {
     name: 'amber:manifest-writer',
     writeManifest,
     configureServer,
+
 
     writeBundle: () => {
       DevServer.value && configureServer(DevServer.value)
