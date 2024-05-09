@@ -6,8 +6,9 @@ program.command('clean')
   .description('Clean output folder')
   .action(async () => {
     try {
-      await fs.access(join(cwd, 'amber.comfig.ts'))
-    } catch {
+      await fs.access(join(cwd, 'amber.config.ts'))
+        .catch(() => fs.access(join(cwd, 'amber.config.js')))
+    } catch (e) {
       console.error('Amber config not found')
       process.exit(1)
     }
