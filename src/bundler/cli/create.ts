@@ -1,4 +1,4 @@
-import program, { cwd } from './program'
+import { cwd } from './program'
 import fs from 'fs/promises'
 import { join } from 'path'
 import { spawn } from 'node:child_process'
@@ -67,9 +67,7 @@ const transformPackage = (_pkg: string) => {
   return pkg
 }
 
-program.command('create <project-name>')
-.description('Create extension project power by Vite')
-.action(async (folder: string) => {
+export const create = async (folder: string) => {
   if (await exists(folder)) {
     console.log(`Folder ${folder} already existed`)
     process.exit(1)
@@ -101,4 +99,4 @@ program.command('create <project-name>')
     .then(data => fs.writeFile(packagePath, data))
 
   await transform(env)
-})
+}
