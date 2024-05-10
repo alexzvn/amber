@@ -60,13 +60,13 @@ const start = async () => {
   DevServer.value = dev
   await build(vite)
   await build({
-    ...pick(vite, 'plugins'),
+    ...vite,
     build: {
-      ...pick(vite.build!, 'sourcemap', 'minify', 'emptyOutDir'),
+      ...vite.build,
       watch: {},
       rollupOptions: {
+        ... vite.build!.rollupOptions,
         input: BackgroundScript.map,
-        output: vite.build!.rollupOptions!.output
       }
     }
   })
