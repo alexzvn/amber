@@ -83,6 +83,7 @@ program.command('dev')
 .description('Start process to develop browser extension')
 .action(async () => {
   program.dev = true
+  process.env.NODE_ENV ??= 'development'
 
   const { server, config, manifest } = await start()
 
