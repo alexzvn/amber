@@ -67,7 +67,8 @@ const start = async () => {
         ... vite.build!.rollupOptions,
         input: BackgroundScript.map,
       }
-    }
+    },
+    logLevel: 'silent'
   })
 
 

@@ -56,14 +56,36 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
       }
     },
 
-    async handleHotUpdate({ file, server }) {
-      const isMatch = Object.values(BackgroundScript.map)
-        .some(name => file.endsWith(name))
+    async handleHotUpdate({ file, server, modules }) {
+      type Modules = typeof modules
+
+      const scripts = Object.values(BackgroundScript.map)
+      const has = (id: string) => scripts.some(name => id.endsWith(name))
+
+      const checkWorkerDeps = (modules: Modules): boolean => {
+        for (const mod of modules) {
+          if (has(mod.file || mod.id || mod.url)) {
+            return true
+          }
+
+          return checkWorkerDeps([... mod.importers])
+        }
+
+        return false
+      }
+
+      const isMatch = has(file) || checkWorkerDeps(modules)
 
       isMatch && server.hot.send({
         type: 'custom',
         event: 'amber:background.reload',
       })
+
+      setTimeout(() => {
+        isMatch && server.config.logger.info('Reloaded Browser extension', {
+          timestamp: true
+        })
+      }, 5_00)
     },
   }
 })
