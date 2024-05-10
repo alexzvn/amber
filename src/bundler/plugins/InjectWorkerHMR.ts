@@ -1,9 +1,10 @@
 import { defineVitePlugin } from '~/bundler/helper.ts'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import MagicString from "magic-string";
-import type {ViteDevServer} from "vite";
+import type {ViteDevServer} from 'vite'
 import {DevServer} from '~/bundler/plugins/BuildEnv.ts'
 import type {AmberOptions} from '~/bundler/configure.ts'
+import LoaderScript from '~/bundler/client/__loader?raw'
 import fs from 'fs/promises'
 import { join } from 'path'
 
@@ -15,6 +16,7 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
   }
 
   let port = 5173
+  let loader = '/entries/__loader.js'
   let server: ViteDevServer|undefined
 
   return {
@@ -27,6 +29,11 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
     configureServer(srv) {
       port = srv.config.server.port || 5173
       server = srv
+    },
+
+    writeBundle() {
+      const loaderPath = join(server?.config.build.outDir || 'dist', loader)
+      fs.writeFile(loaderPath, LoaderScript)
     },
 
     transform(code, id) {
@@ -42,8 +49,11 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
       if (id.endsWith('/client/worker.esm.js')) {
         const script = [... BackgroundScript.$registers][0]
 
-        code = code.replace(/__HMR_PORT__/g, port.toString())
-        code = code.replace(/__SCRIPT__/g,  script?.file ? `"${script.file }"` : '(void 0)')
+        code = code
+          .replace(/__HMR_PORT__/g, port.toString())
+          .replace(/__SCRIPT__/g,  script?.file ? `"${script.file}"` : '(void 0)')
+          .replace(/VITE_URL/g, `http://localhost:${port}`)
+          .replace(/LOADER_SCRIPT/g, loader)
 
         const magic = new MagicString(code)
 

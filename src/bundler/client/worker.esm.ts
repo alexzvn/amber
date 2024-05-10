@@ -1,3 +1,5 @@
+import LoadingPage from './loading.html?raw'
+
 // injected during build process
 declare const __HMR_PORT__: number
 declare const __SCRIPT__: string|undefined
@@ -39,7 +41,23 @@ const proxy = async (url: URL) => {
   url.port = port + ''
 
   url.searchParams.set('t', Date.now().toString())
-  const res = await fetch(url.href.replace(/=$|=(?=&)/g, ''))
+  const res = await fetch(url.href.replace(/=$|=(?=&)/g, '')).catch(() => undefined)
+
+  if (url.pathname.endsWith('.html') && !res) {
+    return new Response(LoadingPage, {
+      headers: { 'Content-Type': 'text/html' }
+    })
+  }
+
+  if (!res) {
+    const response = await fetch(chrome.runtime.getURL(url.pathname))
+
+    return new Response(response.body, {
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') ?? 'text/javascript'
+      }
+    })
+  }
 
   return new Response(res.body, {
     headers: {
@@ -59,7 +77,17 @@ self.addEventListener('fetch', (event: any) => {
 const target = new EventTarget()
 let shouldReload = false
 
-target.addEventListener('connect', () => {
+target.addEventListener('connect', async () => {
+  const reconnect = () => {
+    setTimeout(() => target.dispatchEvent(new Event('connect')), 3000)
+  }
+
+  const ok = await fetch('http://localhost:' + port).catch(reconnect)
+
+  if (!ok) {
+    return
+  }
+
   let socket: WebSocket|undefined = new WebSocket(`ws://localhost:${port}`, 'vite-hmr')
 
   socket.addEventListener('open', () => {
@@ -83,10 +111,15 @@ target.addEventListener('connect', () => {
     }
   })
 
+  socket.addEventListener('error', () => {
+    console.log('[amber] Lost connection to dev server')
+    socket?.close()
+  })
+
   socket.addEventListener('close', () => {
     socket = undefined
     shouldReload = true
-    setTimeout(() => target.dispatchEvent(new Event('connect')), 3_000)
+    target.dispatchEvent(new Event('connect'))
   })
 })
 
