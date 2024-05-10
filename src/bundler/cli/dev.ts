@@ -6,8 +6,7 @@ import ContentScript from '~/bundler/components/ContentScript'
 import Page from '~/bundler/components/Page'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import AmberPlugin from '~/bundler/plugins'
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
-import { pick } from '~/bundler/helper'
+import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
 
 
 const start = async () => {
