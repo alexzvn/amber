@@ -5,7 +5,7 @@ export default class BackgroundScript {
 
   public readonly path: ReturnType<typeof pathDiscover>
 
-  constructor(public readonly file: string) {
+  constructor(public file: string) {
     this.path = pathDiscover(file)
 
     BackgroundScript.$registers.add(this)

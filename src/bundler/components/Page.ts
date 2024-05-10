@@ -5,7 +5,7 @@ export default class Page extends String {
   public readonly path: ReturnType<typeof pathDiscover>
 
   constructor(
-    public readonly file: string,
+    public file: string,
     public readonly target?: string
   ) {
     super()

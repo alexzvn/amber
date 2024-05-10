@@ -40,7 +40,7 @@ export default class ContentScript {
   public readonly matches: string[]
 
   constructor(
-    public readonly file: string,
+    public file: string,
     options: Partial<Option> & { matches: Matches }
   ) {
     options.assetDir ??= 'assets'
