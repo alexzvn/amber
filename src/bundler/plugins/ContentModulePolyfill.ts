@@ -80,8 +80,8 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       const saveDir = join(outdir, 'scripts')
       await mkdir(saveDir)
 
-      for (const file in bundle) {
-        const script = ContentScript.$registers.find(script => file.endsWith(`/entries/${script.moduleName}.js`))
+      Object.keys(bundle).map(async file => {
+        const script = ContentScript.$registers.find(script => file.endsWith(`entries/${script.moduleName}.js`))
 
         if (! script) {
           return
@@ -89,7 +89,8 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
 
         const code = CSPolyfillProd.replace(/__SCRIPT__/g, `"/entries/${script.moduleName}.js"`)
         await fs.writeFile(join(saveDir, script.path.name + '.js'), code)
-      }
+      })
+
     },
 
     writeBundle(opt, bundles) {

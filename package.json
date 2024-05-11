@@ -20,6 +20,7 @@
     "defu": "^6.1.4",
     "dotenv": "^16.4.5",
     "magic-string": "^0.30.10",
+    "node-html-parser": "^6.1.13",
     "sharp": "^0.33.3",
     "tsx": "^4.9.0",
     "vite": "^5.2.11"
@@ -48,7 +49,6 @@
     "chrome-extension",
     "tool"
   ],
-  
   "homepage": "https://github.com/alexzvn/amber#readme",
   "bugs": {
     "url": "https://github.com/alexzvn/amber/issues"

@@ -41,7 +41,9 @@ const proxy = async (url: URL) => {
   url.port = port + ''
 
   url.searchParams.set('t', Date.now().toString())
-  const res = await fetch(url.href.replace(/=$|=(?=&)/g, '')).catch(() => undefined)
+  const res = await fetch(url.href.replace(/=$|=(?=&)/g, ''), {
+    headers: { Referer: chrome.runtime.getURL('/') }
+  }).catch(() => undefined)
 
   if (url.pathname.endsWith('.html') && !res) {
     return new Response(LoadingPage, {
@@ -49,7 +51,7 @@ const proxy = async (url: URL) => {
     })
   }
 
-  if (!res) {
+  if (!res || !res.ok) {
     const response = await fetch(chrome.runtime.getURL(url.pathname))
 
     return new Response(response.body, {
