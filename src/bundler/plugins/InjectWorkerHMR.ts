@@ -77,8 +77,6 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
           if (has(mod.file || mod.id || mod.url)) {
             return true
           }
-
-          return checkWorkerDeps([... mod.importers])
         }
 
         return false
