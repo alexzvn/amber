@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "up": "bun scripts/build.ts",
+    "prepublish": "bun scripts/build.ts",
     "publish": "cd dist && npm publish --access public"
   },
   "bin": {
