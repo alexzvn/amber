@@ -10,6 +10,6 @@ export default (manifest: GeneralManifest, amber: AmberOptions = {}) => [
   ResolveAlias(),
   InjectClientHMR(),
   InjectWorkerHMR(amber),
-  ContentModulePolyfill(),
+  ContentModulePolyfill(amber),
   ManifestWriter(manifest, amber),
 ]

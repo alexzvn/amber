@@ -28,7 +28,7 @@ type UpdateEvent = {
 
 type CustomEvent = {
   type: 'custom'
-  event?: 'amber:background.reload' | (string & {}),
+  event?: 'amber:background.reload' | 'amber:page.reload' | (string & {}),
   data?: unknown
 }
 
@@ -77,6 +77,10 @@ self.addEventListener('fetch', (event: any) => {
 const target = new EventTarget()
 let shouldReload = false
 
+const reloadCurrentTab = () => chrome.tabs.query({ active: true }, ([tab]) => {
+  tab && tab.id && chrome.tabs.reload(tab.id)
+})
+
 target.addEventListener('connect', async () => {
   const reconnect = () => {
     setTimeout(() => target.dispatchEvent(new Event('connect')), 3000)
@@ -106,9 +110,21 @@ target.addEventListener('connect', async () => {
   socket.addEventListener('message', (event) => {
     const data = JSON.parse(event.data) as HMR
 
-    if (data.type === 'custom' && data.event === 'amber:background.reload') {
+    if (data.type !== 'custom') {
+      return
+    }
+
+    if (data.event === 'amber:background.reload') {
       chrome.runtime.reload()
     }
+
+    if (data.event === 'amber:page.reload') {
+      reloadCurrentTab()
+    }
+  })
+
+  chrome.tabs.query({ active: true }, ([tab]) => {
+    tab.id
   })
 
   socket.addEventListener('error', () => {

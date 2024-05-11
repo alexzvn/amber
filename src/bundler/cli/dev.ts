@@ -76,11 +76,18 @@ const start = async () => {
     customShortcuts: [
       {
         key: 'e',
-        description: 'Reload browser extension',
+        description: 'reload browser extension',
         action(server) {
           server.hot.send({ type: 'custom', event: 'amber:background.reload' })
           server.config.logger.info('Reload browser extension message was sent', { timestamp: true })
         },
+      }, {
+        key: 'p',
+        description: 'reload current active tab',
+        action(server) {
+          server.hot.send({ type: 'custom', event: 'amber:page.reload' })
+          server.config.logger.info('Reload browser extension message was sent', { timestamp: true })
+        }
       }
     ],
   })

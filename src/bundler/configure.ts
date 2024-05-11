@@ -12,6 +12,15 @@ export type AmberConfig = {
    * @default false
    */
   bypassCSP: boolean
+
+  /**
+   * Enable full reload a page with content script in HMR mode
+   * If you don't want full reload by content script just
+   * set it to false
+   * 
+   * @default true
+   */
+  autoReloadPage: boolean
 }
 
 export type AmberOptions = Partial<AmberConfig>

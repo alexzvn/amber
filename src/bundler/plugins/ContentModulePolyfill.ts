@@ -6,23 +6,13 @@ import ContentScript from '~/bundler/components/ContentScript'
 import CSPolyfillDev from '~/bundler/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/bundler/client/content-script.iife.prod.js?raw'
 import fs from "fs/promises"
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
+import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
+import type { AmberOptions } from '../configure'
 
 
-export default defineVitePlugin(() => {
+export default defineVitePlugin((amber: AmberOptions = {}) => {
   let outdir = 'dist'
   let server: ViteDevServer|undefined
-
-  const get = (id: string) => {
-    for (const script of ContentScript.$registers) {
-      if (id.endsWith(script.file)) {
-        return script
-      }
-    }
-
-    return undefined
-  }
-
 
   return [{
     name: 'amber:content-module-polyfill',
@@ -46,9 +36,11 @@ export default defineVitePlugin(() => {
       const host = `http://localhost:${server.config.server.port}/`
 
       for (const script of ContentScript.$registers) {
+        const enableReload = amber.autoReloadPage ?? false
         const code = CSPolyfillDev
           .replace(/__PRE_SCRIPT__/g, `"${host}@vite/client"`)
           .replace(/__SCRIPT__/g, `"${host}${script.file}"`)
+          .replace(/__ALLOW_FULL_RELOAD__/g, enableReload.toString())
 
         await fs.writeFile(join(outdir, 'scripts', script.path.name + '.js'), code)
       }
@@ -58,6 +50,30 @@ export default defineVitePlugin(() => {
         await mkdir(saveDir)
         await fs.writeFile(join(saveDir, page.path.filename!), 'This content is ignored during development')
       }
+    },
+
+    transform(_code, id) {
+      if (!id.includes('/vite/dist/client/client')) {
+        return
+      }
+
+      const lines = _code.split('\n')
+      const reloadLine = lines.findIndex((line) => line.includes(`case 'full-reload':`))
+      const [space] = lines[reloadLine + 1].match(/^\s+/)!
+
+      const inject = [
+        space + `if ('_AMBER_ALLOW_RELOAD' in window && window['_AMBER_ALLOW_RELOAD'] !== true) {`,
+        space + `    break;`,
+        space + `}`,
+      ]
+
+      const injected = [
+        ... lines.slice(0, reloadLine + 1),
+        ... inject,
+        ... lines.slice(reloadLine + 1)
+      ]
+
+      return { code: injected.join('\n') }
     },
 
     async generateBundle(_options, bundle) {
