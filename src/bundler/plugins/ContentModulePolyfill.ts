@@ -1,6 +1,7 @@
 import {defineVitePlugin, mkdir} from '~/bundler/helper.ts'
 import type {ViteDevServer} from 'vite'
-import {join} from 'path'
+import {join, dirname} from 'path'
+import Page from '~/bundler/components/Page'
 import ContentScript from '~/bundler/components/ContentScript'
 import CSPolyfillDev from '~/bundler/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/bundler/client/content-script.iife.prod.js?raw'
@@ -34,34 +35,45 @@ export default defineVitePlugin(() => {
       server = _server 
     },
 
-    buildStart() {
+    async buildStart() {
       server ??= DevServer.value
-    },
 
-    async transform(code, id) {
-      const script = get(id)
-
-      if (! script) {
+      if (! server) {
         return
       }
 
-      const host = server ? `http://localhost:${server.config.server.port}/` : ''
+      await mkdir(join(outdir, 'scripts'))
+      const host = `http://localhost:${server.config.server.port}/`
 
-      const fill = {
-        prescript: host ? `"${host}@vite/client"` : '(void 0)',
-        script: host ? `"${host}${script.file}"` :`"/entries/${script.moduleName}.js"`
+      for (const script of ContentScript.$registers) {
+        const code = CSPolyfillDev
+          .replace(/__PRE_SCRIPT__/g, `"${host}@vite/client"`)
+          .replace(/__SCRIPT__/g, `"${host}${script.file}"`)
+
+        await fs.writeFile(join(outdir, 'scripts', script.path.name + '.js'), code)
       }
 
-      const polyfill = (host ? CSPolyfillDev : CSPolyfillProd)
-        .replace(/__PRE_SCRIPT__/g, fill.prescript)
-        .replace(/__SCRIPT__/g, fill.script)
+      for (const page of Page.$registers) {
+        const saveDir = join(outdir, dirname(page.toString()))
+        await mkdir(saveDir)
+        await fs.writeFile(join(saveDir, page.path.filename!), 'This content is ignored during development')
+      }
+    },
 
+    async generateBundle(_options, bundle) {
       const saveDir = join(outdir, 'scripts')
       await mkdir(saveDir)
 
-      await fs.writeFile(join(saveDir, script.path.name + '.js'), polyfill)
+      for (const file in bundle) {
+        const script = ContentScript.$registers.find(script => file.endsWith(`/entries/${script.moduleName}.js`))
 
-      return { code }
+        if (! script) {
+          return
+        }
+
+        const code = CSPolyfillProd.replace(/__SCRIPT__/g, `"/entries/${script.moduleName}.js"`)
+        await fs.writeFile(join(saveDir, script.path.name + '.js'), code)
+      }
     },
 
     writeBundle(opt, bundles) {
@@ -75,7 +87,6 @@ export default defineVitePlugin(() => {
         script.options.css ??= []
         script.options.css.push(...bundle!.viteMetadata.importedCss)
       }
-
     }
   }]
 })

@@ -55,9 +55,7 @@ const start = async () => {
 
   const dev = await createServer({ ...vite, configFile: false })
 
-  
   DevServer.value = dev
-  await build(vite)
   await build({
     ...vite,
     build: {
@@ -71,10 +69,21 @@ const start = async () => {
     logLevel: 'silent'
   })
 
-
   await dev.listen()
   dev.printUrls()
-  dev.bindCLIShortcuts()
+  dev.bindCLIShortcuts({
+    print: true,
+    customShortcuts: [
+      {
+        key: 'e',
+        description: 'Reload browser extension',
+        action(server) {
+          server.hot.send({ type: 'custom', event: 'amber:background.reload' })
+          server.config.logger.info('Reload browser extension message was sent', { timestamp: true })
+        },
+      }
+    ],
+  })
 
   return { config: vite, server: dev, manifest: config.manifest }
 }
