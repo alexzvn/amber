@@ -1,6 +1,6 @@
 {
   "name": "@alexzvn/amber",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "author": "Alexzvn",
   "license": "MIT",
   "module": "index.ts",
@@ -8,8 +8,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepublish": "bun scripts/build.ts",
-    "publish": "cd dist && npm publish --access public"
+    "up": "bun scripts/build.ts",
+    "stream": "cd dist && npm publish --access public"
   },
   "bin": {
     "amber": "dist/cli.js"
