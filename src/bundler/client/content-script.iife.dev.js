@@ -24,8 +24,7 @@ window._AMBER_ALLOW_RELOAD = __ALLOW_FULL_RELOAD__;
   try {
     typeof pre !== 'undefined' && await import(pre)
     await import(script)
-  } catch {
-    info('Content script may not work due because strict site CSP.')
-    info('You may want to enable `amber.bypassCSP` to `true` in amber.config.ts')
+  } catch (error) {
+    console.error(error)
   }
 })()
