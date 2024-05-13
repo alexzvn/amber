@@ -43,6 +43,11 @@ const start = async () => {
       },
       watch: {
         ignored: ['**/dist/**']
+      },
+      warmup: {
+        clientFiles: [
+          ...ContentScript.$registers.map(script => script.file)
+        ]
       }
     }
   })
