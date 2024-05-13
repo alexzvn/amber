@@ -31,9 +31,11 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
       server = srv
     },
 
-    writeBundle() {
-      const loaderPath = join(server?.config.build.outDir || 'dist', loader)
-      fs.writeFile(loaderPath, LoaderScript)
+    async writeBundle() {
+      if (server) {
+        const loaderPath = join(server?.config.build.outDir || 'dist', loader)
+        await fs.writeFile(loaderPath, LoaderScript)
+      }
     },
 
     transform(code, id) {
