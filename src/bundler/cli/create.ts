@@ -59,8 +59,11 @@ const transformPackage = (_pkg: string) => {
   pkg.devDependencies ??= {}
   pkg.devDependencies[PackageName] = `^${PackageVersion}`
 
-  pkg.scripts.dev = 'amber dev'
-  pkg.scripts.build = 'amber build --prod'
+  Object.assign(pkg.scripts, {
+    clean: 'amber clean',
+    dev: 'amber dev',
+    build: 'amber build --prod'
+  })
 
   delete pkg.scripts.preview
 
