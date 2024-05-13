@@ -14,7 +14,7 @@ const bindAccessibleResouce = (manifest: GeneralManifest) => {
       return false
     }
 
-    item.resources.push('shared/*', 'entries/*')
+    item.resources.push('shared/*', 'scripts/*')
 
     return true
   })
