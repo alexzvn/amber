@@ -55,7 +55,7 @@ const transform = async (env: Awaited<ReturnType<typeof getDevelopEnv>>) => {
 const transformPackage = (_pkg: string) => {
   const pkg = JSON.parse(_pkg)
 
-  pkg.description ??= ''
+  pkg.description ??= 'A browser extension built with Vite + Amber'
   pkg.devDependencies ??= {}
   pkg.devDependencies[PackageName] = `^${PackageVersion}`
 
