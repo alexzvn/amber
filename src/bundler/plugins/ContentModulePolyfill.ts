@@ -110,7 +110,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
 
     writeBundle(opt, bundles) {
       for (const script of ContentScript.$registers) {
-        const bundle = bundles['entries/' + script.moduleName + '.js'] as any
+        const bundle = bundles[`scripts/_${script.moduleName}.js`] as any
 
         if (!bundle || !bundle.viteMetadata) {
           return
