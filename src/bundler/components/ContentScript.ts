@@ -30,7 +30,7 @@ type Option = NonNullable<Unpacked<ChromeBrowserManifest['content_scripts']>> & 
   scriptDir: string
 }
 
-export default class ContentScript {
+export default class  ContentScript {
   static readonly $registers: ContentScript[] = []
 
   public readonly path: ReturnType<typeof pathDiscover>
@@ -54,7 +54,7 @@ export default class ContentScript {
   }
 
   get moduleName() {
-    return `cs-${this.path.name}`
+    return `${this.path.name}`
   }
 
   toJSON() {

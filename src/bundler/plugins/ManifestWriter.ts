@@ -21,7 +21,7 @@ const bindAccessibleResouce = (manifest: GeneralManifest) => {
 
   !isMatchAll && resources.push({
     matches: ['<all_urls>'],
-    resources: ['shared/*', 'entries/*']
+    resources: ['shared/*', 'scripts/*']
   })
 }
 

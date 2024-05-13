@@ -17,6 +17,22 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
   return [{
     name: 'amber:content-module-polyfill',
 
+    config(cfg) {
+      cfg.build ??= {}
+      cfg.build.rollupOptions ??= {}
+      cfg.build.rollupOptions.output ??= {}
+
+      const output = Array.isArray(cfg.build.rollupOptions.output)
+        ? cfg.build.rollupOptions.output[0]
+        : cfg.build.rollupOptions.output
+
+      output.entryFileNames = (chunk) => {
+        const script = ContentScript.$registers.find(script => chunk.facadeModuleId?.endsWith(script.file))
+
+        return script ? 'scripts/_[name].js' : 'entries/[name].js'
+      }
+    },
+
     configResolved(cfg) {
       outdir = cfg.build.outDir
     },
@@ -81,16 +97,15 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       await mkdir(saveDir)
 
       Object.keys(bundle).map(async file => {
-        const script = ContentScript.$registers.find(script => file.endsWith(`entries/${script.moduleName}.js`))
+        const script = ContentScript.$registers.find(script => file.endsWith(`scripts/_${script.moduleName}.js`))
 
         if (! script) {
           return
         }
 
-        const code = CSPolyfillProd.replace(/__SCRIPT__/g, `"/entries/${script.moduleName}.js"`)
+        const code = CSPolyfillProd.replace(/__SCRIPT__/g, `"/scripts/_${script.moduleName}.js"`)
         await fs.writeFile(join(saveDir, script.path.name + '.js'), code)
       })
-
     },
 
     writeBundle(opt, bundles) {
