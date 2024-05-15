@@ -5,8 +5,8 @@
   "license": "MIT",
   "module": "index.ts",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/amber/index.js",
+  "types": "dist/amber/index.d.ts",
   "scripts": {
     "up": "bun scripts/build.ts",
     "stream": "cd dist && npm publish --access public"
@@ -20,6 +20,7 @@
     "defu": "^6.1.4",
     "dotenv": "^16.4.5",
     "magic-string": "^0.30.10",
+    "mitt": "^3.0.1",
     "node-html-parser": "^6.1.13",
     "sharp": "^0.33.3",
     "tsx": "^4.9.0",

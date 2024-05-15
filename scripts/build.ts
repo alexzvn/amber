@@ -5,14 +5,15 @@ const scripts = [
   'src/bundler/bundler.ts',
   'src/bundler/cli/index.ts',
   'src/bundler/client/worker.esm.ts',
-  'src/bundler/client/worker-bypass-csp.esm.ts'
+  'src/bundler/client/worker-bypass-csp.esm.ts',
+  'src/amber/index.ts'
 ]
 
 await $`rm -rf dist`
 
-pkg.types = 'bundler.d.ts'
-pkg.main = 'bundler.js'
-pkg.bin = { amber: 'cli/index.js' }
+pkg.types = 'amber/index.d.ts'
+pkg.main = 'amber/index.js'
+pkg.bin = { amber: 'bundler/cli/index.js' }
 
 Bun.write(Bun.file('dist/package.json'), JSON.stringify(pkg, null, 2))
 
