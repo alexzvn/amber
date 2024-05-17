@@ -1,19 +1,26 @@
+import { safeAsyncCall } from '~/amber/misc/Misc'
 import type { AcceptMode, EventKey, HandlerFunc, MessagingPayload, StreamHandlerFunc } from './MessageMisc'
 import { isPayload, MessagingError } from './MessageMisc'
 
-export const registerEvent = (mode: AcceptMode, map: Map<EventKey, HandlerFunc>) => {
+export const registerEvent = (mode: AcceptMode, map: Map<EventKey, HandlerFunc[]>) => {
   chrome.runtime.onMessage.addListener((msg, sender) => {
     if (! isPayload(msg)) {
       return
     }
 
-    const handler = map.get(msg.name)
+    const handlers = map.get(msg.name) || []
 
-    if (msg.accept !== mode || msg.type !== 'emit' || !handler) {
+    if (msg.accept !== mode || msg.type !== 'emit' || !handlers.length) {
       return
     }
 
-    handler.call({ sender }, ...msg.data as any)
+    for (const handler of handlers) {
+      try {
+        handler.call({ sender }, ...msg.data as any)
+      } catch (e) {
+        console.error(e)
+      }
+    }
   })
 }
 

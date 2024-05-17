@@ -18,8 +18,9 @@ export default class Messaging<
    */
   readonly map = {} as MapMessaging
   readonly _channel = {} as MapChannel
+  private static _channel = {} as Record<string, Channel|ContentChannel>
 
-  private readonly events = new Map<EventKey, HandlerFunc>()
+  private readonly events = new Map<EventKey, HandlerFunc[]>()
   private readonly handlers = new Map<EventKey, HandlerFunc>()
   private readonly streams = new Map<EventKey, StreamHandlerFunc>()
 
@@ -36,11 +37,11 @@ export default class Messaging<
     const Key extends EventKey,
     const Handler extends HandlerFunc
   >(event: Key, handler: Handler) {
-    if (this.events.has(event)) {
-      throw new Error(`Event ${event} already exists`)
-    }
+    const handlers = this.events.get(event) ?? []
 
-    this.events.set(event, handler)
+    handlers.push(handler)
+
+    this.events.set(event, handlers)
 
     return this as unknown as Messaging<MapEvent<
       MapMessaging['events'] & Record<Key, Handler>,
@@ -49,11 +50,23 @@ export default class Messaging<
     >, MapChannel>
   }
 
-  handle<
+  off<
     const Key extends EventKey,
     const Handler extends HandlerFunc
   >(event: Key, handler: Handler) {
-    if (this.handlers.has(event)) {
+    const _handlers = this.events.get(event) ?? []
+    const handlers = _handlers.filter(value => value !== handler)
+
+    this.events.set(event, handlers)
+
+    return this
+  } 
+
+  handle<
+    const Key extends EventKey,
+    const Handler extends HandlerFunc
+  >(event: Key, handler: Handler, replace = false) {
+    if (this.handlers.has(event) && !replace) {
       throw new Error(`Handler ${event} already exists`)
     }
 
@@ -69,8 +82,8 @@ export default class Messaging<
   stream<
     const Key extends EventKey,
     const Handler extends StreamHandlerFunc
-  >(event: Key, handler: Handler) {
-    if (this.streams.has(event)) {
+  >(event: Key, handler: Handler, replace = false) {
+    if (this.streams.has(event) && !replace) {
       throw new Error(`Stream handler ${event} already exists`)
     }
 
@@ -100,38 +113,32 @@ export default class Messaging<
   }
 
   get content() {
-    const channel = this._channel as any
-
-    const value = channel['content'] ?? Messaging.getContentChannel()
-
-    return value as ContentChannel<Messaging<MapChannel['content']>>
+    return Messaging.getContentChannel() as ContentChannel<Messaging<MapChannel['content']>>
   }
 
   get background() {
-    const channel = this._channel as any
-
-    const value = channel['background'] ?? Messaging.getContentChannel()
-
-    return value as Channel<Messaging<MapChannel['background']>>
+    return Messaging.getBackgroundChannel() as Channel<Messaging<MapChannel['background']>>
   }
 
   get ui() {
-    const channel = this._channel as any
-
-    const value = channel['ui'] ?? Messaging.getContentChannel()
-
-    return value as Channel<Messaging<MapChannel['ui']>>
+    return Messaging.getUIChannel() as Channel<Messaging<MapChannel['ui']>>
   }
 
-  public static getWorkerChannel<M extends Messaging>() {
-    return new Channel<M>('background')
+  public static getBackgroundChannel<M extends Messaging>() {
+    const value = Messaging._channel['background'] ??= new Channel('background')
+
+    return value as Channel<M>
   }
 
   public static getContentChannel<M extends Messaging>() {
-    return new ContentChannel<M>()
+    const value = Messaging._channel['content'] ??= new ContentChannel()
+
+    return value as ContentChannel<M>
   }
 
   public static getUIChannel<M extends Messaging>() {
-    return new Channel<M>('ui')
+    const value = Messaging._channel['ui'] ??= new Channel('ui')
+
+    return value as Channel<M>
   }
 }
