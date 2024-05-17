@@ -3,11 +3,11 @@
 ```bash
 # run one of following
 
-npm create amber@latest my-project
+npm create amber@latest
 
-yarn create amber my-project
+yarn create amber
 
-bun create amber my-project
+bun create amber
 ```
 
 More infomation will come later.
