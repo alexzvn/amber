@@ -1,7 +1,8 @@
 import { defineConfig } from 'tsup'
 import raw from 'unplugin-raw/esbuild'
 import pkg from './package.json'
-import {createWriteStream} from "fs";
+import {createWriteStream} from 'fs'
+import { cp } from 'fs/promises'
 
 export default defineConfig({
   esbuildPlugins: [raw()],
@@ -18,6 +19,7 @@ export default defineConfig({
 
     createWriteStream('dist/package.json').end(JSON.stringify(pkg, null, 2))
     createWriteStream('dist/.npmignore').end('chunk-*')
+    return cp('README.md', 'dist/README.md')
   },
 
   entry: {
