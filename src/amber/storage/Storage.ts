@@ -1,6 +1,5 @@
 import mitt, { type Handler } from 'mitt'
-
-const emitter = mitt()
+import { invokeOnce } from '../misc/Misc.ts'
 
 interface ValueChange<T> {
   value: T
@@ -9,13 +8,25 @@ interface ValueChange<T> {
 
 type SubscriberHandler<T> = (changes: ValueChange<T>) => unknown
 
-chrome.storage.onChanged.addListener(changes => {
-  for (const [key, { newValue, oldValue }] of Object.entries(changes)) {
-    emitter.emit(key, { value: newValue, old: oldValue })
-  }
-})
+const setupGlobalEvent = (): ReturnType<typeof mitt> => {
+  // @ts-ignore
+  setup.cache ??= invokeOnce(() => {
+    const emitter = mitt()
 
-export const on = <T>(type: string, handler: SubscriberHandler<T>) => emitter.on(type, handler as any)
+    chrome.storage.onChanged.addListener(changes => {
+      for (const [key, { newValue, oldValue }] of Object.entries(changes)) {
+        emitter.emit(key, { value: newValue, old: oldValue })
+      }
+    })
+
+    return emitter
+  })
+
+  // @ts-ignore
+  return setup.cache()
+}
+
+export const on = <T>(type: string, handler: SubscriberHandler<T>) => setupGlobalEvent().on(type, handler as any)
 
 export const get = async <T>(key: string, fallback?: T) => {
   return chrome.storage.local.get(key).then(record => record[key] as T || fallback)
