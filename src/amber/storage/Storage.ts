@@ -10,7 +10,7 @@ type SubscriberHandler<T> = (changes: ValueChange<T>) => unknown
 
 const setupGlobalEvent = (): ReturnType<typeof mitt> => {
   // @ts-ignore
-  setup.cache ??= invokeOnce(() => {
+  setupGlobalEvent.cache ??= invokeOnce(() => {
     const emitter = mitt()
 
     chrome.storage.onChanged.addListener(changes => {
@@ -23,7 +23,7 @@ const setupGlobalEvent = (): ReturnType<typeof mitt> => {
   })
 
   // @ts-ignore
-  return setup.cache()
+  return setupGlobalEvent.cache()
 }
 
 export const on = <T>(type: string, handler: SubscriberHandler<T>) => setupGlobalEvent().on(type, handler as any)
