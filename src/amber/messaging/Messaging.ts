@@ -1,7 +1,7 @@
 import { Channel, ContentChannel } from './Channel'
 import { registerEvent, registerHandler, registerStream } from './MessageHandler'
 import type { EventKey, HandlerFunc, MapEvent, StreamHandlerFunc } from './MessageMisc'
-import { getMode } from './MessageMisc'
+import { convertToEvent, getMode } from './MessageMisc'
 
 export const defineMessagingAddon = <
   T extends Messaging,
@@ -19,6 +19,8 @@ export default class Messaging<
   readonly map = {} as MapMessaging
   readonly _channel = {} as MapChannel
   private static _channel = {} as Record<string, Channel|ContentChannel>
+
+  public static convertStreamToEvent = convertToEvent
 
   private readonly events = new Map<EventKey, HandlerFunc[]>()
   private readonly handlers = new Map<EventKey, HandlerFunc>()

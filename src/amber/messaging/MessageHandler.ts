@@ -95,11 +95,12 @@ export const registerStream = (mode: AcceptMode, map: Map<EventKey, StreamHandle
       close() {
         msg.data = undefined
         msg.type = 'stream:end'
+        return emit(msg)
       },
 
-      abort(reason) {
+      abort(reason?: Error) {
         msg.type = 'stream:error'
-        msg.data = new MessagingError(new Error(reason || 'Messaging stream aborted'))
+        msg.data = new MessagingError(reason || new Error('Stream aborted')).toObject()
         return emit(msg)
       }
     })
@@ -113,19 +114,25 @@ export const registerStream = (mode: AcceptMode, map: Map<EventKey, StreamHandle
         return
       }
 
-      if (value[Symbol.iterator]) {
-        for (const chunk of value) {
-          await writer.write(chunk)
+      try {
+        if (value[Symbol.iterator]) {
+          for (const chunk of value) {
+            await writer.write(chunk)
+          }
         }
+
+        if (value[Symbol.asyncIterator]) {
+          for await (const chunk of value) {
+            await writer.write(chunk)
+          }
+        }
+      } catch (e) {
+        // @ts-ignore
+        writer.abort(e)
+        console.error(e)
       }
 
-      if (value[Symbol.asyncIterator]) {
-        for await (const chunk of value) {
-          await writer.write(chunk)
-        }
-      }
-
-      writer.close()
+      return writer.close()
     })
 
     return true

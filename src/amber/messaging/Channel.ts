@@ -1,7 +1,9 @@
-import { isPayload, makePayload, MessagingError } from './MessageMisc'
-import type { AcceptMode, MessagingPayload, Pair } from './MessageMisc'
+import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
+import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream } from './MessageMisc'
 import type Messaging from './Messaging'
 import type { GenericFunc } from '~/amber/type'
+
+export type AsyncReadableStreamEvent<T> = AsyncReadableStream<T> & ReturnType<typeof convertToEvent<T>>
 
 type EventName<T extends Pair> = keyof Exclude<T, symbol>
 type Str = string & {}
@@ -10,8 +12,6 @@ type ParamOf<V> = V extends GenericFunc ? Parameters<V> : unknown[]
 type InvokeReturn<V> = V extends GenericFunc
   ? (ReturnType<V> extends Promise<any> ? Awaited<ReturnType<V>>: ReturnType<V>)
   : unknown
-
-type AsyncReadableStream<D> = ReadableStream<D> & { [Symbol.asyncIterator]: () => AsyncIterator<D> }
 
 export class Channel<Target extends Messaging = Messaging> {
   constructor(public readonly target: Exclude<AcceptMode, 'content'>) {}
@@ -56,7 +56,7 @@ export class Channel<Target extends Messaging = Messaging> {
   async requestStream<
     const Key extends EventName<Target['map']['streams']>|Str,
     const Func extends FindCallable<Target['map']['streams'], Key>
-  >(event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStream<any>> {
+  >(event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<any>> {
     const payload = makePayload({
       accept: this.target,
       data: args as any,
@@ -85,17 +85,23 @@ export class Channel<Target extends Messaging = Messaging> {
       }
 
       if (msg.type === 'stream:error') {
-        controller.error(msg.data)
-        controller.close()
+        const error = new MessagingError(msg.data as Error)
+
+        // @ts-ignore
+        Object.defineProperty(error, 'stack', { value: msg.data.stack })
+
+        controller.error(error)
       }
     }
 
-    return new ReadableStream({
+    const stream = new ReadableStream({
       start(_controller) {
         controller = _controller
         chrome.runtime.onMessage.addListener(messageListener)
       }
     }) as any
+
+    return convertToEvent(stream as any)
   }
 }
 
@@ -171,17 +177,23 @@ export class ContentChannel<Target extends Messaging = Messaging> {
       }
 
       if (msg.type === 'stream:error') {
-        controller.error(msg.data)
-        controller.close()
+        const error = new MessagingError(msg.data as Error)
+
+        // @ts-ignore
+        Object.defineProperty(error, 'stack', { value: msg.data.stack })
+
+        controller.error(error)
       }
     }
 
-    return new ReadableStream({
+    const stream = new ReadableStream({
       start(_controller) {
         controller = _controller
         chrome.runtime.onMessage.addListener(messageListener)
       }
     }) as any
+
+    return convertToEvent(stream as any)
   }
 
   async emitActiveTab<
@@ -213,7 +225,7 @@ export class ContentChannel<Target extends Messaging = Messaging> {
     const tab = await this.getActiveTab()
 
     if (tab?.id) {
-      return this.send(tab.id, key, ...args)
+      return this.requestStream(tab.id, key, ...args)
     }
   }
 

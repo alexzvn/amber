@@ -1,3 +1,4 @@
+import mitt, {type Emitter} from 'mitt'
 
 export type EventKey = string|number
 
@@ -93,4 +94,46 @@ export class MessagingError extends Error {
       stack: this.stack
     }
   }
+}
+
+export type AsyncReadableStream<D> = ReadableStream<D> & { [Symbol.asyncIterator]: () => AsyncIterator<D> }
+
+export const convertToEvent = <Chunk, Error = any>(stream: AsyncReadableStream<Chunk>) => {
+  type Events ={
+    data: Chunk
+    error: Error
+    close: void
+  }
+
+  const emitter = mitt<Events>()
+
+  const listen = async () => {
+    try {
+      for await (const chunk of stream) {
+        emitter.emit('data', chunk)
+      }
+    } catch (e) {
+      emitter.emit('error', e as any)
+    }
+
+    emitter.emit('close')
+  }
+
+  let isRegister = false
+
+  Object.assign(stream, {
+    all: emitter.all,
+    off: emitter.off,
+    on: (key: any, cb: any) => {
+      // lazy bind event
+      if (!isRegister) {
+        listen()
+        isRegister = true
+      }
+
+      emitter.on(key, cb)
+    }
+  })
+
+  return stream as AsyncReadableStream<Chunk> & Omit<Emitter<Events>, 'emit'>
 }
