@@ -3,15 +3,16 @@ import { base64ArrayBuffer } from './ArrayBufferToBase64'
 
 export const invokeOnce = <A extends any[], R>(handler: GenericFunc<A, R>) => {
   let isCalled = false
+  let value: R
 
   return (...args: A) => {
     if (isCalled) {
-      return undefined
+      return value
     }
 
     isCalled = true
 
-    return handler(...args)
+    return value = handler(...args)
   }
 }
 
