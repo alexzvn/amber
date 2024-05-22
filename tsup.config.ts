@@ -19,7 +19,6 @@ export default defineConfig({
     pkg.bin = { amber: 'cli.js' }
 
     createWriteStream('dist/package.json').end(JSON.stringify(pkg, null, 2))
-    createWriteStream('dist/.npmignore').end('chunk-*')
     return cp('README.md', 'dist/README.md')
   },
 
