@@ -61,6 +61,8 @@ export const bufferToBase64 = (buffer: Uint8Array) => {
   return base64ArrayBuffer(buffer as unknown as ArrayBuffer)
 }
 
+export const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
+
 export const hashCode = (text: string) => {
   let hash = 0
 
