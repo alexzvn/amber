@@ -1,6 +1,6 @@
 {
   "name": "@alexzvn/amber",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "author": "Alexzvn",
   "license": "MIT",
   "module": "index.ts",
