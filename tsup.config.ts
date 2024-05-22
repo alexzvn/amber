@@ -15,6 +15,7 @@ export default defineConfig({
   onSuccess: async () => {
     pkg.types = 'index.d.ts'
     pkg.main = 'index.js'
+    pkg.module = 'index.js'
     pkg.bin = { amber: 'cli.js' }
 
     createWriteStream('dist/package.json').end(JSON.stringify(pkg, null, 2))
