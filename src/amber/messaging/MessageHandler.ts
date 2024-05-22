@@ -1,4 +1,3 @@
-import { safeAsyncCall } from '~/amber/misc/Misc'
 import type { AcceptMode, EventKey, HandlerFunc, MessagingPayload, StreamHandlerFunc } from './MessageMisc'
 import { isPayload, MessagingError } from './MessageMisc'
 
