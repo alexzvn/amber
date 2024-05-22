@@ -95,7 +95,7 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
         isMatch && server.config.logger.info('Reloaded Browser extension', {
           timestamp: true
         })
-      }, 5_00)
+      }, 500)
     },
   }
 })
