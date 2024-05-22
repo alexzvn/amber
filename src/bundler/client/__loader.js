@@ -1,5 +1,4 @@
 const $ = document.querySelector.bind(document)
-$('button').onclick = () => chrome.runtime.reload()
 
 const info = (... args) => {
   const style = [
@@ -14,6 +13,8 @@ const info = (... args) => {
 }
 
 window.addEventListener('load', async () => {
+  $('button').onclick = () => chrome.runtime.reload()
+
   const url = $('a').href
 
   let attempt = 1
