@@ -128,11 +128,11 @@ export const registerStream = (mode: AcceptMode, map: Map<EventKey, StreamHandle
         }
       } catch (e) {
         // @ts-ignore
-        writer.abort(e)
+        await writer.abort(e)
         console.error(e)
+      } finally {
+        await writer.close()
       }
-
-      return writer.close()
     })
 
     return true
