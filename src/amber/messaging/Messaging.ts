@@ -35,7 +35,6 @@ export default class Messaging<
 
   constructor() {
     const accept = getMode()
-    console.log(accept)
 
     registerEvent(accept, this.events)
     registerHandler(accept, this.handlers)
