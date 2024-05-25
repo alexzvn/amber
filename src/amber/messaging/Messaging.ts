@@ -8,9 +8,16 @@ export const defineMessagingAddon = <
   R extends Messaging
 >(callback: (messaging: T) => R) => callback
 
+type OtherChannel = { background: MapEvent, ui: MapEvent, content: MapEvent }
+type MergeChannel<B extends MapEvent, U extends MapEvent, C extends MapEvent> = {
+  background: B
+  ui: U
+  content: C
+}
+
 export default class Messaging<
   MapMessaging extends MapEvent = MapEvent,
-  MapChannel extends { background: MapEvent, ui: MapEvent, content: MapEvent } =  { background: MapEvent, ui: MapEvent, content: MapEvent }
+  MapChannel extends OtherChannel = OtherChannel
 > {
   /**
    * This property only used for typescript mapping
@@ -99,15 +106,24 @@ export default class Messaging<
   }
 
   use<
-    const T extends Messaging,
-    const R extends Messaging,
-    const Addon extends typeof defineMessagingAddon<T, R>
-  >(defineMessagingAddon: Addon): Messaging<MapEvent<
-    MapMessaging['events'] & R['map']['events'],
-    MapMessaging['handlers'] & R['map']['handlers'],
-    MapMessaging['streams'] & R['map']['streams']
-  >, R['_channel']> {
-    return defineMessagingAddon(this as any) as any
+    const Addon extends ReturnType<typeof defineMessagingAddon>,
+    const Return extends ReturnType<Addon>
+  >(addon: Addon) {
+    type M = Return['map']
+    type C =  Return['_channel']
+
+    return addon(this as any) as any as Messaging<
+      MapEvent<
+        MapMessaging['events'] & M['events'],
+        MapMessaging['handlers'] & M['handlers'],
+        MapMessaging['streams'] & M['streams']
+      >,
+      MergeChannel<
+        MapChannel['background'] & C['background'],
+        MapChannel['ui'] & C['ui'],
+        MapChannel['content'] & C['content']
+      >
+    >
   }
 
   typing<const M extends Messaging, const K extends 'ui'|'content'|'background'>() {
