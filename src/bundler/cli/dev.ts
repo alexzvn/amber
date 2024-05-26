@@ -7,6 +7,7 @@ import Page from '~/bundler/components/Page'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import AmberPlugin from '~/bundler/plugins'
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
+import { getMapIIFE } from '../components'
 
 
 const start = async () => {
@@ -74,6 +75,23 @@ const start = async () => {
     logLevel: 'silent'
   })
 
+  await build({
+    ...vite,
+    build: {
+      ...vite.build,
+      watch: {},
+      rollupOptions: {
+        ... vite.build!.rollupOptions,
+        input: getMapIIFE(),
+        output: {
+          ...vite.build!.rollupOptions!.output,
+          format: 'iife',
+        }
+      }
+    },
+    logLevel: 'silent'
+  })
+
   await dev.listen()
   dev.printUrls()
   dev.bindCLIShortcuts({
@@ -84,14 +102,14 @@ const start = async () => {
         description: 'reload browser extension',
         action(server) {
           server.hot.send({ type: 'custom', event: 'amber:background.reload' })
-          server.config.logger.info('Reload browser extension message was sent', { timestamp: true })
+          server.config.logger.info('Reloading browser extension', { timestamp: true })
         },
       }, {
         key: 'p',
-        description: 'reload current active tab',
+        description: 'reload current tab',
         action(server) {
           server.hot.send({ type: 'custom', event: 'amber:page.reload' })
-          server.config.logger.info('Reload browser extension message was sent', { timestamp: true })
+          server.config.logger.info('Reloading current active tab', { timestamp: true })
         }
       }
     ],

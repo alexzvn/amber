@@ -27,7 +27,13 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
         : cfg.build.rollupOptions.output
 
       output.entryFileNames = (chunk) => {
-        const script = ContentScript.$registers.find(script => chunk.facadeModuleId?.endsWith(script.file))
+        const script = ContentScript.$registers.find(script => {
+          return chunk.facadeModuleId?.endsWith(script.file)
+        })
+
+        if (script?.options.format === 'iife') {
+          return 'scripts/[name].js'
+        }
 
         return script ? 'scripts/_[name].js' : 'entries/[name].js'
       }
@@ -52,6 +58,10 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       const host = `http://localhost:${server.config.server.port}/`
 
       for (const script of ContentScript.$registers) {
+        if (script.options.format !== 'es') {
+          continue
+        }
+
         const enableReload = amber.autoReloadPage ?? false
         const code = CSPolyfillDev
           .replace(/__PRE_SCRIPT__/g, `"${host}@vite/client"`)

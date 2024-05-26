@@ -28,6 +28,13 @@ type Option = NonNullable<Unpacked<ChromeBrowserManifest['content_scripts']>> & 
    * @default scripts
    */
   scriptDir: string
+
+  /**
+   * Output build script format
+   * 
+   * @default es
+   */
+  format: 'es'|'iife'
 }
 
 export default class  ContentScript {
@@ -45,6 +52,7 @@ export default class  ContentScript {
   ) {
     options.assetDir ??= 'assets'
     options.scriptDir ??= 'scripts'
+    options.format ??= 'es'
 
     this.options = options as any
     this.matches = options.matches

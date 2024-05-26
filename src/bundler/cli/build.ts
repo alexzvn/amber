@@ -1,10 +1,11 @@
-import { build, mergeConfig, type UserConfig,defineConfig } from 'vite'
+import { build, mergeConfig, type UserConfig, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import AmberPlugin from '~/bundler/plugins'
 import ContentScript from '~/bundler/components/ContentScript'
 import Page from '~/bundler/components/Page'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
+import { getMapIIFE, getMapModule } from '~/bundler/components/'
 import { exists } from '~/bundler/helper'
 import { join } from 'path'
 import fs from 'fs/promises'
@@ -30,21 +31,7 @@ program.command('build')
   const minify = options.prod || options.minify
   const sourcemap: boolean = options.sourcemap ? options.sourcemap : false
 
-  const inputs = {} as Record<string, string>
-
-  for (const script of ContentScript.$registers) {
-    inputs[script.moduleName] = script.file
-  }
-
-  for (const page of Page.$registers) {
-    inputs[page.path.name!] = page.file
-  }
-
-  for (const script of BackgroundScript.$registers) {
-    inputs[script.path.name!] = script.file
-  }
-
-  let vite: UserConfig = defineConfig({
+  const modules: UserConfig = defineConfig({
     plugins: [AmberPlugin(config.manifest)],
     build: {
       sourcemap,
@@ -52,7 +39,7 @@ program.command('build')
       watch,
       emptyOutDir: false,
       rollupOptions: {
-        input: inputs,
+        input: getMapModule(),
         output: {
           entryFileNames: 'entries/[name].js',
           chunkFileNames: 'shared/[name].js',
@@ -62,6 +49,29 @@ program.command('build')
     }
   })
 
-  await build(mergeConfig(vite, config.vite))
+  const mapIIFE = getMapIIFE()
+
+  const iife: UserConfig = defineConfig({
+    plugins: [AmberPlugin(config.manifest)],
+    build: {
+      sourcemap,
+      minify,
+      watch,
+      emptyOutDir: false,
+      rollupOptions: {
+        input: mapIIFE,
+        output: {
+          format: 'iife',
+          entryFileNames: 'entries/[name].js',
+          chunkFileNames: 'shared/[name].js',
+          assetFileNames: 'assets/[name].[ext]',
+        },
+      }
+    }
+  })
+
+  await build(mergeConfig(modules, config.vite))
+  Object.keys(mapIIFE).length && await build(mergeConfig(iife, config.vite))
+
   await ProcessIcon(cwd, 'dist')
 })
