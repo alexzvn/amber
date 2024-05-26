@@ -22,6 +22,11 @@ export default defineConfig({
     return cp('README.md', 'dist/README.md')
   },
 
+  esbuildOptions(options, context) {
+    options.external ??= []
+    options.external.push('sharp')
+  },
+
   entry: {
     bundler: 'src/bundler/bundler.ts',
     index: 'src/amber/index.ts',
