@@ -58,6 +58,7 @@ const transformPackage = (_pkg: string) => {
   pkg.description ??= 'A browser extension built with Vite + Amber'
   pkg.devDependencies ??= {}
   pkg.devDependencies[PackageName] = `^${PackageVersion}`
+  pkg.devDependencies['@types/chrome'] = '^0.0.267'
 
   Object.assign(pkg.scripts, {
     clean: 'amber clean',
