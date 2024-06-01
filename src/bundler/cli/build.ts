@@ -2,9 +2,6 @@ import { build, mergeConfig, type UserConfig, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import AmberPlugin from '~/bundler/plugins'
-import ContentScript from '~/bundler/components/ContentScript'
-import Page from '~/bundler/components/Page'
-import BackgroundScript from '~/bundler/components/BackgroundScript'
 import { getMapIIFE, getMapModule } from '~/bundler/components/'
 import { exists } from '~/bundler/helper'
 import { join } from 'path'
@@ -51,27 +48,30 @@ program.command('build')
 
   const mapIIFE = getMapIIFE()
 
-  const iife: UserConfig = defineConfig({
-    plugins: [AmberPlugin(config.manifest)],
-    build: {
-      sourcemap,
-      minify,
-      watch,
-      emptyOutDir: false,
-      rollupOptions: {
-        input: mapIIFE,
-        output: {
-          format: 'iife',
-          entryFileNames: 'entries/[name].js',
-          chunkFileNames: 'shared/[name].js',
-          assetFileNames: 'assets/[name].[ext]',
-        },
-      }
-    }
-  })
-
   await build(mergeConfig(modules, config.vite))
-  Object.keys(mapIIFE).length && await build(mergeConfig(iife, config.vite))
+
+  for (const [mod, name] of Object.entries(getMapIIFE())) {
+    const iife: UserConfig = defineConfig({
+      plugins: [AmberPlugin(config.manifest)],
+      build: {
+        sourcemap,
+        minify,
+        watch,
+        emptyOutDir: false,
+        rollupOptions: {
+          input: { [mod]: name },
+          output: {
+            format: 'iife',
+            entryFileNames: 'entries/[name].js',
+            chunkFileNames: 'shared/[name].js',
+            assetFileNames: 'assets/[name].[ext]',
+          },
+        }
+      }
+    })
+
+    await build(mergeConfig(iife, config.vite))
+  }
 
   await ProcessIcon(cwd, 'dist')
 })
