@@ -63,22 +63,6 @@ export const bufferToBase64 = (buffer: Uint8Array) => {
 
 export const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
-export const hashCode = (text: string) => {
-  let hash = 0
-
-  if (text.length === 0) {
-    return hash
-  }
-
-  for (let i = 0; i < text.length; i++) {
-    const chr = text.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr
-    hash |= 0 // Convert to 32bit integer
-  }
-
-  return hash
-}
-
 export const pick = <const Obj extends Record<any, any>>(obj: Obj, ...keys: Array<keyof Obj>) => {
   type PickedKey = typeof keys[number]
 
