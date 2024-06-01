@@ -26,6 +26,8 @@ export const random = (): string => {
 
 type MakePayload<D> = { id?: string|number } & Omit<MessagingEvent<D>, 'id'>
 
+export const OnceSymbol = Symbol('invoke function once')
+
 
 export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
   data.id ??= random()

@@ -1,7 +1,7 @@
 import { Channel, ContentChannel } from './Channel'
 import { registerEvent, registerHandler, registerStream } from './MessageHandler'
 import type { EventKey, HandlerFunc, MapEvent, StreamHandlerFunc } from './MessageMisc'
-import { convertToEvent, getMode } from './MessageMisc'
+import { convertToEvent, getMode, OnceSymbol } from './MessageMisc'
 
 export const defineMessagingAddon = <
   T extends Messaging,
@@ -29,7 +29,7 @@ export default class Messaging<
 
   public static convertStreamToEvent = convertToEvent
 
-  private readonly events = new Map<EventKey, HandlerFunc[]>()
+  private readonly events = new Map<EventKey, Set<HandlerFunc>>()
   private readonly handlers = new Map<EventKey, HandlerFunc>()
   private readonly streams = new Map<EventKey, StreamHandlerFunc>()
 
@@ -45,11 +45,13 @@ export default class Messaging<
     const Key extends EventKey,
     const Handler extends HandlerFunc
   >(event: Key, handler: Handler) {
-    const handlers = this.events.get(event) ?? []
+    if (! this.events.has(event)) {
+      this.events.set(event, new Set())
+    }
 
-    handlers.push(handler)
+    const handlers = this.events.get(event)!
 
-    this.events.set(event, handlers)
+    handlers.add(handler)
 
     return this as unknown as Messaging<MapEvent<
       MapMessaging['events'] & Record<Key, Handler>,
@@ -62,13 +64,32 @@ export default class Messaging<
     const Key extends EventKey,
     const Handler extends HandlerFunc
   >(event: Key, handler: Handler) {
-    const _handlers = this.events.get(event) ?? []
-    const handlers = _handlers.filter(value => value !== handler)
+    const handlers = this.events.get(event)
 
-    this.events.set(event, handlers)
+    handlers?.delete(handler)
 
     return this
-  } 
+  }
+
+  once<
+    const Key extends EventKey,
+    const Handler extends HandlerFunc
+  >(event: Key, handler: Handler) {
+    if (! this.events.has(event)) {
+      this.events.set(event, new Set())
+    }
+
+    Object.assign(handler, { [OnceSymbol]: true })
+    const handlers = this.events.get(event)!
+
+    handlers.add(handler)
+
+    return this as unknown as Messaging<MapEvent<
+      MapMessaging['events'] & Record<Key, Handler>,
+      MapMessaging['handlers'],
+      MapMessaging['streams']
+    >, MapChannel>
+  }
 
   handle<
     const Key extends EventKey,

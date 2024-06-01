@@ -13,6 +13,8 @@ type InvokeReturn<V> = V extends GenericFunc
   ? (ReturnType<V> extends Promise<any> ? Awaited<ReturnType<V>>: ReturnType<V>)
   : unknown
 
+class ChannelError extends Error {}
+
 export class Channel<Target extends Messaging = Messaging> {
   constructor(public readonly target: Exclude<AcceptMode, 'content'>) {}
 
@@ -39,6 +41,10 @@ export class Channel<Target extends Messaging = Messaging> {
       type: 'request',
       data: args as any
     }))
+
+    if (! isPayload(payload)) {
+      throw new ChannelError(`Can't receive response from handler ${event.toString()}`)
+    }
 
     if (payload.type === 'error') {
       const e = payload.data as any
@@ -67,7 +73,7 @@ export class Channel<Target extends Messaging = Messaging> {
     const data = await chrome.runtime.sendMessage(payload)
 
     if (! isPayload(data)) {
-      throw new Error('Not found any stream handler for event ' + (event as string))
+      throw new Error('Not found any stream handler for event ' + event.toString())
     }
 
     let controller: ReadableStreamDefaultController
@@ -131,6 +137,10 @@ export class ContentChannel<Target extends Messaging = Messaging> {
       type: 'request',
       data: args as any
     }))
+
+    if (! isPayload(payload)) {
+      throw new ChannelError(`Can't receive response from handler ${event.toString()}`)
+    }
 
     if (payload.type === 'error') {
       const e = payload.data as any
