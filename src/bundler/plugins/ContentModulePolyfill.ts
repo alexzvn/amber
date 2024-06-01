@@ -58,7 +58,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       const host = `http://localhost:${server.config.server.port}/`
 
       for (const script of ContentScript.$registers) {
-        if (script.options.format !== 'es') {
+        if (script.options.format !== 'es' && !server) {
           continue
         }
 

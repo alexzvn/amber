@@ -3,22 +3,15 @@ import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
 import defu from 'defu'
 import ContentScript from '~/bundler/components/ContentScript'
-import Page from '~/bundler/components/Page'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
 import AmberPlugin from '~/bundler/plugins'
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
-import { getMapIIFE } from '../components'
+import { getDevMapModule } from '../components'
 
 
 const start = async () => {
   const config = await loadAmberConfig()
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
-
-  const inputs = {
-    ...ContentScript.map,
-    ...BackgroundScript.map,
-    ...Page.map,
-  } as Record<string, string>
 
   let vite: UserConfig = defineConfig({
     plugins: [AmberPlugin(config.manifest, config.amber)],
@@ -27,7 +20,7 @@ const start = async () => {
       minify: false,
       emptyOutDir: false,
       rollupOptions: {
-        input: inputs,
+        input: getDevMapModule(),
         output: {
           entryFileNames: 'entries/[name].js',
           chunkFileNames: 'shared/[name].js',
@@ -70,23 +63,6 @@ const start = async () => {
       rollupOptions: {
         ... vite.build!.rollupOptions,
         input: BackgroundScript.map,
-      }
-    },
-    logLevel: 'silent'
-  })
-
-  await build({
-    ...vite,
-    build: {
-      ...vite.build,
-      watch: {},
-      rollupOptions: {
-        ... vite.build!.rollupOptions,
-        input: getMapIIFE(),
-        output: {
-          ...vite.build!.rollupOptions!.output,
-          format: 'iife',
-        }
       }
     },
     logLevel: 'silent'

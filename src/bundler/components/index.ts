@@ -23,6 +23,18 @@ export const getMapModule = () => {
   return inputs
 }
 
+export const getDevMapModule = () => {
+  const inputs = getMapModule()
+
+  for (const script of ContentScript.$registers) {
+    if (script.options.format === 'iife') {
+      inputs[script.moduleName] = script.file
+    }
+  }
+
+  return inputs
+}
+
 export const getMapIIFE = () => {
   const inputs = {} as Record<string, string>
 
