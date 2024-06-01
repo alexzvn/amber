@@ -13,6 +13,7 @@ export default defineVitePlugin(() => {
 
   return {
     name: 'amber:inline-script-polyfill',
+    enforce: 'post',
 
     configResolved: cfg => { config = cfg },
 
@@ -40,12 +41,14 @@ export default defineVitePlugin(() => {
       const scripts = root.querySelectorAll('script:not([src])')
 
       for (const script of scripts) {
-        if (! script.textContent.trim()) {
+        const content = script.rawText.trim()
+
+        if (! content) {
           continue
         }
 
-        const id = hash(script.textContent).toString(16)
-        !inline.has(id) && inline.set(id, script.textContent)
+        const id = hash(content).toString(16)
+        !inline.has(id) && inline.set(id, content)
 
         script.textContent = ''
         script.setAttribute('src', join('/', 'shared', `inline-${id}.js`))
