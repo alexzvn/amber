@@ -15,6 +15,7 @@ const bindAccessibleResouce = (manifest: GeneralManifest) => {
     }
 
     item.resources.push('shared/*', 'scripts/*')
+    item.resources = [... new Set(item.resources)]
 
     return true
   })
