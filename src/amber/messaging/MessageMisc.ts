@@ -28,7 +28,6 @@ type MakePayload<D> = { id?: string|number } & Omit<MessagingEvent<D>, 'id'>
 
 export const OnceSymbol = Symbol('invoke function once')
 
-
 export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
   data.id ??= random()
 
@@ -36,7 +35,7 @@ export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
 }
 
 export const isPayload = <D>(payload: any): payload is MessagingPayload<D> => {
-  return '__EMessage' in payload && payload.__EMessage
+  return typeof payload === 'object' && '__EMessage' in payload && payload.__EMessage
 }
 
 export const getMode = (): AcceptMode => {
