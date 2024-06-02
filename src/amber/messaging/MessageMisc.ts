@@ -35,7 +35,7 @@ export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
 }
 
 export const isPayload = <D>(payload: any): payload is MessagingPayload<D> => {
-  return typeof payload === 'object' && '__EMessage' in payload && payload.__EMessage
+  return payload && typeof payload === 'object' && '__EMessage' in payload && payload.__EMessage
 }
 
 export const getMode = (): AcceptMode => {
