@@ -1,4 +1,5 @@
 import mitt, {type Emitter} from 'mitt'
+import type { GenericFunc } from '../type'
 
 export type EventKey = string|number
 
@@ -68,6 +69,20 @@ export type StreamHandlerFunc<K extends any[] = any, E = any, R = any> = {
   (this: StreamContext<E>, ...args: K): R
   (...args: K): R|AsyncGenerator<E, R>|Iterator<E>|R[]
 }
+
+type ExtractValueStream<R> = R extends AsyncGenerator<infer V> ? V :
+  R extends Iterator<infer V> ? V :
+  R extends Generator<infer V> ? V :
+  R extends Array<infer V> ? V : unknown
+
+type ValueOfStream<T> = T extends GenericFunc<infer _, infer R>
+  ?
+    R extends Promise<infer V>
+      ? ExtractValueStream<V>
+      : ExtractValueStream<R>
+  : unknown
+
+export type ValueOfStreamHandler<T> = ValueOfStream<Awaited<T>> extends never ? unknown : ValueOfStream<Awaited<T>>
 
 export type MapEvent<
   Events extends Pair = Pair,

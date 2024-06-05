@@ -1,5 +1,5 @@
 import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
-import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream } from './MessageMisc'
+import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler } from './MessageMisc'
 import type Messaging from './Messaging'
 import type { GenericFunc } from '~/amber/type'
 
@@ -62,7 +62,7 @@ export class Channel<Target extends Messaging = Messaging> {
   async requestStream<
     const Key extends EventName<Target['map']['streams']>|Str,
     const Func extends FindCallable<Target['map']['streams'], Key>
-  >(event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<any>> {
+  >(event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<ValueOfStreamHandler<Func>>> {
     const payload = makePayload({
       accept: this.target,
       data: args as any,
@@ -158,7 +158,7 @@ export class ContentChannel<Target extends Messaging = Messaging> {
   async requestStream<
     const Key extends EventName<Target['map']['streams']>|Str,
     const Func extends FindCallable<Target['map']['streams'], Key>
-  >(tabId: number, event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStream<any>> {
+  >(tabId: number, event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<ValueOfStreamHandler<Func>>> {
     const payload = makePayload({
       accept: this.target,
       data: args as any,
