@@ -9,7 +9,7 @@ import type {AmberOptions} from '~/bundler/configure.ts'
 
 export default (manifest: GeneralManifest, amber: AmberOptions = {}) => [
   ResolveAlias(),
-  InjectWorkerHMR(amber),
+  InjectWorkerHMR(manifest, amber),
   ContentModulePolyfill(amber),
   ManifestWriter(manifest, amber),
   InlineScriptPolyfill()
