@@ -62,7 +62,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
           continue
         }
 
-        const enableReload = amber.autoReloadPage ?? false
+        const enableReload = script.options.hotReload
         const code = CSPolyfillDev
           .replace(/__PRE_SCRIPT__/g, `"${host}@vite/client"`)
           .replace(/__SCRIPT__/g, `"${host}${script.file}"`)

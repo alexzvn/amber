@@ -35,6 +35,13 @@ type Option = NonNullable<Unpacked<ChromeBrowserManifest['content_scripts']>> & 
    * @default es
    */
   format: 'es'|'iife'
+
+  /**
+   * Enable hot window reload by dev server
+   *
+   * @default true
+   */
+  hotReload: boolean
 }
 
 export default class  ContentScript {
@@ -53,6 +60,7 @@ export default class  ContentScript {
     options.assetDir ??= 'assets'
     options.scriptDir ??= 'scripts'
     options.format ??= 'es'
+    options.hotReload ??= true
 
     this.options = options as any
     this.matches = options.matches
