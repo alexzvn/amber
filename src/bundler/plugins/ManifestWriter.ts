@@ -78,7 +78,6 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
     writeManifest,
     configureServer,
 
-
     writeBundle: () => {
       DevServer.value && configureServer(DevServer.value)
 

@@ -1,6 +1,7 @@
 import { defineVitePlugin } from '~/bundler/helper.ts'
 import BackgroundScript from '~/bundler/components/BackgroundScript'
-import MagicString from "magic-string";
+import MagicString from "magic-string"
+import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
 import type {ViteDevServer} from 'vite'
 import {DevServer} from '~/bundler/plugins/BuildEnv.ts'
 import type {AmberOptions} from '~/bundler/configure.ts'
@@ -8,7 +9,7 @@ import LoaderScript from '~/bundler/client/__loader?raw'
 import fs from 'fs/promises'
 import { join } from 'path'
 
-export default  defineVitePlugin((amber: AmberOptions = {}) => {
+export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
   const get = (id: string) => {
     return [...BackgroundScript.$registers].find(script => {
       return id.endsWith(script.file) || script.file === id || script.file.endsWith(id)
@@ -24,6 +25,19 @@ export default  defineVitePlugin((amber: AmberOptions = {}) => {
 
     buildStart() {
       server ??= DevServer.value
+    },
+
+    configResolved() {
+      if (! amber.bypassCSP) {
+        return
+      }
+
+      const hosts = new Set(Array.isArray(amber.bypassCSP) ? amber.bypassCSP : [
+        amber.bypassCSP === true ? '<all_urls>' : amber.bypassCSP
+      ])
+
+      manifest.host_permissions?.forEach(host => hosts.add(host))
+      manifest.host_permissions = [...hosts]
     },
 
     configureServer(srv) {
