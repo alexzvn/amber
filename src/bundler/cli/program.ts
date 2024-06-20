@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import { version } from '~/../package.json'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import type { DefinedConfig } from '~/bundler/configure'
 import { exists } from '~/bundler/helper'
 
@@ -14,7 +15,7 @@ export const loadAmberConfig = async () => {
 
   for (const file of configs) {
     if (await exists(file)) {
-      const mod = await import(join(cwd, file) + '?' + Date.now())
+      const mod = await import(pathToFileURL(join(cwd, file)).toString())
       return mod.default as DefinedConfig
     }
   }
