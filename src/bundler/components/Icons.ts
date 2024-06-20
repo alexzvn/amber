@@ -1,5 +1,6 @@
 import { join } from 'path'
 import type { Sharp } from 'sharp'
+import slash from 'slash'
 
 type IconOption = {
   /**
@@ -48,7 +49,7 @@ export default class Icons {
 
   toJSON() {
     return this.config.size.reduce((carry, size) => {
-      carry[`${size}`] = join(this.config.dir, `${this.config.name}${size}.png`)
+      carry[`${size}`] = slash(join(this.config.dir, `${this.config.name}${size}.png`))
 
       return carry
     }, {} as Record<string, string>)

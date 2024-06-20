@@ -53,7 +53,7 @@ export const pathDiscover = (path: string) => {
   const explode = path.split('/')
 
   const filename = explode.pop()
-  
+
   const dir = explode.join('/')
   const names = filename?.split('.')
   const ext = names?.pop()

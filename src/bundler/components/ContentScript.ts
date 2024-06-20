@@ -1,6 +1,7 @@
 import type {ChromeBrowserManifest, Matches} from '~/bundler/browsers/chrome'
-import type {RequireAtLeastOne, Str, Unpacked} from '~/bundler/type'
+import type {Unpacked} from '~/bundler/type'
 import {pathDiscover, pick} from '~/bundler/helper'
+import slash from 'slash'
 import { join } from 'path'
 
 type Option = NonNullable<Unpacked<ChromeBrowserManifest['content_scripts']>> & {
@@ -97,8 +98,8 @@ export default class  ContentScript {
 
     return {
       ...options,
-      js: js.filter(Boolean).flat(),
-      css: css.length ? css: undefined
+      js: js.filter(Boolean).flat().map(value => slash(value!)),
+      css: css.length ? css.map(slash) : undefined
     }
   }
 

@@ -1,3 +1,4 @@
+import slash from 'slash'
 import {pathDiscover} from '~/bundler/helper'
 
 export default class Page extends String {
@@ -14,7 +15,7 @@ export default class Page extends String {
   }
 
   toJSON() {
-    return this.target || this.file
+    return slash(this.target || this.file)
   }
 
   toString() {
