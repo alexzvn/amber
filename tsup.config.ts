@@ -11,6 +11,7 @@ export default defineConfig({
   target: 'esnext',
   dts: true,
   clean: true,
+  external: ['sharp'],
 
   onSuccess: async () => {
     pkg.types = 'index.d.ts'
