@@ -5,16 +5,21 @@ import { join } from 'path'
 
 const parseURL = (path: string) => {
   try {
-    return new URL(path)
+    const url = new URL(path)
+
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      return url
+    }
   } catch {
     return undefined
   }
+
+  return undefined
 }
 
 export default defineVitePlugin(async () => {
   const base = join('.amber', 'cache')
   await mkdir(base)
-
 
   return {
     name: 'amber:import-url',
