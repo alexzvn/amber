@@ -91,6 +91,13 @@ const start = async () => {
     ],
   })
 
+  await ProcessIcon(cwd, 'dist')
+
+  dev.restart = async () => {
+    await dev.close()
+    setImmediate(start)
+  }
+
   return { config: vite, server: dev, manifest: config.manifest }
 }
 
@@ -100,24 +107,5 @@ program.command('dev')
   program.dev = true
   process.env.NODE_ENV ??= 'development'
 
-  const { server, config, manifest } = await start()
-
-  server.watcher.on('change', async (file) => {
-    /\.env$/.test(file) && await build(config)
-  })
-
-  server.watcher.on('change', async file => {
-    if (! /amber\.config\.ts/.test(file)) {
-      return
-    }
-
-    const _config = await loadAmberConfig()
-
-    Object.assign(_config.manifest, _config.devManifest)
-    Object.assign(manifest, _config.manifest)
-
-    await build(config)
-  })
-
-  await ProcessIcon(cwd, 'dist')
+  await start()
 })
