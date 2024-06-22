@@ -25,6 +25,6 @@ export const loadAmberConfig = async () => {
 
 export const program = new Command('amber')
   .description('Amber CLI for building browser chrome extension')
-  .version(version) as Command & { dev: boolean }
+  .version(version) 
 
 export default program
