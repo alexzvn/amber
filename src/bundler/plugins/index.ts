@@ -3,6 +3,7 @@ import ManifestWriter from '~/bundler/plugins/ManifestWriter.ts'
 import InjectWorkerHMR from '~/bundler/plugins/InjectWorkerHMR.ts'
 import InlineScriptPolyfill from '~/bundler/plugins/InlineScriptPolyfill.ts'
 import ResolveAlias from './ResolveAlias'
+import ImportViaURL from './ImportViaURL'
 import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
 import type {AmberOptions} from '~/bundler/configure.ts'
 
@@ -12,5 +13,6 @@ export default (manifest: GeneralManifest, amber: AmberOptions = {}) => [
   InjectWorkerHMR(manifest, amber),
   ContentModulePolyfill(amber),
   ManifestWriter(manifest, amber),
-  InlineScriptPolyfill()
+  InlineScriptPolyfill(),
+  ImportViaURL(),
 ]

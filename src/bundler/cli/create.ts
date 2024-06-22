@@ -88,6 +88,7 @@ export const create = async (folder: string) => {
   })
 
   const packagePath = join(cwd, folder, 'package.json')
+  const gitignore = join(cwd, folder, '.gitignore')
 
   if (! await exists(packagePath)) {
     return process.exit(0)
@@ -101,6 +102,11 @@ export const create = async (folder: string) => {
     .then(text => packageContent = transformPackage(text))
     .then(text => JSON.stringify(text, null, 2))
     .then(data => fs.writeFile(packagePath, data))
+
+  await fs.readFile(gitignore)
+    .then(buff => buff.toString())
+    .then(text => '.amber\n' + text)
+    .then(data => fs.writeFile(gitignore, data))
 
   await transform(env)
 }
