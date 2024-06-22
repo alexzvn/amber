@@ -1,3 +1,4 @@
+import { spawn } from 'child_process'
 import { mergeConfig, type UserConfig, createServer, build, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/bundler/build/ProcessIcon'
@@ -69,6 +70,7 @@ const start = async () => {
   })
 
   await dev.listen()
+
   dev.printUrls()
   dev.bindCLIShortcuts({
     print: true,
@@ -95,17 +97,36 @@ const start = async () => {
 
   dev.restart = async () => {
     await dev.close()
-    setImmediate(start)
+    process.exit(0xfa)
   }
 
   return { config: vite, server: dev, manifest: config.manifest }
 }
 
-program.command('dev')
-.description('Start process to develop browser extension')
-.action(async () => {
-  program.dev = true
-  process.env.NODE_ENV ??= 'development'
+const thread = {
+  main: async () => {
+    let status: number
 
-  await start()
-})
+    do {
+      const proc = spawn(process.argv[0], [... process.argv.slice(1), '--fork'], {
+        shell: true,
+        stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0],
+        env: process.env
+      })
+
+      status = await new Promise(ok => proc.on('exit', ok)) || 0
+
+    } while(status === 0xfa)
+  },
+
+  child: start
+}
+
+program.command('dev')
+  .description('Start process to develop browser extension')
+  .option('--fork', 'This is internal args', false)
+  .action(async (opt: { fork: boolean }) => {
+    process.env.NODE_ENV ??= 'development'
+
+    opt.fork ? await thread.child() : await thread.main()
+  })
