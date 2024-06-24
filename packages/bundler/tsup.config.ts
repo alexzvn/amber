@@ -10,11 +10,6 @@ export default defineConfig({
   clean: true,
   external: ['sharp'],
 
-  esbuildOptions(options, context) {
-    options.external ??= []
-    options.external.push('sharp')
-  },
-
   entry: {
     bundler: 'src/bundler.ts',
     cli: 'src/cli/index.ts',
