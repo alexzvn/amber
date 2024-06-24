@@ -1,5 +1,6 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 dist
+amber-project
 # Logs
 
 logs
@@ -11,7 +12,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 # Caches
-
+.turbo
 .cache
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

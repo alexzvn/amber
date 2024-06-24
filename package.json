@@ -32,6 +32,7 @@
     "@types/bun": "latest",
     "@types/chrome": "^0.0.267",
     "tsup": "^8.0.2",
+    "turbo": "^2.0.4",
     "unplugin-raw": "^0.1.1"
   },
   "peerDependencies": {
