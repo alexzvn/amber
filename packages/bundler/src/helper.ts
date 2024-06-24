@@ -1,5 +1,5 @@
 import { mkdir as MakeDirectory, access } from 'fs/promises'
-import type { GenericFunc, Prettify } from './type'
+import type { GenericFunc, Prettify } from '~/type'
 import type {PluginOption} from 'vite'
 
 export const mkdir = async (path: string) => {

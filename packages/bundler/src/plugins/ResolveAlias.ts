@@ -1,7 +1,7 @@
-import { defineVitePlugin } from '~/bundler/helper'
-import ContentScript from '~/bundler/components/ContentScript'
-import Background from '~/bundler/components/BackgroundScript'
-import Page from '~/bundler/components/Page'
+import { defineVitePlugin } from '~//helper'
+import ContentScript from '~/components/ContentScript'
+import Background from '~/components/BackgroundScript'
+import Page from '~/components/Page'
 import { relative } from 'path'
 
 

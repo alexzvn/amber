@@ -1,12 +1,12 @@
-import {defineVitePlugin, mkdir} from '~/bundler/helper.ts'
+import {defineVitePlugin, mkdir} from '~/helper'
 import type {ViteDevServer} from 'vite'
 import {join, dirname} from 'path'
-import Page from '~/bundler/components/Page'
-import ContentScript from '~/bundler/components/ContentScript'
-import CSPolyfillDev from '~/bundler/client/content-script.iife.dev.js?raw'
-import CSPolyfillProd from '~/bundler/client/content-script.iife.prod.js?raw'
+import Page from '~/components/Page'
+import ContentScript from '~/components/ContentScript'
+import CSPolyfillDev from '~/client/content-script.iife.dev.js?raw'
+import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
 import fs from "fs/promises"
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
+import {DevServer} from "~/plugins/BuildEnv.ts"
 import type { AmberOptions } from '../configure'
 
 

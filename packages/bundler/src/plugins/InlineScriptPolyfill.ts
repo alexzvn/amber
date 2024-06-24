@@ -1,6 +1,6 @@
-import {defineVitePlugin, invokeOnce, mkdir} from '~/bundler/helper.ts'
+import {defineVitePlugin, invokeOnce, mkdir} from '~/helper'
 import { parse } from 'node-html-parser'
-import { hash } from '~/bundler/helper'
+import { hash } from '~/helper'
 import { join } from 'path'
 import fs from 'fs/promises'
 import type {ResolvedConfig} from 'vite'

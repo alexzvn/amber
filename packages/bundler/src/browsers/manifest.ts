@@ -1,8 +1,8 @@
-import type {Prettify, Unpacked} from '~/bundler/type'
-import type {ChromeBrowserManifest} from '~/bundler/browsers/chrome'
-import type ContentScript from '~/bundler/components/ContentScript'
-import type Page from "~/bundler/components/Page"
-import type BackgroundScript from '~/bundler/components/BackgroundScript'
+import type {Prettify, Unpacked} from '~/type'
+import type {ChromeBrowserManifest} from '~/browsers/chrome'
+import type ContentScript from '~/components/ContentScript'
+import type Page from "~/components/Page"
+import type BackgroundScript from '~/components/BackgroundScript'
 import type Icons from '../components/Icons'
 
 type CBM<T extends keyof ChromeBrowserManifest> = NonNullable<ChromeBrowserManifest[T]>

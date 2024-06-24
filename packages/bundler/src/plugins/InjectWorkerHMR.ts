@@ -1,11 +1,11 @@
-import { defineVitePlugin } from '~/bundler/helper.ts'
-import BackgroundScript from '~/bundler/components/BackgroundScript'
+import { defineVitePlugin } from '~//helper'
+import BackgroundScript from '~/components/BackgroundScript'
 import MagicString from "magic-string"
-import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
+import type {GeneralManifest} from '~/browsers/manifest.ts'
 import type {ViteDevServer} from 'vite'
-import {DevServer} from '~/bundler/plugins/BuildEnv.ts'
-import type {AmberOptions} from '~/bundler/configure.ts'
-import LoaderScript from '~/bundler/client/__loader?raw'
+import {DevServer} from '~/plugins/BuildEnv.ts'
+import type {AmberOptions} from '~//configure'
+import LoaderScript from '~/client/__loader?raw'
 import fs from 'fs/promises'
 import { join } from 'path'
 

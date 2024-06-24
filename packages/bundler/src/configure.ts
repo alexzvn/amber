@@ -1,6 +1,6 @@
 import {type UserConfig} from 'vite'
-import type {GeneralManifest} from '~/bundler/browsers/manifest'
-import type {Match, Matches} from '~/bundler/browsers/chrome'
+import type {GeneralManifest} from '~/browsers/manifest'
+import type {Match, Matches} from '~/browsers/chrome'
 
 export type AmberConfig = {
   /**

@@ -1,4 +1,4 @@
-import { code } from '~/amber/hashing/Hash'
+import { code } from '../../../amber/hashing/Hash'
 import { defineVitePlugin, exists, mkdir } from '../helper'
 import fs from 'fs/promises'
 import { join } from 'path'

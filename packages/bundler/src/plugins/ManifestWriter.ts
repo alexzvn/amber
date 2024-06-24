@@ -1,11 +1,11 @@
 import fs from 'fs/promises'
 import path from 'path'
-import {defineVitePlugin, invokeOnce, mkdir} from '~/bundler/helper.ts'
-import type {GeneralManifest} from '~/bundler/browsers/manifest.ts'
-import type {ViteDevServer} from "vite";
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts";
-import type {AmberOptions} from "~/bundler/configure.ts";
-import BackgroundScript from '~/bundler/components/BackgroundScript'
+import {defineVitePlugin, invokeOnce, mkdir} from '~/helper'
+import type {GeneralManifest} from '~/browsers/manifest.ts'
+import type {ViteDevServer} from "vite"
+import {DevServer} from "~/plugins/BuildEnv.ts"
+import type {AmberOptions} from "~/configure"
+import BackgroundScript from '~/components/BackgroundScript'
 
 const bindAccessibleResouce = (manifest: GeneralManifest) => {
   const resources = (manifest.web_accessible_resources ??= [])

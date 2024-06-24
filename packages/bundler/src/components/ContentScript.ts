@@ -1,6 +1,6 @@
-import type {ChromeBrowserManifest, Matches} from '~/bundler/browsers/chrome'
-import type {Unpacked} from '~/bundler/type'
-import {pathDiscover, pick} from '~/bundler/helper'
+import type {ChromeBrowserManifest, Matches} from '~/browsers/chrome'
+import type {Unpacked} from '~/type'
+import {pathDiscover, pick} from '~/helper'
 import slash from 'slash'
 import { join } from 'path'
 

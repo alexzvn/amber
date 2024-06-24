@@ -2,8 +2,8 @@ import { Command } from 'commander'
 import { version } from '~/../package.json'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
-import type { DefinedConfig } from '~/bundler/configure'
-import { exists } from '~/bundler/helper'
+import type { DefinedConfig } from '~//configure'
+import { exists } from '~//helper'
 
 export const cwd = process.cwd()
 

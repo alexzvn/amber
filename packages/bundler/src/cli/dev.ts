@@ -1,12 +1,12 @@
 import { spawn } from 'child_process'
 import { mergeConfig, type UserConfig, createServer, build, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import ProcessIcon from '~/bundler/build/ProcessIcon'
+import ProcessIcon from '~/build/ProcessIcon'
 import defu from 'defu'
-import ContentScript from '~/bundler/components/ContentScript'
-import BackgroundScript from '~/bundler/components/BackgroundScript'
-import AmberPlugin from '~/bundler/plugins'
-import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
+import ContentScript from '~/components/ContentScript'
+import BackgroundScript from '~/components/BackgroundScript'
+import AmberPlugin from '~/plugins'
+import {DevServer} from "~/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
 import { escapeExecutePath } from '../helper'
 

@@ -1,4 +1,4 @@
-import {pathDiscover} from '~/bundler/helper'
+import {pathDiscover} from '~/helper'
 
 export default class BackgroundScript {
   static readonly $registers = new Set<BackgroundScript>()

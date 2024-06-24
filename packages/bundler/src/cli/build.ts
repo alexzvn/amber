@@ -1,9 +1,9 @@
 import { build, mergeConfig, type UserConfig, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import ProcessIcon from '~/bundler/build/ProcessIcon'
-import AmberPlugin from '~/bundler/plugins'
-import { getMapIIFE, getMapModule } from '~/bundler/components/'
-import { exists } from '~/bundler/helper'
+import ProcessIcon from '~/build/ProcessIcon'
+import AmberPlugin from '~/plugins'
+import { getMapIIFE, getMapModule } from '~/components/'
+import { exists } from '~//helper'
 import { join } from 'path'
 import fs from 'fs/promises'
 
