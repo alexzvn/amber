@@ -92,3 +92,29 @@ export const hash = (text: string) => {
 
   return hash
 }
+
+/**
+ * insert backslash before white space
+ * to escape path for linux-like environment
+ */
+export const escapeExecutePath = (path: string) => {
+  const normalizePath = (path: string) => {
+    if (process.platform === 'win32') {
+      return path.replace(/\//, '\\')
+    }
+  
+    return path.replace(/\\/g, '/')
+  }
+
+  path = normalizePath(path)
+
+  if (process.platform !== 'win32') {
+    return path.split(' ').join('\\ ')
+  }
+
+  if (path.search(/\s/) !== -1) {
+    return `"${path}"`
+  }
+
+  return path;
+}

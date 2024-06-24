@@ -8,6 +8,7 @@ import BackgroundScript from '~/bundler/components/BackgroundScript'
 import AmberPlugin from '~/bundler/plugins'
 import {DevServer} from "~/bundler/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
+import { escapeExecutePath } from '../helper'
 
 
 const start = async () => {
@@ -108,10 +109,13 @@ const thread = {
     let status: number
 
     do {
-      const proc = spawn(process.argv[0], [... process.argv.slice(1), '--fork'], {
+      const cmd = escapeExecutePath(process.argv[0])
+      const argv = process.argv.slice(1).map(escapeExecutePath)
+
+      const proc = spawn(cmd, argv, {
         shell: true,
         stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0],
-        env: process.env
+        env: { ...process.env, INTERNAL_DEV_SERVER: 'true' }
       })
 
       status = await new Promise(ok => proc.on('exit', ok)) || 0
@@ -124,9 +128,14 @@ const thread = {
 
 program.command('dev')
   .description('Start process to develop browser extension')
-  .option('--fork', 'This is internal args', false)
-  .action(async (opt: { fork: boolean }) => {
+  .action(async () => {
+    const isMainProcess = !process.env.INTERNAL_DEV_SERVER
+
     process.env.NODE_ENV ??= 'development'
 
-    opt.fork ? await thread.child() : await thread.main()
+    if (isMainProcess) {
+      console.log('\n\tStarting amber development...\n')
+    }
+
+    isMainProcess ? await thread.main() : await thread.child()
   })
