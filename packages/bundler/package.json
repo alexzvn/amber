@@ -1,5 +1,5 @@
 {
-  "name": "@alexzvn/amber",
+  "name": "@amber.js/bundler",
   "version": "0.5.2",
   "description": "",
   "main": "index.js",
@@ -31,7 +31,8 @@
     "unplugin-raw": "^0.1.1"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "amber.js": "^0.5.0"
   },
   "engines": {
     "node": ">= 18.x"

@@ -1,19 +1,10 @@
 {
-  "name": "@alexzvn/amber",
+  "name": "@amber.js/docs",
   "version": "0.5.2",
   "author": "Alexzvn",
   "license": "MIT",
-  "module": "index.ts",
-  "type": "module",
-  "main": "dist/amber/index.js",
-  "types": "dist/amber/index.d.ts",
   "scripts": {
-
-  },
-  "dependencies": {
-  },
-  "devDependencies": {
-    "turbo": "^2.0.4"
+    "build": "bun ./scripts/build.ts"
   },
   "description": "To install dependencies:",
   "repository": {
@@ -29,6 +20,5 @@
   "homepage": "https://github.com/alexzvn/amber#readme",
   "bugs": {
     "url": "https://github.com/alexzvn/amber/issues"
-  },
-  "packageManager": "bun@1.1.14"
+  }
 }

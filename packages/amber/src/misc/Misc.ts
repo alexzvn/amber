@@ -1,4 +1,4 @@
-import type { GenericFunc, Prettify } from '~/amber/type'
+import type { GenericFunc, Prettify } from '~/type'
 import { base64ArrayBuffer } from './ArrayBufferToBase64'
 
 export const invokeOnce = <A extends any[], R>(handler: GenericFunc<A, R>) => {

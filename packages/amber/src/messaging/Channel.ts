@@ -1,7 +1,7 @@
 import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
 import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler } from './MessageMisc'
 import type Messaging from './Messaging'
-import type { GenericFunc } from '~/amber/type'
+import type { GenericFunc } from '~/type'
 
 export type AsyncReadableStreamEvent<T> = AsyncReadableStream<T> & ReturnType<typeof convertToEvent<T>>
 
