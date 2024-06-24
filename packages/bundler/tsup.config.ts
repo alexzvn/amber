@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup'
 import raw from 'unplugin-raw/esbuild'
 
 export default defineConfig({
-  esbuildPlugins: [raw()],
+  esbuildPlugins: [raw() as any],
 
   format: 'esm',
   target: 'esnext',
