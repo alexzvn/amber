@@ -39,7 +39,7 @@ const injectBackgroundWorker = (manifest: GeneralManifest) => {
     return
   }
 
-  manifest.background = new BackgroundScript('@alexzvn/amber/client/worker.esm')
+  manifest.background = new BackgroundScript('@amber.js/bundler/client/worker.esm')
 }
 
 export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
