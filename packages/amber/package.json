@@ -1,6 +1,6 @@
 {
   "name": "amber.js",
-  "version": "0.5.0",
+  "version": "0.5.3-rc",
   "scripts": {
     "build": "tsup-node",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -36,5 +36,8 @@
   },
   "homepage": "https://github.com/alexzvn/amber#readme",
   "module": "index.ts",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "mitt": "^3.0.1"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@amber.js/bundler",
-  "version": "0.5.2",
+  "version": "0.5.3-rc",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,6 @@
     "defu": "^6.1.4",
     "dotenv": "^16.4.5",
     "magic-string": "^0.30.10",
-    "mitt": "^3.0.1",
     "node-html-parser": "^6.1.13",
     "sharp": "^0.33.4",
     "slash": "^5.1.0",
@@ -31,13 +30,11 @@
     "unplugin-raw": "^0.1.1"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0",
-    "amber.js": "^0.5.0"
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">= 18.x"
   },
-
   "exports": {
     ".": {
       "import": {
@@ -45,14 +42,12 @@
         "default": "./dist/bundler.mjs"
       }
     },
-
     "./client/worker.esm": {
       "import": {
         "types": "./dist/client/worker.esm.d.mts",
         "default": "./dist/client/worker.esm.mjs"
       }
     },
-
     "./client/worker-bypass-csp.esm": {
       "import": {
         "types": "./dist/client/worker-bypass-csp.esm.d.mts",
@@ -60,7 +55,6 @@
       }
     }
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alexzvn/amber.git",
