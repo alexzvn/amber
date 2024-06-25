@@ -1,5 +1,5 @@
 {
-  "name": "amber.js",
+  "name": "@amber.js/core",
   "version": "0.5.3-rc",
   "scripts": {
     "build": "tsup-node",
