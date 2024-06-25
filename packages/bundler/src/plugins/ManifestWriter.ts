@@ -57,31 +57,24 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
     await fs.writeFile(target, JSON.stringify(manifest, null, 2))
   }
 
-  const write = () => writeManifest()
-
-  const configureServer = invokeOnce((server: ViteDevServer) => {
-    const port = server.config.server.port
-
-    manifest.host_permissions ??= []
-  
-    manifest.host_permissions.push(`http://localhost:${port}/*`)
-    manifest.web_accessible_resources!.push({
-      matches: ['<all_urls>'],
-      resources: ['/*']
-    })
-
-    injectBackgroundWorker(manifest)
-  })
-
   return {
     name: 'amber:manifest-writer',
-    writeManifest,
-    configureServer,
+    configureServer: (server: ViteDevServer) => {
+      const port = server.config.server.port
+  
+      manifest.host_permissions ??= []
+    
+      manifest.host_permissions.push(`http://localhost:${port}/*`)
+      manifest.web_accessible_resources!.push({
+        matches: ['<all_urls>'],
+        resources: ['/*']
+      })
 
-    writeBundle: () => {
-      DevServer.value && configureServer(DevServer.value)
+      injectBackgroundWorker(manifest)
 
-      return write()
-    }
+      writeManifest()
+    },
+
+    writeBundle: () => writeManifest()
   }
 })

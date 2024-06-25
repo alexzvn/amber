@@ -8,6 +8,7 @@ import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
 import fs from "fs/promises"
 import {DevServer} from "~/plugins/BuildEnv.ts"
 import type { AmberOptions } from '../configure'
+import slash from 'slash'
 
 
 export default defineVitePlugin((amber: AmberOptions = {}) => {
@@ -65,7 +66,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
         const enableReload = script.options.hotReload
         const code = CSPolyfillDev
           .replace(/__PRE_SCRIPT__/g, `"${host}@vite/client"`)
-          .replace(/__SCRIPT__/g, `"${host}${script.file}"`)
+          .replace(/__SCRIPT__/g, `"${host}${slash(script.file)}"`)
           .replace(/__ALLOW_FULL_RELOAD__/g, enableReload.toString())
 
         await fs.writeFile(join(outdir, 'scripts', script.path.name + '.js'), code)

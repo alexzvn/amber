@@ -59,9 +59,12 @@ export default defineVitePlugin(() => {
 
     async writeBundle() {
       const outdir = join(config.build.outDir, 'shared')
-      await mkdir(outdir)
+
+      let flag = false
 
       for (const [id, code] of inline.entries()) {
+        !flag && (flag = true) && await mkdir(outdir)
+
         const filename = `inline-${id}.js`
         await fs.writeFile(join(outdir, filename), code)
       }

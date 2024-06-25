@@ -57,7 +57,7 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
 
       if (server && script) {
         const magic = new MagicString(code, { filename: script.path.filename })
-        magic.prepend(`import '@alexzvn/amber/client/worker.esm';\n`)
+        magic.prepend(`import '@amber.js/bundler/client/worker.esm';\n`)
 
         return { code: magic.toString(), map: magic.generateMap() }
       }

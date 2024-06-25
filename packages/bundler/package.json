@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "amber": "dist/cli.js"
+    "amber": "./dist/cli.mjs"
   },
   "dependencies": {
     "archiver": "^7.0.1",
@@ -53,7 +53,7 @@
       }
     },
 
-    "./dist/client/worker-bypass-csp.esm": {
+    "./client/worker-bypass-csp.esm": {
       "import": {
         "types": "./dist/client/worker-bypass-csp.esm.d.mts",
         "default": "./dist/client/worker-bypass-csp.esm.mjs"
