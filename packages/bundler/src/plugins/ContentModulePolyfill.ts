@@ -85,7 +85,14 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       }
 
       const lines = _code.split('\n')
-      const reloadLine = lines.findIndex((line) => line.includes(`case 'full-reload':`))
+      const reloadLine = lines.findIndex((line) => {
+        return line.includes(`case 'full-reload':`) || line.includes(`case "full-reload":`)
+      })
+
+      if (reloadLine === -1) {
+        return this.warn('Disable auto reload may not work.')
+      }
+
       const [space] = lines[reloadLine + 1].match(/^\s+/)!
 
       const inject = [
