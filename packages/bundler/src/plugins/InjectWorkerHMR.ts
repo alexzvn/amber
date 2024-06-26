@@ -62,7 +62,7 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
         return { code: magic.toString(), map: magic.generateMap() }
       }
 
-      if (id.endsWith('/client/worker.esm.js')) {
+      if (id.endsWith('/client/worker.esm.mjs')) {
         const script = [... BackgroundScript.$registers][0]
 
         code = code
