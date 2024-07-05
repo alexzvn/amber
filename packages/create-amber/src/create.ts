@@ -104,11 +104,10 @@ export const create = async (folder: string) => {
   }
 
   const env = await getDevelopEnv(folder)
-  let packageContent: any
 
   await fs.readFile(packagePath)
     .then(buff => buff.toString())
-    .then(text => packageContent = transformPackage(text))
+    .then(text => transformPackage(text))
     .then(text => JSON.stringify(text, null, 2))
     .then(data => fs.writeFile(packagePath, data))
 
