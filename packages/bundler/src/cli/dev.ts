@@ -117,7 +117,7 @@ const thread = {
 
       const proc = spawn(cmd, argv, {
         shell: true,
-        stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0],
+        stdio: [0, 1, 2],
         env: { ...process.env, INTERNAL_DEV_SERVER: 'true' }
       })
 

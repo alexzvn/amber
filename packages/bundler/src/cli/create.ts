@@ -80,7 +80,7 @@ export const create = async (folder: string) => {
   const proc = spawn('npm create vite@latest ' + folder, {
     shell: true,
     env: process.env,
-    stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0]
+    stdio: [0, 1, 2]
   })
 
   await new Promise<number>(resolve => {
