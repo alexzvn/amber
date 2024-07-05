@@ -1,4 +1,4 @@
-import { defineVitePlugin } from '~//helper'
+import { defineVitePlugin } from '~/helper'
 import ContentScript from '~/components/ContentScript'
 import Background from '~/components/BackgroundScript'
 import Page from '~/components/Page'

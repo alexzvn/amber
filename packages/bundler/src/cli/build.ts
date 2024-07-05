@@ -3,7 +3,7 @@ import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/build/ProcessIcon'
 import AmberPlugin from '~/plugins'
 import { getMapIIFE, getMapModule } from '~/components/'
-import { exists } from '~//helper'
+import { exists } from '~/helper'
 import { join } from 'path'
 import fs from 'fs/promises'
 

@@ -1,4 +1,4 @@
-import { defineVitePlugin } from '~//helper'
+import { defineVitePlugin } from '~/helper'
 import BackgroundScript from '~/components/BackgroundScript'
 import MagicString from "magic-string"
 import type {GeneralManifest} from '~/browsers/manifest.ts'

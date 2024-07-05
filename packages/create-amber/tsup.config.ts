@@ -11,5 +11,5 @@ export default defineConfig({
   clean: true,
   external: ['sharp'],
 
-  entry: ['command.ts']
+  entry: ['src/command.ts']
 })
