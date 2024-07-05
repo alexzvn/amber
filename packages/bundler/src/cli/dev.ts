@@ -9,9 +9,12 @@ import AmberPlugin from '~/plugins'
 import {DevServer} from "~/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
 import { escapeExecutePath } from '../helper'
+import dotenv from 'dotenv'
 
 
 const start = async () => {
+  dotenv.config({ override: true })
+
   const config = await loadAmberConfig()
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
