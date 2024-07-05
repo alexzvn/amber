@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "~/*": ["./src/*"],
+      "@bundler/*": ["./../bundler/src/*"],
+      "@amber/*": ["./../amber/src/*"]
+    }
+  },
+  "include": ["src", "global.d.ts"]
+}

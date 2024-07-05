@@ -1,12 +1,20 @@
-import { cwd } from './program'
 import fs from 'fs/promises'
 import { join } from 'path'
 import { spawn } from 'node:child_process'
-import { exists } from '~//helper'
-import { version as PackageVersion, name as PackageName } from '~/../package.json'
 import ConfigTemplate from './template/config.ts.template?raw'
 import BackgroundTemplate from './template/background.ts.template?raw'
 import ContentScriptTemplate from './template/content-script.ts.template?raw'
+import { access } from 'fs/promises'
+
+const exists = async (path: string) => {
+  try {
+    return await access(path).then(() => true)
+  } catch {
+    return false
+  }
+}
+
+const cwd = process.cwd()
 
 const getDevelopEnv = async (folder: string) => {
   const base = join(cwd, folder)
@@ -57,7 +65,8 @@ const transformPackage = (_pkg: string) => {
 
   pkg.description ??= 'A browser extension built with Vite + Amber'
   pkg.devDependencies ??= {}
-  pkg.devDependencies[PackageName] = `^${PackageVersion}`
+  pkg.devDependencies['@amber.js/bundler'] = `^0.5.4`
+  pkg.devDependencies['@amber.js/core'] = `^0.5.3`
   pkg.devDependencies['@types/chrome'] = '^0.0.267'
 
   Object.assign(pkg.scripts, {
@@ -80,7 +89,7 @@ export const create = async (folder: string) => {
   const proc = spawn('npm create vite@latest ' + folder, {
     shell: true,
     env: process.env,
-    stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0]
+    stdio: [0, 1, 2]
   })
 
   await new Promise<number>(resolve => {
@@ -95,11 +104,10 @@ export const create = async (folder: string) => {
   }
 
   const env = await getDevelopEnv(folder)
-  let packageContent: any
 
   await fs.readFile(packagePath)
     .then(buff => buff.toString())
-    .then(text => packageContent = transformPackage(text))
+    .then(text => transformPackage(text))
     .then(text => JSON.stringify(text, null, 2))
     .then(data => fs.writeFile(packagePath, data))
 

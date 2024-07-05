@@ -9,9 +9,12 @@ import AmberPlugin from '~/plugins'
 import {DevServer} from "~/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
 import { escapeExecutePath } from '../helper'
+import dotenv from 'dotenv'
 
 
 const start = async () => {
+  dotenv.config({ override: true })
+
   const config = await loadAmberConfig()
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
@@ -114,7 +117,7 @@ const thread = {
 
       const proc = spawn(cmd, argv, {
         shell: true,
-        stdio: process.platform === 'win32' ? [0, 1, 2] : [0, 0, 0],
+        stdio: [0, 1, 2],
         env: { ...process.env, INTERNAL_DEV_SERVER: 'true' }
       })
 

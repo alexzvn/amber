@@ -1,7 +1,7 @@
 import { Command } from 'commander'
 import prompts from 'prompts'
-import { create } from '../bundler/src/cli/create'
-import { version, name } from './package.json'
+import { create } from './create'
+import { version, name } from '../package.json'
 
 const program = new Command()
   .name(name)

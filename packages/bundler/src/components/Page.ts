@@ -1,5 +1,5 @@
 import slash from 'slash'
-import {pathDiscover} from '~//helper'
+import {pathDiscover} from '~/helper'
 
 export default class Page extends String {
   static readonly $registers = new Set<Page>()

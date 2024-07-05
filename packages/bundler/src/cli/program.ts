@@ -3,7 +3,7 @@ import { version } from '~/../package.json'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
 import type { DefinedConfig } from '~//configure'
-import { exists } from '~//helper'
+import { exists } from '~/helper'
 
 export const cwd = process.cwd()
 
