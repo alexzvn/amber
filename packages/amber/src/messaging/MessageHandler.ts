@@ -7,9 +7,9 @@ export const registerEvent = (mode: AcceptMode, map: Map<EventKey, Set<HandlerFu
       return
     }
 
-    const handlers = map.get(msg.name)!
+    const handlers = map.get(msg.name)
 
-    if (msg.accept !== mode || msg.type !== 'emit' || !handlers.size) {
+    if (msg.accept !== mode || msg.type !== 'emit' || !handlers?.size) {
       return
     }
 
