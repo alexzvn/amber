@@ -6,7 +6,7 @@ import {
   BackgroundScript,
   version,
   Icons
-} from '@alexzvn/amber/bundler'
+} from '@amber.js/bundler'
 
 export default defineConfig({
   manifest: {
