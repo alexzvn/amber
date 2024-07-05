@@ -1,6 +1,6 @@
 {
   "name": "@amber.js/core",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "scripts": {
     "build": "tsup-node",
     "test": "echo \"Error: no test specified\" && exit 1"
