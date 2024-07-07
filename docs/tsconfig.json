@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["./.vitepress/components"]
+    }
+  },
+  "include": ["./**/*.md", ".vitepress/**/*"],
+  "exclude": [".vitepress/cache/**/*"]
+}
