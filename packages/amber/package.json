@@ -1,10 +1,13 @@
 {
   "name": "@amber.js/core",
   "version": "0.5.4",
+  "module": "index.ts",
+  "type": "module",
   "scripts": {
     "build": "tsup-node",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "dependencies": {},
   "devDependencies": {
     "tsup": "^8.1.0",
     "@types/bun": "latest"
@@ -29,15 +32,10 @@
     "url": "git+https://github.com/alexzvn/amber.git",
     "directory": "packages/amber"
   },
-  "author": "",
+  "author": "Alexzvn",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/alexzvn/amber/issues"
   },
-  "homepage": "https://github.com/alexzvn/amber#readme",
-  "module": "index.ts",
-  "type": "module",
-  "dependencies": {
-    "mitt": "^3.0.1"
-  }
+  "homepage": "https://github.com/alexzvn/amber#readme"
 }
