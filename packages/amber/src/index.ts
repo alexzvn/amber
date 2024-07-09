@@ -3,7 +3,7 @@ export type { AsyncReadableStreamEvent } from './messaging/Channel.ts'
 import Storage from './storage/Storage'
 import * as Misc from './misc/Misc'
 import * as Hash from './hashing/Hash.ts'
-import { defineWorkerQueue } from './queue/WorkerQueue'
+import { defineSimpleQueue } from './queue/SimpleQueue.ts'
 
 export {
   Storage,
@@ -11,5 +11,5 @@ export {
   Misc,
   Hash,
   defineMessagingAddon,
-  defineWorkerQueue
+  defineSimpleQueue
 }

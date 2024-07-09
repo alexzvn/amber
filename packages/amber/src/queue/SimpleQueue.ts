@@ -8,7 +8,7 @@ export type WorkerQueueOption<T> = Partial<{
   concurrent: number,
 }>
 
-export const defineWorkerQueue = <T>(handler: Worker<T>, options: WorkerQueueOption<T> = {}) => {
+export const defineSimpleQueue = <T>(handler: Worker<T>, options: WorkerQueueOption<T> = {}) => {
   const queue = new Array<T>()
   const state = { running: 0, stop: false }
   const emitter = new EventTarget()
