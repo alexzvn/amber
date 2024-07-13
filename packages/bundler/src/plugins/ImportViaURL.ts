@@ -49,6 +49,7 @@ const compile = (filepath: string, callback: (dts: string) => unknown) => {
       checkJs: false,
       resolveJsonModule: true,
       esModuleInterop: true,
+      skipLibCheck: true
     }
   })
 
