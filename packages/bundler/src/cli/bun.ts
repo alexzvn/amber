@@ -1,6 +1,5 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import 'dotenv/config'
-import 'tsx'
 
 import program from './program'
 import './dev'

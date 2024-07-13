@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "amber": "dist/cli.mjs"
+    "amber": "dist/cli.mjs",
+    "amberx": "dist/bun.mjs"
   },
   "dependencies": {
     "archiver": "^7.0.1",
