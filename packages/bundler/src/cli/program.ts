@@ -2,10 +2,25 @@ import { Command } from 'commander'
 import { version } from '~/../package.json'
 import { join } from 'path'
 import { pathToFileURL } from 'url'
-import type { DefinedConfig } from '~//configure'
+import type { DefinedConfig } from '~/configure'
 import { exists } from '~/helper'
+import { tsImport } from 'tsx/esm/api'
 
 export const cwd = process.cwd()
+
+const read = async (file: string) => {
+  try {
+    return await import(file)
+  } catch (e) {
+
+    // @ts-ignore
+    if (e.code === 'ERR_UNKNOWN_FILE_EXTENSION') {
+      return await tsImport(file, import.meta.url)
+    }
+
+    throw e
+  }
+}
 
 export const loadAmberConfig = async () => {
   const configs = [
@@ -15,7 +30,7 @@ export const loadAmberConfig = async () => {
 
   for (const file of configs) {
     if (await exists(file)) {
-      const mod = await import(pathToFileURL(join(cwd, file)).toString())
+      const mod = await read(pathToFileURL(join(cwd, file)).toString())
       return mod.default as DefinedConfig
     }
   }
