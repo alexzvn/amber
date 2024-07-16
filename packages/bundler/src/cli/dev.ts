@@ -10,9 +10,12 @@ import {DevServer} from "~/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
 import { escapeExecutePath } from '../helper'
 import dotenv from 'dotenv'
+import { chromium } from 'playwright'
+import { join } from 'path'
 
+type DevOption = { devBrowser: boolean }
 
-const start = async () => {
+const start = async (option: DevOption) => {
   dotenv.config({ override: true })
 
   const config = await loadAmberConfig()
@@ -104,7 +107,24 @@ const start = async () => {
     process.exit(0xfa)
   }
 
-  return { config: vite, server: dev, manifest: config.manifest }
+  const extensionPath = join(cwd, 'dist')
+
+  const browser = option.devBrowser && await chromium.launchPersistentContext('.amber/browser/chrome', {
+    headless: false,
+    bypassCSP: true,
+    viewport: null,
+    args: [
+      `--disable-extensions-except=${extensionPath}`,
+      `--load-extension=${extensionPath}`
+    ],
+    ignoreDefaultArgs: ['--enable-automation', '--no-sandbox']
+  })
+
+  if (browser) {
+    browser.pages()[0].goto(`http://localhost:${dev.config.server.port}`)
+  }
+
+  return { config: vite, server: dev, manifest: config.manifest, browser }
 }
 
 const thread = {
@@ -131,7 +151,8 @@ const thread = {
 
 program.command('dev')
   .description('Start process to develop browser extension')
-  .action(async () => {
+  .option('-d, --dev-browser', 'Disable auto development browser')
+  .action(async (option: DevOption) => {
     const isMainProcess = !process.env.INTERNAL_DEV_SERVER
 
     process.env.NODE_ENV ??= 'development'
@@ -140,5 +161,5 @@ program.command('dev')
       console.log('\n\tStarting amber development...\n')
     }
 
-    isMainProcess ? await thread.main() : await thread.child()
+    isMainProcess ? await thread.main() : await thread.child(option)
   })
