@@ -1,5 +1,5 @@
 import { spawn } from 'child_process'
-import { mergeConfig, type UserConfig, createServer, build, defineConfig } from 'vite'
+import { mergeConfig, type UserConfig, createServer, build, defineConfig, type ViteDevServer, type CLIShortcut } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/build/ProcessIcon'
 import defu from 'defu'
@@ -79,26 +79,24 @@ const start = async (option: DevOption) => {
   await dev.listen()
 
   dev.printUrls()
-  dev.bindCLIShortcuts({
-    print: true,
-    customShortcuts: [
-      {
-        key: 'e',
-        description: 'reload browser extension',
-        action(server) {
-          server.hot.send({ type: 'custom', event: 'amber:background.reload' })
-          server.config.logger.info('Reloading browser extension', { timestamp: true })
-        },
-      }, {
-        key: 'p',
-        description: 'reload current tab',
-        action(server) {
-          server.hot.send({ type: 'custom', event: 'amber:page.reload' })
-          server.config.logger.info('Reloading current active tab', { timestamp: true })
-        }
+
+  const shortcuts: CLIShortcut<ViteDevServer>[] = [
+    {
+      key: 'e',
+      description: 'reload browser extension',
+      action(server) {
+        server.hot.send({ type: 'custom', event: 'amber:background.reload' })
+        server.config.logger.info('Reloading browser extension', { timestamp: true })
+      },
+    }, {
+      key: 'p',
+      description: 'reload current tab',
+      action(server) {
+        server.hot.send({ type: 'custom', event: 'amber:page.reload' })
+        server.config.logger.info('Reloading current active tab', { timestamp: true })
       }
-    ],
-  })
+    }
+  ]
 
   await ProcessIcon(cwd, 'dist')
 
@@ -111,18 +109,24 @@ const start = async (option: DevOption) => {
 
   const browser = option.devBrowser && await chromium.launchPersistentContext('.amber/browser/chrome', {
     headless: false,
-    bypassCSP: true,
     viewport: null,
-    args: [
-      `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`
-    ],
-    ignoreDefaultArgs: ['--enable-automation', '--no-sandbox']
+    args: [`--load-extension=${extensionPath}`],
+    ignoreDefaultArgs: ['--enable-automation', '--no-sandbox', '--disable-extensions']
   })
 
   if (browser) {
-    browser.pages()[0].goto(`http://localhost:${dev.config.server.port}`)
+    const devPage = `http://localhost:${dev.config.server.port}`
+
+    browser.pages()[0].goto(devPage)
+
+    shortcuts.push({
+      key: 'd',
+      description: 'open in development browser',
+      action: () => { browser.newPage().then(page => page.goto(devPage)) }
+    })
   }
+
+  dev.bindCLIShortcuts({ print: true, customShortcuts: shortcuts })
 
   return { config: vite, server: dev, manifest: config.manifest, browser }
 }
@@ -144,6 +148,8 @@ const thread = {
       status = await new Promise(ok => proc.on('exit', ok)) || 0
 
     } while(status === 0xfa)
+
+    console.log()
   },
 
   child: start
