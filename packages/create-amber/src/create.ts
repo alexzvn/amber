@@ -65,14 +65,16 @@ const transformPackage = (_pkg: string) => {
 
   pkg.description ??= 'A browser extension built with Vite + Amber'
   pkg.devDependencies ??= {}
-  pkg.devDependencies['@amber.js/bundler'] = `^0.5.4`
-  pkg.devDependencies['@amber.js/core'] = `^0.5.3`
-  pkg.devDependencies['@types/chrome'] = '^0.0.267'
+  pkg.devDependencies['@amber.js/bundler'] = `^0.6.1`
+  pkg.devDependencies['@amber.js/core'] = `^0.5.5`
+  pkg.devDependencies['@types/chrome'] = '^0.0.268'
 
   Object.assign(pkg.scripts, {
+    prepare: 'playwright install',
+    dev: 'amber dev --dev-browser',
+    build: 'amber build',
+    archive: 'amber archive',
     clean: 'amber clean',
-    dev: 'amber dev',
-    build: 'amber build --prod'
   })
 
   delete pkg.scripts.preview
@@ -113,7 +115,7 @@ export const create = async (folder: string) => {
 
   await fs.readFile(gitignore)
     .then(buff => buff.toString())
-    .then(text => '.amber\n' + text)
+    .then(text => ".amber\nrelease\n\n" + text)
     .then(data => fs.writeFile(gitignore, data))
 
   await transform(env)
