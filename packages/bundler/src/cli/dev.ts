@@ -117,8 +117,6 @@ const start = async (option: DevOption) => {
   if (browser) {
     const devPage = `http://localhost:${dev.config.server.port}`
 
-    browser.pages()[0].goto(devPage)
-
     shortcuts.push({
       key: 'd',
       description: 'open in development browser',
