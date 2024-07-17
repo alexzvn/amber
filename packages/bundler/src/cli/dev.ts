@@ -111,6 +111,7 @@ const start = async (option: DevOption) => {
   const browser = option.devBrowser && await chromium.launchPersistentContext('.amber/browser/chrome', {
     headless: false,
     viewport: null,
+    bypassCSP: config.amber.bypassCSP === true,
     args: [`--load-extension=${extensionPath}`],
     ignoreDefaultArgs: ['--enable-automation', '--no-sandbox', '--disable-extensions']
   })
