@@ -13,6 +13,7 @@ import dotenv from 'dotenv'
 import { chromium } from 'playwright'
 import { join } from 'path'
 
+
 type DevOption = { devBrowser: boolean }
 
 const start = async (option: DevOption) => {
@@ -115,7 +116,9 @@ const start = async (option: DevOption) => {
   })
 
   if (browser) {
-    const devPage = `http://localhost:${dev.config.server.port}`
+    const devPage = `http://localhost:${dev.config.server.port}/@amber.js/welcome`
+
+    browser.pages().at(0)?.goto(devPage)
 
     shortcuts.push({
       key: 'd',
@@ -160,10 +163,6 @@ program.command('dev')
     const isMainProcess = !process.env.INTERNAL_DEV_SERVER
 
     process.env.NODE_ENV ??= 'development'
-
-    if (isMainProcess) {
-      console.log('\n\tStarting amber development...\n')
-    }
 
     isMainProcess ? await thread.main() : await thread.child(option)
   })
