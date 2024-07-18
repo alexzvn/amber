@@ -5,6 +5,7 @@ import ConfigTemplate from './template/config.ts.template?raw'
 import BackgroundTemplate from './template/background.ts.template?raw'
 import ContentScriptTemplate from './template/content-script.ts.template?raw'
 import { access } from 'fs/promises'
+import Json from 'comment-json'
 
 const exists = async (path: string) => {
   try {
@@ -100,6 +101,7 @@ export const create = async (folder: string) => {
 
   const packagePath = join(cwd, folder, 'package.json')
   const gitignore = join(cwd, folder, '.gitignore')
+  const tsconfig = join(cwd, folder, 'tsconfig.json')
 
   if (! await exists(packagePath)) {
     return process.exit(0)
@@ -119,4 +121,13 @@ export const create = async (folder: string) => {
     .then(data => fs.writeFile(gitignore, data))
 
   await transform(env)
+
+  if (! exists(tsconfig)) {
+    return
+  }
+
+  await fs.readFile(tsconfig)
+    .then(buffer => Json.parse(buffer.toString()) as any)
+    .then(config => Json.assign(config.compilerOptions, { verbatimModuleSyntax: true }))
+    .then(config => fs.writeFile(tsconfig, Json.stringify(config)))
 }
