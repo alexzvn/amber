@@ -61,7 +61,7 @@ const transform = async (env: Awaited<ReturnType<typeof getDevelopEnv>>) => {
   return fs.writeFile(join(env.base, `amber.config.${env.mode}`), code)
 }
 
-const transformPackage = (_pkg: string) => {
+const transformPackage = (_pkg: string, devBrowser: boolean) => {
   const pkg = JSON.parse(_pkg)
 
   pkg.description ??= 'A browser extension built with Vite + Amber'
@@ -70,20 +70,28 @@ const transformPackage = (_pkg: string) => {
   pkg.devDependencies['@amber.js/core'] = `^0.5.5`
   pkg.devDependencies['@types/chrome'] = '^0.0.268'
 
+  pkg.scripts = {}
+
+  devBrowser && Object.assign(pkg.scripts, { prepare: 'playwright install' })
+
   Object.assign(pkg.scripts, {
-    prepare: 'playwright install',
-    dev: 'amber dev --dev-browser',
+    dev: `amber dev ${devBrowser ? '--dev-browser' : ''}`.trim(),
     build: 'amber build',
     archive: 'amber archive',
     clean: 'amber clean',
   })
 
-  delete pkg.scripts.preview
-
   return pkg
 }
 
-export const create = async (folder: string) => {
+export type CreateAmber = {
+  folder: string
+  devBrowser: boolean
+}
+
+export const create = async (config: CreateAmber) => {
+  const { folder } = config
+
   if (await exists(folder)) {
     console.log(`Folder ${folder} already existed`)
     process.exit(1)
@@ -111,7 +119,7 @@ export const create = async (folder: string) => {
 
   await fs.readFile(packagePath)
     .then(buff => buff.toString())
-    .then(text => transformPackage(text))
+    .then(text => transformPackage(text, config.devBrowser))
     .then(text => JSON.stringify(text, null, 2))
     .then(data => fs.writeFile(packagePath, data))
 
@@ -128,6 +136,10 @@ export const create = async (folder: string) => {
 
   await fs.readFile(tsconfig)
     .then(buffer => Json.parse(buffer.toString()) as any)
-    .then(config => Json.assign(config.compilerOptions, { verbatimModuleSyntax: true }))
-    .then(config => fs.writeFile(tsconfig, Json.stringify(config)))
+    .then(config => {
+      if (config.compilerOptions) {
+        Json.assign(config.compilerOptions, { verbatimModuleSyntax: true })
+        return fs.writeFile(tsconfig, Json.stringify(config, null, 2))
+      }
+    })
 }
