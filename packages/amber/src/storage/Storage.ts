@@ -4,9 +4,9 @@ type WrappedStorage = ReturnType<typeof storageOf>
 
 const cache = new Map<string, WrappedStorage>()
 
-const getTypeStorage = (type: 'session'|'sync'|'managed') => {
+const getTypeStorage = (type: 'session'|'sync'|'managed'|'local') => {
   if (cache.has(type)) {
-    return cache.get(type)
+    return cache.get(type)!
   }
 
   const storage = storageOf(chrome.storage[type], type)
@@ -17,7 +17,15 @@ const getTypeStorage = (type: 'session'|'sync'|'managed') => {
 }
 
 const Storage = {
-  ...storageOf(chrome.storage.local, 'local'),
+  // Lazy init storage method
+  get get() { return getTypeStorage('local').get },
+  get set() { return getTypeStorage('local').set },
+  get getByteUsed() { return getTypeStorage('local').getByteUsed },
+  get item() { return getTypeStorage('local').item },
+  get remove() { return getTypeStorage('local').remove },
+  get watch() { return getTypeStorage('local').watch },
+
+  // Lazy init other type of storage
   get session() { return getTypeStorage('session') },
   get sync() { return getTypeStorage('sync') },
   get managed() { return getTypeStorage('managed') },
