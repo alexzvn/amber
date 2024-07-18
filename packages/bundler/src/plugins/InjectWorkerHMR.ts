@@ -4,7 +4,7 @@ import MagicString from "magic-string"
 import type {GeneralManifest} from '~/browsers/manifest.ts'
 import type {ViteDevServer} from 'vite'
 import {DevServer} from '~/plugins/BuildEnv.ts'
-import type {AmberOptions} from '~//configure'
+import type {AmberOptions} from '~/configure'
 import LoaderScript from '~/client/__loader?raw'
 import fs from 'fs/promises'
 import { join } from 'path'
@@ -43,6 +43,10 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
     configureServer(srv) {
       port = srv.config.server.port || 5173
       server = srv
+
+      srv.httpServer?.addListener('listening', () => {
+        port = srv.config.server.port || 5173
+      })
     },
 
     async writeBundle() {
