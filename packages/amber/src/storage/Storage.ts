@@ -2,33 +2,30 @@ import { storageOf } from './wrapper'
 
 type WrappedStorage = ReturnType<typeof storageOf>
 
-const cache = new Map<string, WrappedStorage>()
 
-const getTypeStorage = (type: 'session'|'sync'|'managed'|'local') => {
-  if (cache.has(type)) {
-    return cache.get(type)!
+export default class Storage {
+  private static _cache = new Map<string, WrappedStorage>()
+
+  private static from(type: 'session'|'sync'|'managed'|'local') {
+    if (Storage._cache.has(type)) {
+      return Storage._cache.get(type)!
+    }
+
+    const storage = storageOf(chrome.storage[type], type)
+
+    Storage._cache.set(type, storage)
+
+    return storage
   }
 
-  const storage = storageOf(chrome.storage[type], type)
+  static get get() { return Storage.from('local').get }
+  static get set() { return Storage.from('local').set }
+  static get getByteUsed() { return Storage.from('local').getByteUsed }
+  static get item() { return Storage.from('local').item }
+  static get remove() { return Storage.from('local').remove }
+  static get watch() { return Storage.from('local').watch }
 
-  cache.set(type, storage)
-
-  return storage
+  static get session() { return Storage.from('session') }
+  static get sync() { return Storage.from('sync') }
+  static get managed() { return Storage.from('managed') }
 }
-
-const Storage = {
-  // Lazy init storage method
-  get get() { return getTypeStorage('local').get },
-  get set() { return getTypeStorage('local').set },
-  get getByteUsed() { return getTypeStorage('local').getByteUsed },
-  get item() { return getTypeStorage('local').item },
-  get remove() { return getTypeStorage('local').remove },
-  get watch() { return getTypeStorage('local').watch },
-
-  // Lazy init other type of storage
-  get session() { return getTypeStorage('session') },
-  get sync() { return getTypeStorage('sync') },
-  get managed() { return getTypeStorage('managed') },
-}
-
-export default Storage
