@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { spawn, type ChildProcess } from 'child_process'
 import { mergeConfig, type UserConfig, createServer, build, defineConfig, type ViteDevServer, type CLIShortcut } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
 import ProcessIcon from '~/build/ProcessIcon'
@@ -10,7 +10,8 @@ import {DevServer} from "~/plugins/BuildEnv.ts"
 import { getDevMapModule } from '../components'
 import { escapeExecutePath } from '../helper'
 import dotenv from 'dotenv'
-import { chromium } from 'playwright'
+import { chromium } from 'playwright-extra'
+import stealth from 'puppeteer-extra-plugin-stealth'
 import { join } from 'path'
 
 
@@ -86,14 +87,14 @@ const start = async (option: DevOption) => {
       key: 'e',
       description: 'reload browser extension',
       action(server) {
-        server.hot.send({ type: 'custom', event: 'amber:background.reload' })
+        server.ws.send({ type: 'custom', event: 'amber:background.reload' })
         server.config.logger.info('Reloading browser extension', { timestamp: true })
       },
     }, {
       key: 'p',
       description: 'reload current tab',
       action(server) {
-        server.hot.send({ type: 'custom', event: 'amber:page.reload' })
+        server.ws.send({ type: 'custom', event: 'amber:page.reload' })
         server.config.logger.info('Reloading current active tab', { timestamp: true })
       }
     }
@@ -101,17 +102,16 @@ const start = async (option: DevOption) => {
 
   await ProcessIcon(cwd, 'dist')
 
-  dev.restart = async () => {
-    await dev.close()
-    process.exit(0xfa)
-  }
-
   const extensionPath = join(cwd, 'dist')
+
+  chromium.use(stealth())
 
   const browser = option.devBrowser && await chromium.launchPersistentContext('.amber/browser/chrome', {
     headless: false,
     viewport: null,
     bypassCSP: config.amber.bypassCSP === true,
+    handleSIGHUP: false,
+    handleSIGINT: false,
     args: [`--load-extension=${extensionPath}`],
     ignoreDefaultArgs: ['--enable-automation', '--no-sandbox', '--disable-extensions']
   })
@@ -119,16 +119,22 @@ const start = async (option: DevOption) => {
   if (browser) {
     const devPage = `http://localhost:${dev.config.server.port}/@amber.js/welcome`
 
-    browser.pages().at(0)?.goto(devPage)
+    browser.newPage()
+      .then(page => page.goto(devPage))
+      .then(() => browser.pages()[0].close()) // ignore chrome warning
 
-    shortcuts.push({
-      key: 'd',
-      description: 'open in development browser',
-      action: () => { browser.newPage().then(page => page.goto(devPage)) }
-    })
+    dev.openBrowser = () => { browser.newPage().then(page => page.goto(devPage)) }
   }
 
   dev.bindCLIShortcuts({ print: true, customShortcuts: shortcuts })
+
+  dev.restart = async () => {
+    await dev.close()
+    browser && await browser.close()
+    process.exit(0xfa)
+  }
+
+  process.on('beforeExit', () => console.log('im out'))
 
   return { config: vite, server: dev, manifest: config.manifest, browser }
 }
@@ -136,12 +142,27 @@ const start = async (option: DevOption) => {
 const thread = {
   main: async () => {
     let status: number
+    let proc: ChildProcess
+
+    process.on('SIGINT', async () => {
+      proc.kill('SIGTERM')
+      await new Promise(ok => proc.on('close', ok))
+
+      // cleanup stdin
+      process.stdin.setRawMode(true)
+      process.stdout.write('\u001b[?25h') // Show cursor
+      process.stdout.write('\n') // Move to a new line
+
+      process.exit(0)
+    })
+
+    process.stdout.write('\n')
 
     do {
       const cmd = escapeExecutePath(process.argv[0])
       const argv = process.argv.slice(1).map(escapeExecutePath)
 
-      const proc = spawn(cmd, argv, {
+      proc = spawn(cmd, argv, {
         shell: true,
         stdio: [0, 1, 2],
         env: { ...process.env, INTERNAL_DEV_SERVER: 'true' }
@@ -150,8 +171,6 @@ const thread = {
       status = await new Promise(ok => proc.on('exit', ok)) || 0
 
     } while(status === 0xfa)
-
-    console.log()
   },
 
   child: start
