@@ -1,3 +1,4 @@
+import { defineVitePlugin, invokeOnce } from '~/helper'
 import sharp from 'sharp'
 import { join } from 'path'
 import Icons from '~/components/Icons'
@@ -19,8 +20,24 @@ const resize = async (icon: Icons, cwd: string, outDir: string) => {
   }
 }
 
-export default async (cwd: string, outDir: string) => {
+const handle = async (cwd: string, outDir: string) => {
   for (const icon of Icons.$registers.values()) {
     await resize(icon, cwd, outDir)
   }
 }
+
+export default defineVitePlugin(async () => {
+  const processIcon = invokeOnce(handle)
+
+  return {
+    name: 'amber:icon-generator',
+
+    async configureServer() {
+      await processIcon(process.cwd(), 'dist')
+    },
+
+    async buildStart() {
+      await processIcon(process.cwd(), 'dist')
+    }
+  }
+})

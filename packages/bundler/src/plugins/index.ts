@@ -7,6 +7,8 @@ import ImportViaURL from './ImportViaURL'
 import EmitTypeEnvironment from './EmitTypeEnvironment'
 import AutoRestart from './AutoRestart'
 import AmberWelcomePage from './AmberWelcomePage'
+import IconProcessor from './IconProcessor'
+
 import type {GeneralManifest} from '~/browsers/manifest.ts'
 import type {AmberOptions} from '~//configure'
 
@@ -19,5 +21,6 @@ export default (manifest: GeneralManifest, amber: AmberOptions = {}) => [
   ImportViaURL(),
   EmitTypeEnvironment(),
   AutoRestart(),
-  AmberWelcomePage()
+  AmberWelcomePage(),
+  IconProcessor()
 ]
