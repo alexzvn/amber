@@ -14,6 +14,9 @@ type DevOption = { devBrowser: boolean }
 const start = async (option: DevOption) => {
   const { vite, config } = await Configuration.resolveConfig()
   const server = await createServer({ ...vite, configFile: false })
+  const session = new Configuration.Session()
+
+  await session.init()
 
   DevServer.value = server
   await build({
@@ -53,11 +56,15 @@ const start = async (option: DevOption) => {
     ]
   })
 
-  const browser = option.devBrowser && await Browser.setup(config, server)
+  const browser = option.devBrowser && await Browser.setup({ config, server, session })
 
   server.restart = async () => {
+    session.emitter.emit('restart')
+
     await server.close()
     browser && await browser.close()
+    await session.save()
+
     process.exit(0xfa)
   }
 
@@ -69,6 +76,10 @@ const thread = {
     let status: number
     let proc: ChildProcess
 
+    const session = new Configuration.Session()
+
+    await session.init()
+
     process.on('SIGINT', async () => {
       proc.kill('SIGTERM')
       await new Promise(ok => proc.on('close', ok))
@@ -77,6 +88,8 @@ const thread = {
       process.stdin.setRawMode(true)
       process.stdout.write('\u001b[?25h') // Show cursor
       process.stdout.write('\n') // Move to a new line
+
+      await session.destroy()
 
       process.exit(0)
     })
@@ -96,6 +109,8 @@ const thread = {
       status = await new Promise(ok => proc.on('exit', ok)) || 0
 
     } while(status === 0xfa)
+
+      await session.destroy()
   },
 
   child: start
@@ -108,7 +123,6 @@ program.command('dev')
     const isMainProcess = !process.env.INTERNAL_DEV_SERVER
 
     process.env.NODE_ENV ??= 'development'
-    process.env.AMBER_SESSION_ID ??= randomBytes(8).toString('hex')
 
     isMainProcess ? await thread.main() : await thread.child(option)
   })

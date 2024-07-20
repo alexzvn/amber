@@ -1,6 +1,5 @@
 import { build, mergeConfig, type UserConfig, defineConfig } from 'vite'
 import { program, loadAmberConfig, cwd } from './program'
-import ProcessIcon from '~/build/ProcessIcon'
 import AmberPlugin from '~/plugins'
 import { getMapIIFE, getMapModule } from '~/components/'
 import { exists } from '~/helper'
@@ -46,8 +45,6 @@ program.command('build')
     }
   })
 
-  const mapIIFE = getMapIIFE()
-
   await build(mergeConfig(modules, config.vite))
 
   for (const [mod, name] of Object.entries(getMapIIFE())) {
@@ -72,6 +69,4 @@ program.command('build')
 
     await build(mergeConfig(iife, config.vite))
   }
-
-  await ProcessIcon(cwd, 'dist')
 })

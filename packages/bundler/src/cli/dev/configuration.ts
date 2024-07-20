@@ -5,6 +5,11 @@ import defu from 'defu'
 import AmberPlugin from '~/plugins'
 import { getDevMapModule } from '~/components'
 import ContentScript from '~/components/ContentScript'
+import { exists, mkdir } from '~/helper'
+import fs from 'fs/promises'
+import { join } from 'path'
+import { randomBytes } from 'crypto'
+import mitt, { type Emitter } from 'mitt'
 
 export const resolveConfig = async () => {
   dotenv.config({ override: true })
@@ -52,4 +57,55 @@ export const resolveConfig = async () => {
   })
 
   return { vite, config }
+}
+
+type SessionEvent = {
+  restart: void
+}
+
+export class Session <T extends Record<any, unknown> = Record<any, unknown>> {
+  readonly path: string
+  readonly id: string
+  readonly emitter: Emitter<SessionEvent>
+
+  data: T = {} as T
+
+  constructor(id?: string) {
+    this.emitter = mitt()
+
+    if (!id) {
+      id = process.env.AMBER_SESSION_ID ?? randomBytes(8).toString('hex')
+      process.env.AMBER_SESSION_ID ??= id
+    }
+
+    this.id = id
+    this.path = join('.amber/cache', `${this.id}.json`)
+  }
+
+  /**
+   * Load session from file (if exists) or create new one
+   */
+  async init() {
+    await mkdir('.amber/cache')
+
+
+    if (await exists(this.path)) {
+      return this.data = await fs.readFile(this.path)
+        .then(buffer => JSON.parse(buffer.toString()))
+        .catch(() => ({}))
+    }
+  }
+
+  async save() {
+    await fs.writeFile(this.path, JSON.stringify(this.data, null, 2))
+  }
+
+  /**
+   * Destroy develop session
+   */
+  async destroy() {
+    this.data = {} as T
+
+    await fs.rm(this.path, { force: true })
+  }
 }
