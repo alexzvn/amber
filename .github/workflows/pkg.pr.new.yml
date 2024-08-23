@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Install dependencies and build
+    name: Install dependencies and publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,14 +25,6 @@ jobs:
       - name: Build create-amber package
         run: cd packages/create-amber && bun install --frozen-lockfile
 
-  publish:
-    name: Publish packages
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: canary
       - name: Publish amber package
         run: bunx pkg-pr-new publish --compact 'packages/amber'
+
