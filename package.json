@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "bun ./scripts/build.ts",
+    "pkg": "pkg-pr-new",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@shikijs/vitepress-twoslash": "^1.10.3",
+    "pkg-pr-new": "^0.0.20",
     "shiki": "^1.10.3",
     "vitepress": "^1.2.3",
     "vue": "^3.4.31"
