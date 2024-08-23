@@ -35,4 +35,4 @@ jobs:
         with:
           bun-version: canary
       - name: Publish amber package
-        run: bunx pkg publish './packages/*'
+        run: bunx pkg publish --compact 'packages/amber'
