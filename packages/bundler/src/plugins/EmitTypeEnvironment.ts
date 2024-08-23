@@ -33,7 +33,7 @@ export default defineVitePlugin(async () => {
 
       const inject = Object.keys(env)
         .filter(key => key.startsWith('VITE_'))
-        .map(key => `  readonly ${key}: string`)
+        .map(key => ` readonly ${key}: string`)
         .join('\n')
 
       await fs.writeFile(file, content.replace(/{__CONTENT__}/, inject.trimStart()))
