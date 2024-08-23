@@ -22,7 +22,8 @@
     "@types/bun": "latest",
     "@types/prompts": "^2.4.9",
     "tsup": "^8.1.0",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "unplugin-raw": "^0.2.2"
   },
   "engines": {
     "node": ">= 18.x"
