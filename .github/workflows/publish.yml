@@ -1,0 +1,38 @@
+name: Publish Any Commit
+on:
+  pull_request:
+  push:
+    branches: ['**']
+    tags: ['!**']
+
+jobs:
+  build:
+    name: Install dependencies and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build amber package
+        run: cd packages/amber && bun install --frozen-lockfile
+      - name: Build bundler package
+        run: cd packages/bundler && bun install --frozen-lockfile
+      - name: Build create-amber package
+        run: cd packages/create-amber && bun install --frozen-lockfile
+
+  publish:
+    name: Publish packages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+      - name: Publish amber package
+        run: bunx pkg publish './packages/amber' './packages/bundler' './packages/create-amber'
