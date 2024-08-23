@@ -25,6 +25,6 @@ jobs:
       - name: Build create-amber package
         run: cd packages/create-amber && bun install --frozen-lockfile
 
-      - name: Publish amber package
-        run: bunx pkg-pr-new publish --compact 'packages/*'
+      - name: Publish packages
+        run: bunx pkg-pr-new publish --comment=update --compact 'packages/*'
 
