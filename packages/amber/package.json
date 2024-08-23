@@ -10,8 +10,9 @@
   },
   "dependencies": { "mitt": "^3.0.1" },
   "devDependencies": {
-    "tsup": "^8.1.0",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/chrome": "^0.0.270",
+    "tsup": "^8.1.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
