@@ -75,7 +75,7 @@ type ExtractValueStream<R> = R extends AsyncGenerator<infer V> ? V :
   R extends Generator<infer V> ? V :
   R extends Array<infer V> ? V : unknown
 
-type ValueOfStream<T> = T extends GenericFunc<infer _, infer R>
+export type ValueOfStream<T> = T extends GenericFunc<infer _, infer R>
   ?
     R extends Promise<infer V>
       ? ExtractValueStream<V>

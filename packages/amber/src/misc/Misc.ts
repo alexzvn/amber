@@ -75,6 +75,22 @@ export const pick = <const Obj extends Record<any, any>>(obj: Obj, ...keys: Arra
   return out
 }
 
+/**
+ * Using panic instead of throw new error.
+ * 
+ * ```js
+ * panic('example error')
+ * panic(new Error('example error 2'))
+ * ```
+ */
+export const panic = (error: Error|string): never => {
+  if (typeof error === 'string') {
+    throw new Error(error)
+  }
+
+  throw error
+}
+
 export {
   base64ArrayBuffer as arrayBufferToBase64
 }
