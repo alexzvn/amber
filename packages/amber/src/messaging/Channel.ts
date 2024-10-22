@@ -1,5 +1,5 @@
 import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
-import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler } from './MessageMisc'
+import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler, EventKey, HandlerFunc, StreamHandlerFunc, ValueOfStream } from './MessageMisc'
 import type Messaging from './Messaging'
 import type { GenericFunc } from '~/type'
 
@@ -241,5 +241,56 @@ export class ContentChannel<Target extends Messaging = Messaging> {
 
   private async getActiveTab() {
     return await chrome.tabs.query({ active: true }).then(tabs => tabs[0])
+  }
+}
+
+export class SelfChannel<
+  const Target extends Messaging,
+> {
+  constructor(
+    protected readonly events: Map<EventKey, Set<HandlerFunc>>,
+    protected readonly handlers: Map<EventKey, HandlerFunc>,
+    protected readonly streams: Map<EventKey, StreamHandlerFunc>
+  ) {}
+
+  emit<
+    const Key extends EventName<Target['map']['events']>|Str,
+    const Func extends FindCallable<Target['map']['events'], Key>
+  >(key: Key, ...args: ParamOf<Func>) {
+    const handlers = this.events.get(key as EventKey) ?? new Set()
+
+    for (const handler of handlers) {
+      handler(...args)
+    }
+  }
+
+  handle<
+    const Key extends EventName<Target['map']['handlers']>|Str,
+    const Func extends FindCallable<Target['map']['handlers'], Key>
+  >(key: Key, ...args: ParamOf<Func>) {
+    type HandlerValue = Func extends GenericFunc ? ReturnType<Func> : unknown
+
+    const handler = this.handlers.get(key as EventKey)
+
+    if (!handler) {
+      throw new Error(`Handler ${key as EventKey} is not set yet`)
+    }
+
+    return handler(...args) as HandlerValue
+  }
+
+  stream<
+    const Key extends EventName<Target['map']['streams']>|Str,
+    const Func extends FindCallable<Target['map']['streams'], Key>
+  >(key: Key, ...args: ParamOf<Func>) {
+    type ReturnValue = Func extends GenericFunc ? ReturnType<Func> : unknown
+
+    const handler = this.handlers.get(key as EventKey)
+
+    if (!handler) {
+      throw new Error(`Handler ${key as EventKey} is not set yet`)
+    }
+
+    return handler(...args) as ReturnValue
   }
 }

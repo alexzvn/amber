@@ -1,4 +1,4 @@
-import { Channel, ContentChannel } from './Channel'
+import { Channel, ContentChannel, SelfChannel } from './Channel'
 import { registerEvent, registerHandler, registerStream } from './MessageHandler'
 import type { EventKey, HandlerFunc, MapEvent, StreamHandlerFunc } from './MessageMisc'
 import { convertToEvent, getMode, OnceSymbol } from './MessageMisc'
@@ -150,6 +150,14 @@ export default class Messaging<
     return this as Messaging<MapMessaging, MapChannel & { [key in K]: M['map'] }>
   }
 
+  get self() {
+    return new SelfChannel<typeof this>(
+      this.events,
+      this.handlers,
+      this.streams
+    )
+  }
+
   get content() {
     return Messaging.getContentChannel() as ContentChannel<Messaging<MapChannel['content']>>
   }
@@ -180,3 +188,11 @@ export default class Messaging<
     return value as Channel<M>
   }
 }
+
+const test = new Messaging()
+  .on('action', (a: string) => {})
+  .handle('add', (a: number, b: number) => a + b)
+  .handle('add.async', async (a: number, b: number) => a+b)
+  .stream('stream', function * () {
+    
+  })
