@@ -7,6 +7,7 @@ interface SelectorSingle {
 
   any: typeof any
   sequence: typeof sequence
+  wait: typeof wait
 }
 
 interface SelectorMultiple {
@@ -130,6 +131,6 @@ const sequence = async <const O extends WaitSelectorOption>(selectors: string[],
   return undefined
 }
 
-
+$.wait = wait
 $.any = any
 $.sequence = sequence
