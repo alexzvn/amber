@@ -13,6 +13,7 @@ interface SelectorSingle {
 interface SelectorMultiple {
   <const K extends keyof HTMLElementTagNameMap>(element: Element, selector: K): NodeListOf<HTMLElementTagNameMap[K]>
   <const K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>
+  <const V extends Element>(selector: string): NodeListOf<V>
 }
 
 export const $: SelectorSingle = /* #__PURE__ */ ((a: Element|string, b?: string) => {
