@@ -35,10 +35,11 @@ export default defineConfig({
     sidebar: [
       { text: 'Getting Started', link: '/guide/get-started' },
       {
-        text: 'Development Configuration',
+        text: 'AmberJS Configuration',
         items: [
-          { text: 'Overview' },
-          { text: 'Troubleshoot' },
+          { text: 'Overview', link: '/guide/bundler/overview' },
+          { text: 'Configuration', link: '/guide/bundler/configuration'  },
+          { text: 'Troubleshoot', link: '/guide/bundler/troubleshoot'  },
         ]
       },
       {
@@ -50,6 +51,14 @@ export default defineConfig({
           { text: 'Simple Queue' },
           { text: 'Hashing' },
           { text: 'Miscellaneous' }
+        ]
+      },
+      {
+        text: 'Others',
+        items: [
+          { text: 'Setup Github Action' },
+          { text: 'Integrate with Sentry' },
+          { text: 'Deploy Extension To Store' }
         ]
       }
     ],
