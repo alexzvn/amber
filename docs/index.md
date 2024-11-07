@@ -5,27 +5,29 @@ layout: home
 hero:
   name: "Amber.js"
   text: "Meta framework for building chrome extension MV3"
-  tagline: My great project tagline
+  tagline: Next generation of building browser extension
+  image:
+    src: /amber.webp
+    alt: VitePress
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Get Started
+      link: /guide/get-started
     - theme: alt
-      text: API Examples
+      text: Read the docs
       link: /api-examples
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Type Safe
+    icon: 🛡️
+    details: AmberJS leverage Typescript language to provide strongly typed library
+
+  - title: Intuitive Channel API
+    icon: 🛠️
+    details: Robust channel api for communicate between content script and background script
+
+  - title: Reduce development time
+    icon: ⚡️
+    details: Power by Vite, allow AmberJS update any source code change direct to UI without reloading extension
 ---
 
-
-<script lang="ts" setup>
-import Example from '@components/Example.vue'
-</script>
-
-<Example />

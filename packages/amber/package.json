@@ -8,10 +8,11 @@
     "build": "tsup-node",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": { "mitt": "^3.0.1" },
+  "dependencies": { "mitt": "^3.0.1", "throttle-debounce": "^5.0.2" },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/chrome": "^0.0.270",
+    "@types/throttle-debounce": "^5.0.2",
     "tsup": "^8.1.0"
   },
   "peerDependencies": {
