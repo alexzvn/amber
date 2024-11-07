@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import { fileURLToPath } from 'url'
 
 // https://vitepress.dev/reference/site-config
@@ -12,7 +13,10 @@ export default defineConfig({
       light: 'github-light',
       dark: 'github-dark'
     },
-    codeTransformers: [transformerTwoslash()]
+    codeTransformers: [transformerTwoslash()],
+    config(md) {
+      md.use(tabsMarkdownPlugin)
+    },
   },
 
   vite: {
@@ -25,21 +29,34 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Docs', link: '/markdown-examples' }
     ],
 
     sidebar: [
+      { text: 'Getting Started', link: '/guide/get-started' },
       {
-        text: 'Examples',
+        text: 'Development Configuration',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Overview' },
+          { text: 'Troubleshoot' },
+        ]
+      },
+      {
+        text: 'Amber Library',
+        items: [
+          { text: 'Messaging Channel' },
+          { text: 'Storage' },
+          { text: 'Selector' },
+          { text: 'Simple Queue' },
+          { text: 'Hashing' },
+          { text: 'Miscellaneous' }
         ]
       }
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/alexzvn/amber' }
+      { icon: 'github', link: 'https://github.com/alexzvn/amber' },
+      { icon: 'x', link: 'https://x.com/alexzvnvn' }
     ]
   },
 })
