@@ -11,27 +11,24 @@ Amber simplifies the development of browser extensions by providing a streamline
 
 1. To create new scaffold development project, run one of following command:
 
-:::tabs
-== npm
-```sh
+:::code-group
+```sh [npm]
 npm create amber@latest my-extension
 ```
 
-== yarn
-```sh
+```sh [yarn]
 yarn create amber my-extension
 ```
 
-== pnpm
-```sh
+```sh [pnpm]
 pnpm create amber my-extension
 ```
 
-== bun
-```sh
+```sh [bun]
 bun create amber my-extension
 ```
 :::
+
 
 2. Go to your created folder
 
@@ -41,27 +38,25 @@ cd my-extension
 
 3. Start development process
 
-:::tabs
-== npm
-```sh
+
+:::code-group
+```sh [npm]
 npm run dev
 ```
 
-== yarn
-```sh
+```sh [yarn]
 yarn dev
 ```
 
-== pnpm
-```sh
+```sh [pnpm]
 pnpm dev
 ```
 
-== bun
-```sh
+```sh [bun]
 bun dev
 ```
 :::
+
 After run dev command, you should see `dist` folder located on root of the project.
 
 ## Loading extension to Chrome browser
