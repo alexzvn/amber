@@ -2,7 +2,7 @@
 dist
 amber-project
 test
-.vitepress
+.vitepress/cache
 # Logs
 
 logs
