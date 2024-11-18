@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitepress'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
-import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 import { fileURLToPath } from 'url'
 
 // https://vitepress.dev/reference/site-config
@@ -14,9 +13,6 @@ export default defineConfig({
       dark: 'github-dark'
     },
     codeTransformers: [transformerTwoslash()],
-    config(md) {
-      md.use(tabsMarkdownPlugin)
-    },
   },
 
   vite: {
@@ -66,6 +62,11 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/alexzvn/amber' },
       { icon: 'x', link: 'https://x.com/alexzvnvn' }
-    ]
+    ],
+
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: 'Copyright © 2024-present Alexzvn'
+    }
   },
 })
