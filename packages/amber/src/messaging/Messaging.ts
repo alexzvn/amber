@@ -188,11 +188,3 @@ export default class Messaging<
     return value as Channel<M>
   }
 }
-
-const test = new Messaging()
-  .on('action', (a: string) => {})
-  .handle('add', (a: number, b: number) => a + b)
-  .handle('add.async', async (a: number, b: number) => a+b)
-  .stream('stream', function * () {
-    
-  })
