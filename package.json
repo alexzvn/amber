@@ -9,7 +9,8 @@
     "pkg": "pkg-pr-new",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "documate:upload": "documate upload"
   },
   "description": "To install dependencies:",
   "repository": {
@@ -27,6 +28,7 @@
     "url": "https://github.com/alexzvn/amber/issues"
   },
   "devDependencies": {
+    "@documate/documate": "^0.2.1",
     "@shikijs/vitepress-twoslash": "^1.10.3",
     "pkg-pr-new": "^0.0.20",
     "shiki": "^1.10.3",

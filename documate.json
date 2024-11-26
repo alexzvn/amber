@@ -1,0 +1,5 @@
+{
+    "root": "docs",
+    "include": [ "**/*.md" ],
+    "backend": "https://amber-ai.alexzvn.me/upload"
+  }
