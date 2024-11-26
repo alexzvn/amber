@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "bun ./scripts/build.ts",
+    "push": "bun ./scripts/publish.ts",
     "pkg": "pkg-pr-new",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
