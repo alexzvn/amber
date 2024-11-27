@@ -118,7 +118,7 @@ const thread = {
 
 program.command('dev')
   .description('Start process to develop browser extension')
-  .option('-d, --dev-browser', 'Disable auto development browser')
+  .option('-d, --dev-browser', 'Enable auto development browser')
   .action(async (option: DevOption) => {
     const isMainProcess = !process.env.INTERNAL_DEV_SERVER
 
