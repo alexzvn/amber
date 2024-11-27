@@ -1,6 +1,6 @@
 import { storageOf, wrap, type Pair } from './wrapper'
 
-type ItemMeta<K extends Pair = Pair> = Pair & {
+type ItemMeta<K extends Pair = Pair> = K & {
   __$initialized?: boolean
   __$expires?: number
   __$version?: number
