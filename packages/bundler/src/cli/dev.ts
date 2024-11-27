@@ -110,7 +110,7 @@ const thread = {
 
     } while(status === 0xfa)
 
-      await session.destroy()
+    await session.destroy()
   },
 
   child: start
