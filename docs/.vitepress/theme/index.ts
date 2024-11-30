@@ -19,6 +19,6 @@ const Extended = {
 export default {
   extends: Extended,
   enhanceApp({ app }: EnhanceAppContext) {
-    app.use(TwoslashFloatingVue)
+    app.use(TwoslashFloatingVue as any)
   }
 }
