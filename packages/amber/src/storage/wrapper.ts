@@ -110,7 +110,9 @@ export const storageOf = (storage: StorageLike, metaKey: string) => {
       reset,
       write,
       size,
-      get ready() { return setup }
+      get ready() { return setup },
+      get value() { return $value },
+      set value(data) { write(data) },
     }
   }
 
