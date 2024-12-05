@@ -7,7 +7,7 @@ import {DevServer} from "~/plugins/BuildEnv.ts"
 import type {AmberOptions} from "~/configure"
 import BackgroundScript from '~/components/BackgroundScript'
 
-const bindAccessibleResouce = (manifest: GeneralManifest) => {
+const bindAccessibleResource = (manifest: GeneralManifest) => {
   const resources = (manifest.web_accessible_resources ??= [])
   const isMatchAll = resources.some(item => {
     if (!item.matches.includes('<all_urls>')) {
@@ -43,9 +43,9 @@ const injectBackgroundWorker = (manifest: GeneralManifest) => {
 }
 
 export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
-  let dir: string
+  let dir: string|undefined = undefined
 
-  bindAccessibleResouce(manifest)
+  bindAccessibleResource(manifest)
   amber.bypassCSP && bindBypassSCP(manifest)
 
   const writeManifest = async (outdir?: string) => {
