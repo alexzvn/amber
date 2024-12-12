@@ -59,6 +59,7 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
 
   return {
     name: 'amber:manifest-writer',
+
     configureServer: (server: ViteDevServer) => {
       const port = server.config.server.port
   
@@ -71,10 +72,9 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
       })
 
       injectBackgroundWorker(manifest)
-
-      writeManifest()
     },
 
+    buildStart: () => writeManifest(),
     writeBundle: () => writeManifest()
   }
 })
