@@ -1,12 +1,20 @@
 import {pathDiscover} from '~/helper'
 
+type BackgroundOptions = Partial<{
+  /**
+   * @default true
+   */
+  autoReload: boolean
+}>
+
 export default class BackgroundScript {
   static readonly $registers = new Set<BackgroundScript>()
 
   public readonly path: ReturnType<typeof pathDiscover>
 
-  constructor(public file: string) {
+  constructor(public file: string, public options: BackgroundOptions = {}) {
     this.path = pathDiscover(file)
+    this.options.autoReload ??= true
 
     BackgroundScript.$registers.add(this)
   }

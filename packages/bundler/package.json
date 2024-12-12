@@ -10,7 +10,7 @@
   },
   "bin": {
     "amber": "dist/cli.mjs",
-    "amberx": "dist/bun.mjs"
+    "ambex": "dist/bun.mjs"
   },
   "dependencies": {
     "adm-zip": "^0.5.14",
