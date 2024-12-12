@@ -1,6 +1,4 @@
 #!/usr/bin/env bun
-import 'dotenv/config'
-
 import program from './program'
 import './dev'
 import './build'
