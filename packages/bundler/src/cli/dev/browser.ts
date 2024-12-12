@@ -31,6 +31,7 @@ export const setup = async (init: SetupBrowser) => {
   const tabs = session.data.tabs ??= []
 
   session.emitter.on('restart', () => {
+    tabs.length = 0
     tabs.push(... browser.pages().map(it => it.url()))
   })
 
