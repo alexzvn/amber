@@ -48,6 +48,9 @@ const transform = async (env: Awaited<ReturnType<typeof getDevelopEnv>>) => {
   env.vite && await fs.readFile(join(env.base, env.vite!))
     .then(buff => buff.toString())
     .then(text => {
+      // adding import vite plugin
+      code = text.split('\n').at(1) + '\n' + code
+
       const index = text.indexOf('defineConfig(')
       const configSection = text.slice(index)
         // remove defineConfig(...) wrapper
