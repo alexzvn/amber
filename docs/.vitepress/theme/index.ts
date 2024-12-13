@@ -1,11 +1,13 @@
-import Theme from 'vitepress/theme'
-import TwoslashFloatingVue from '@shikijs/vitepress-twoslash/client'
+
 import type { EnhanceAppContext } from 'vitepress'
+import Theme from 'vitepress/theme'
+import { h } from 'vue'
 import Documate from '@documate/vue'
+import TwoslashFloatingVue from '@shikijs/vitepress-twoslash/client'
+
 import '@documate/vue/dist/style.css'
 import '@shikijs/vitepress-twoslash/style.css'
 import './amber.css'
-import { h } from 'vue'
 
 const Extended = {
   ...Theme,

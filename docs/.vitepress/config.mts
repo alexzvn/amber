@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
+import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { fileURLToPath } from 'url'
 
 // https://vitepress.dev/reference/site-config
@@ -12,7 +13,11 @@ export default defineConfig({
       light: 'github-light',
       dark: 'github-dark'
     },
-    codeTransformers: [transformerTwoslash()],
+    codeTransformers: [
+      transformerTwoslash({
+        typesCache: createFileSystemTypesCache()
+      })
+    ],
   },
 
   vite: {
@@ -41,7 +46,7 @@ export default defineConfig({
       {
         text: 'Amber Library',
         items: [
-          { text: 'Messaging Channel' },
+          { text: 'Messaging Channel', link: '/guide/libraries/messaging-channel' },
           { text: 'Storage' },
           { text: 'Selector' },
           { text: 'Simple Queue' },

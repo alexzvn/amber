@@ -15,7 +15,7 @@ hero:
       link: /guide/get-started
     - theme: alt
       text: Read the docs
-      link: /api-examples
+      link: /guide/bundler/overview
 
 features:
   - title: Type Safe
