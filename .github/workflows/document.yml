@@ -37,11 +37,14 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Install dependencies
-        run: bun i --frozen-lockfile
-
+      - name: Build dependencies
+        run: bun run build
+    
       - name: Link Dependencies
         run: cd packages/amber && bun link && cd ../bundler && bun link
+
+      - name: Install dependencies
+        run: bun i --frozen-lockfile
 
       - name: Build with VitePress
         run: bun docs:build
