@@ -5,8 +5,9 @@ import Page from '~/components/Page'
 import ContentScript from '~/components/ContentScript'
 import CSPolyfillDev from '~/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
+import LoadingHTML from '~/client/loading.html?raw'
 import fs from "fs/promises"
-import {DevServer} from "~/plugins/BuildEnv.ts"
+import {DevServer} from '~/plugins/BuildEnv.ts'
 import type { AmberOptions } from '../configure'
 import slash from 'slash'
 
@@ -75,7 +76,13 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       for (const page of Page.$registers) {
         const saveDir = join(outdir, dirname(page.toString()))
         await mkdir(saveDir)
-        await fs.writeFile(join(saveDir, page.path.filename!), 'This content is ignored during development')
+
+        await fs.writeFile(
+          join(saveDir, page.path.filename!),
+          LoadingHTML
+            .replace(/LOADER_SCRIPT/, '/entries/__loader.js')
+            .replace(/VITE_URL/, host)
+        )
       }
     },
 

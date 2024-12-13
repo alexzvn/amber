@@ -48,10 +48,20 @@ const transform = async (env: Awaited<ReturnType<typeof getDevelopEnv>>) => {
   env.vite && await fs.readFile(join(env.base, env.vite!))
     .then(buff => buff.toString())
     .then(text => {
-      const lines = text.split('\n')
+      const index = text.indexOf('defineConfig(')
+      const configSection = text.slice(index)
+        // remove defineConfig(...) wrapper
+        .replace('defineConfig', '')
+        .trim()
+        .replace(/^\(/, '')
+        .replace(/\)$/, '')
+        // add padding
+        .split('\n')
+        .map(line => '  ' + line)
+        .join('\n')
+        .trim()
 
-      code = lines[1] + '\n' + code
-      code = code.replace(/__VITE__/g, `vite: { ${lines[5].trim()} }`)
+      code = code.replace(/__VITE__/g, `vite: ${configSection}`)
 
       return fs.rm(join(env.base, env.vite!))
     })
@@ -66,16 +76,23 @@ const transformPackage = (_pkg: string, devBrowser: boolean) => {
 
   pkg.description ??= 'A browser extension built with Vite + Amber'
   pkg.devDependencies ??= {}
-  pkg.devDependencies['@amber.js/bundler'] = `^0.6.1`
-  pkg.devDependencies['@amber.js/core'] = `^0.5.5`
-  pkg.devDependencies['@types/chrome'] = '^0.0.268'
+  pkg.devDependencies['@amber.js/bundler'] = `^0.6.3`
+  pkg.devDependencies['@amber.js/core'] = `^0.5.6`
+  pkg.devDependencies['@types/chrome'] = '^0.0.287'
 
   pkg.scripts = {}
 
-  devBrowser && Object.assign(pkg.scripts, { prepare: 'playwright install' })
+  if (devBrowser) {
+    pkg.devDependencies['playwright'] = '^1.49.1'
+
+    Object.assign(pkg.scripts, {
+      prepare: 'playwright install',
+      'dev:browser': 'amber dev --dev-browser'
+    })
+  }
 
   Object.assign(pkg.scripts, {
-    dev: `amber dev ${devBrowser ? '--dev-browser' : ''}`.trim(),
+    dev: 'amber dev',
     build: 'amber build',
     archive: 'amber archive',
     clean: 'amber clean',
@@ -87,6 +104,21 @@ const transformPackage = (_pkg: string, devBrowser: boolean) => {
 export type CreateAmber = {
   folder: string
   devBrowser: boolean
+}
+
+const getTsconfigPath = async (folder: string) => {
+  const files = [
+    join(cwd, folder, 'tsconfig.app.json'),
+    join(cwd, folder, 'tsconfig.json')
+  ]
+
+  for (const path of files) {
+    if (await exists(path)) {
+      return path
+    }
+  }
+
+  return undefined
 }
 
 export const create = async (config: CreateAmber) => {
@@ -109,11 +141,7 @@ export const create = async (config: CreateAmber) => {
 
   const packagePath = join(cwd, folder, 'package.json')
   const gitignore = join(cwd, folder, '.gitignore')
-  const tsconfig = join(cwd, folder, 'tsconfig.json')
-
-  if (! await exists(packagePath)) {
-    return process.exit(0)
-  }
+  const tsconfig = await getTsconfigPath(folder)
 
   const env = await getDevelopEnv(folder)
 
@@ -130,16 +158,20 @@ export const create = async (config: CreateAmber) => {
 
   await transform(env)
 
-  if (! exists(tsconfig)) {
+  if (! tsconfig) {
     return
   }
 
   await fs.readFile(tsconfig)
     .then(buffer => Json.parse(buffer.toString()) as any)
     .then(config => {
+
+      config.include?.push('.amber/types/*.ts')
+
       if (config.compilerOptions) {
         Json.assign(config.compilerOptions, { verbatimModuleSyntax: true })
-        return fs.writeFile(tsconfig, Json.stringify(config, null, 2))
       }
+
+      return fs.writeFile(tsconfig, Json.stringify(config, null, 2))
     })
 }

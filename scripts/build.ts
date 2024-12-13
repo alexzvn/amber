@@ -1,5 +1,8 @@
 import { $ } from 'bun'
 
-['bundler', 'amber'].map(async (name) => {
-  await $`bun run build`.cwd(`packages/${name}`)
+// @ts-ignore
+process.env.FORCE_COLOR = 1;
+
+['bundler', 'amber', 'create-amber'].map(async (name) => {
+  await $`bun i && bun run build`.cwd(`packages/${name}`)
 })

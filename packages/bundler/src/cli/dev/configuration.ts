@@ -40,7 +40,7 @@ export const resolveConfig = async () => {
         port: 5173
       },
       watch: {
-        ignored: ['**/dist/**']
+        ignored: ['**/dist/**', '**/.amber/browser/**']
       },
       warmup: {
         clientFiles: [

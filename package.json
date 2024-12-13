@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "bun ./scripts/build.ts",
+    "push": "bun ./scripts/publish.ts",
     "pkg": "pkg-pr-new",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -33,9 +34,7 @@
     "pkg-pr-new": "^0.0.20",
     "shiki": "^1.22.2",
     "vitepress": "^1.5.0",
-    "vue": "^3.4.31"
-  },
-  "dependencies": {
+    "vue": "^3.4.31",
     "@documate/vue": "^0.3.1"
   }
 }

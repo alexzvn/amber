@@ -86,34 +86,48 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
       }
     },
 
-    async handleHotUpdate({ file, server, modules }) {
-      type Modules = typeof modules
+    async handleHotUpdate({ file, server, read }) {
+      const graph = server.moduleGraph
+      const [module] = (graph.getModulesByFile(file) || new Set)
 
-      const scripts = Object.values(BackgroundScript.map)
-      const has = (id: string) => scripts.some(name => id.endsWith(name))
-
-      const checkWorkerDeps = (modules: Modules): boolean => {
-        for (const mod of modules) {
-          if (has(mod.file || mod.id || mod.url)) {
-            return true
-          }
-        }
-
-        return false
+      if (!module) {
+        return
       }
 
-      const isMatch = has(file) || checkWorkerDeps(modules)
+      const impacts = new Set<string|null>([file])
+      const stack = [... module.importers]
+      const scripts = [...BackgroundScript.$registers]
+        .filter(script => script.options.autoReload)
+        .map(script => script.file)
 
-      isMatch && server.hot.send({
-        type: 'custom',
-        event: 'amber:background.reload',
+      while (stack.length) {
+        const mod = stack.pop()!
+
+        if (impacts.has(mod.id)) continue
+
+        impacts.add(mod.id)
+        stack.push(...mod.importers)
+      }
+
+      const isMatch = [...impacts].some(id => {
+        return scripts.some(script => id?.endsWith(script))
       })
 
+      if (! isMatch) return
+
+      await read()
+
+      // wait for other vite process build background script
       setTimeout(() => {
-        isMatch && server.config.logger.info('Reloaded Browser extension', {
+        server.config.logger.info('Reloaded Browser extension', {
           timestamp: true
         })
+
+        server.hot.send({
+          type: 'custom',
+          event: 'amber:background.reload',
+        })
       }, 500)
-    },
+    }
   }
 })

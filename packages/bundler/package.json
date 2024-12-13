@@ -1,6 +1,6 @@
 {
   "name": "@amber.js/bundler",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "bin": {
     "amber": "dist/cli.mjs",
-    "amberx": "dist/bun.mjs"
+    "ambex": "dist/bun.mjs"
   },
   "dependencies": {
     "adm-zip": "^0.5.14",

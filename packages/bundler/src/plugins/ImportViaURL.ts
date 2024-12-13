@@ -5,17 +5,24 @@ import { join } from 'path'
 import ts from 'typescript'
 
 const parseURL = (path: string) => {
+  const [signature, ...fragments] = path.split(':')
+
+  if (signature !== 'url') {
+    return
+  }
+
   try {
-    const url = new URL(path)
+    const url = new URL(fragments.join(':'))
 
     if (url.protocol === 'http:' || url.protocol === 'https:') {
       return url
     }
+
   } catch {
-    return undefined
+    return
   }
 
-  return undefined
+  return
 }
 
 const tab = (source: string, size = 2) => {
@@ -49,7 +56,8 @@ const compile = (filepath: string, callback: (dts: string) => unknown) => {
       checkJs: false,
       resolveJsonModule: true,
       esModuleInterop: true,
-      skipLibCheck: true
+      skipLibCheck: true,
+      resolvePackageJsonImports: true
     }
   })
 
@@ -74,8 +82,11 @@ export default defineVitePlugin(async () => {
       }
 
       const saveFromURL = async (url: URL) => {
-        const response = await fetch(url.toString())
-        const filename = url.pathname.split('/').pop()
+        const cacheFileName = url.searchParams.get('amber-cache')
+
+        url.searchParams.delete('amber-cache')
+
+        const filename = cacheFileName ?? url.pathname.split('/').pop()
         const target = `${code(url.toString())}-${filename}`
         const filepath = join(base, target)
 
@@ -85,16 +96,19 @@ export default defineVitePlugin(async () => {
         }
 
         this.info('Downloading ' + url)
-        await fs.writeFile(filepath, await response.text())
+        const response = await fetch(url.toString())
+          .catch(e => { throw new Error('Failed to download module: ' + url, { cause: e }) })
+
+        await fs.writeFile(filepath, new Uint8Array(await response.arrayBuffer()))
         this.info('Downloaded ' + url)
 
         compile(filepath, (text) => {
           const declaration = [
-            `declare module ${JSON.stringify(url)} {`,
+            `declare module ${JSON.stringify(source)} {`,
             text,
             `}`
           ]
-  
+
           fs.writeFile(join(typing, `${target}.d.ts`), declaration.join('\n'))
         })
 
