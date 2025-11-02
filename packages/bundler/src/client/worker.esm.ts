@@ -3,9 +3,11 @@ import LoadingPage from './loading.html?raw'
 // injected during build process
 declare const __HMR_PORT__: number
 declare const __SCRIPT__: string|undefined
+declare const __WS_TOKEN__: string|undefined
 
 const port = __HMR_PORT__
 const background = __SCRIPT__ // current background script
+const token = __WS_TOKEN__
 
 type FullReloadEvent = {
   type: 'full-reload'
@@ -94,7 +96,7 @@ target.addEventListener('connect', async () => {
     return
   }
 
-  let socket: WebSocket|undefined = new WebSocket(`ws://localhost:${port}`, 'vite-hmr')
+  let socket: WebSocket|undefined = new WebSocket(`ws://localhost:${port}?token=${token}`, 'vite-hmr')
 
   socket.addEventListener('open', () => {
     console.log('[Amber] dev server connected')
