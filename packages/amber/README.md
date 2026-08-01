@@ -1,15 +1,29 @@
-# amber.js
+# @amber.js/core
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
+Runtime library for Chrome MV3 extensions built with
+[Amber.js](https://amber.alexzvn.me) — typed cross-context messaging, a promise
+wrapper over `chrome.storage`, DOM helpers for content scripts, a bounded work
+queue, and hashing.
 
 ```bash
-bun run index.js
+npm install @amber.js/core
 ```
 
-This project was created using `bun init` in bun v1.1.14. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+```ts
+import { Messaging } from '@amber.js/core'
+
+const channel = new Messaging()
+  .handle('math.add', (a: number, b: number) => a + b)
+
+export type BackgroundChannel = typeof channel
+```
+
+## Documentation
+
+- [Messaging](https://amber.alexzvn.me/guide/api/messaging)
+- [Storage](https://amber.alexzvn.me/guide/api/storage)
+- [DOM & Utilities](https://amber.alexzvn.me/guide/api/dom-utilities)
+
+## License
+
+MIT
