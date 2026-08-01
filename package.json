@@ -39,9 +39,5 @@
     "pkg-pr-new": "^0.0.20",
     "vitepress": "^1.5.0",
     "vue": "^3.4.31"
-  },
-  "dependencies": {
-    "@amber.js/bundler": "link:@amber.js/bundler",
-    "@amber.js/core": "link:@amber.js/core"
   }
 }
