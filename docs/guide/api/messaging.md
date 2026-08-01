@@ -69,8 +69,16 @@ const background = Messaging.getBackgroundChannel<BackgroundChannel>()
 const sum = await background.send('math.add', 1, 2)
 //    ^?
 
+
 const user = await background.send('user.load', 1)
 //    ^?
+
+
+
+
+
+
+//
 ```
 
 `send` awaits the handler's return value, unwrapping promises — an `async`

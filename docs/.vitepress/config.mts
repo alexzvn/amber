@@ -24,7 +24,7 @@ export default defineConfig({
         // `^?` queries default to an absolutely-positioned popup that reserves
         // no height, so it overlaps the code and prose below it. Render them
         // in the code flow instead.
-        queryRendering: 'line',
+        queryRendering: 'popup',
         twoslashOptions: {
           compilerOptions: {
             // @amber.js/bundler ships types via `exports` only, so node10

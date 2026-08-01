@@ -25,6 +25,7 @@ await Storage.set('token', 'abc123')
 const token = await Storage.get<string>('token')
 //    ^?
 
+
 await Storage.remove('token')
 ```
 

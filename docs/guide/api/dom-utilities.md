@@ -24,6 +24,7 @@ import { $, $$ } from '@amber.js/core'
 const input = $('input')
 //    ^?
 
+
 const items = $$('li')
 
 // Scoped to a parent element
@@ -165,8 +166,10 @@ import { Hash } from '@amber.js/core'
 const digest = await Hash.sha256('hello')
 //    ^?
 
+
 const fast = Hash.code('hello')
 //    ^?
+// 
 ```
 
 `sha1`, `sha256`, `sha384`, and `sha512` return lowercase hex strings and are
