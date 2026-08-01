@@ -7,7 +7,7 @@ The published VitePress site for Amber.js (`docs/`) plus the agent-facing docs (
 ### Published site
 
 **Home page**:
-The hero landing page rendered from `index.md`'s `layout: home` frontmatter — a hero block (name, text, tagline, image, action buttons) above a three-item features grid.
+The hero landing page rendered from `index.md`'s `layout: home` frontmatter — a hero block (name, text, tagline, image, action buttons) and a three-item features grid, followed by Markdown body sections comparing a raw MV3 manifest against the Amber equivalent.
 _Avoid_: index page, README
 
 **Guide page**:
@@ -19,7 +19,7 @@ The `themeConfig.nav` top bar of the published site — the Home / Docs links an
 _Avoid_: header, menu bar
 
 **Sidebar**:
-The `themeConfig.sidebar` link tree — the grouped list (Getting Started, AmberJS Configuration, Amber Library, Others) shown alongside guide pages.
+The `themeConfig.sidebar` link tree — the grouped list (Getting Started, Building, Runtime API, Shipping) shown alongside guide pages.
 _Avoid_: table of contents, nav tree
 
 **Code group**:
@@ -31,11 +31,11 @@ A VitePress markdown extension rendering `::: info`, `::: tip`, `::: warning`, `
 _Avoid_: admonition, callout box
 
 **srcExclude**:
-The VitePress `srcExclude` entry that keeps `docs/agents/**` out of the published site — agent-facing docs are repo config, not published pages.
+The VitePress `srcExclude` entry that keeps `docs/agents/**` and `docs/research/**` out of the published site — agent-facing docs and research notes are repo config, not published pages.
 _Avoid_: ignore list
 
 **Documate**:
-The AI docs assistant for the published site, configured by `documate.json` — the config names the `docs/` root, the markdown glob to index, and the backend upload endpoint.
+The AI docs assistant for the published site, configured by `documate.json` at the repository root — the config names the `docs/` root, the markdown glob to index, and the backend upload endpoint.
 _Avoid_: chatbot, search
 
 ### Agent-facing docs
