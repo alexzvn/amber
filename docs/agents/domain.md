@@ -2,12 +2,14 @@
 
 How the engineering skills should consume this repo's domain documentation when exploring the codebase.
 
-This repo is **multi-context**: a root `CONTEXT-MAP.md` points at one `CONTEXT.md` per package.
+This repo is **multi-context**: a root `CONTEXT-MAP.md` points at one `CONTEXT.md` per package,
+plus one for `docs/` itself.
 
 ## Before exploring, read these
 
 - **`CONTEXT-MAP.md`** at the repo root — the index of contexts. It tells you which context owns the area you're touching.
 - **`packages/<name>/CONTEXT.md`** — the glossary for each context relevant to your topic. Read every one you'll be working in, not just the first.
+- **`docs/CONTEXT.md`** — the glossary for the Documentation context (published site + agent-facing docs).
 - **`docs/adr/`** at the root — system-wide decisions, spanning two or more contexts.
 - **`packages/<name>/docs/adr/`** — decisions scoped to a single context.
 
@@ -18,7 +20,10 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 ```
 /
 ├── CONTEXT-MAP.md
-├── docs/adr/                              ← system-wide decisions
+├── docs/                                  ← Documentation context
+│   ├── CONTEXT.md
+│   ├── adr/                               ← system-wide decisions
+│   └── agents/
 └── packages/
     ├── amber/                             ← Runtime context (@amber.js/core)
     │   ├── CONTEXT.md

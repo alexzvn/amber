@@ -20,4 +20,4 @@ The five canonical triage roles, each label string equal to its role name. See `
 
 ### Domain docs
 
-Multi-context: root `CONTEXT-MAP.md` indexes one `CONTEXT.md` + `docs/adr/` per package. See `docs/agents/domain.md`.
+Multi-context: root `CONTEXT-MAP.md` indexes one `CONTEXT.md` + `docs/adr/` per package, plus a Documentation context at `docs/CONTEXT.md`. See `docs/agents/domain.md`.

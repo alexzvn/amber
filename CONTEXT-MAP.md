@@ -1,18 +1,19 @@
 # Context Map
 
-Amber is split into three bounded contexts, one per package. Each owns its own glossary
-(`CONTEXT.md`) and its own decision log (`docs/adr/`). System-wide decisions — anything
-spanning two or more contexts — live in the root `docs/adr/`.
+Amber is split into four bounded contexts — three packages plus the documentation site. Each
+owns its own glossary (`CONTEXT.md`) and its own decision log (`docs/adr/`). System-wide
+decisions — anything spanning two or more contexts — live in the root `docs/adr/`.
 
 Read the context(s) relevant to your topic before exploring. See `docs/agents/domain.md`
 for the consumer rules.
 
-| Context      | Package             | Glossary                          | Decisions                         |
-| ------------ | ------------------- | --------------------------------- | --------------------------------- |
-| **Runtime**  | `@amber.js/core`    | `packages/amber/CONTEXT.md`        | `packages/amber/docs/adr/`        |
-| **Build**    | `@amber.js/bundler` | `packages/bundler/CONTEXT.md`      | `packages/bundler/docs/adr/`      |
-| **Scaffold** | `create-amber`      | `packages/create-amber/CONTEXT.md` | `packages/create-amber/docs/adr/` |
-| _system-wide_ | —                  | this file                          | `docs/adr/`                       |
+| Context           | Package             | Glossary                           | Decisions                         |
+| ----------------- | ------------------- | ---------------------------------- | --------------------------------- |
+| **Runtime**       | `@amber.js/core`    | `packages/amber/CONTEXT.md`        | `packages/amber/docs/adr/`        |
+| **Build**         | `@amber.js/bundler` | `packages/bundler/CONTEXT.md`      | `packages/bundler/docs/adr/`      |
+| **Scaffold**      | `create-amber`      | `packages/create-amber/CONTEXT.md` | `packages/create-amber/docs/adr/` |
+| **Documentation** | —                   | `docs/CONTEXT.md`                  | `docs/adr/` (system-wide)         |
+| _system-wide_     | —                   | this file                          | `docs/adr/`                       |
 
 ## Runtime — `packages/amber`
 
@@ -32,14 +33,25 @@ The `create-amber` initialiser. Speaks in terms of templates and prompts. A one-
 producer of new projects; it depends on the other two contexts' conventions but is not
 depended on by them.
 
+## Documentation — `docs`
+
+The published VitePress site and the agent-facing docs under `docs/agents/`. Speaks in terms
+of home/guide pages, nav and sidebar config, markdown extensions, and the repo's own
+documentation conventions — context map, glossaries, decision logs, issue tracker, triage
+labels. Unlike the other three it ships no code: it is a meta-context that owns the
+documentation conventions the other contexts consume, and describes them without being
+depended on by them.
+
 ## Relationships
 
 ```
 Scaffold ──emits projects that use──▶ Build ──produces bundles containing──▶ Runtime
+
+Documentation ──describes, and sets the doc conventions for──▶ Scaffold, Build, Runtime
 ```
 
 Scaffold is downstream of both: template changes must follow Build's config shape and
 Runtime's public API, never the reverse.
 
-A context's `CONTEXT.md` is created lazily, the first time `/domain-modeling` resolves a
-term there. Absence is not a gap to fill upfront.
+Each context's `CONTEXT.md` is a glossary and nothing else — no implementation detail, no
+spec. Add a term when it is genuinely resolved, not upfront.
