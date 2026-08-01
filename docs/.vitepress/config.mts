@@ -3,6 +3,8 @@ import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { fileURLToPath } from 'url'
 import ts from 'typescript'
+import { copyFile, mkdir } from 'fs/promises'
+import { dirname, join } from 'path'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -93,5 +95,15 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024-present Alexzvn'
     }
+  },
+
+  // llms.txt links to `<page>.md`, so ship the markdown sources alongside the
+  // rendered HTML. `pages` already has srcExclude applied.
+  async buildEnd({ srcDir, outDir, pages }) {
+    await Promise.all(pages.map(async page => {
+      const dest = join(outDir, page)
+      await mkdir(dirname(dest), { recursive: true })
+      await copyFile(join(srcDir, page), dest)
+    }))
   },
 })
