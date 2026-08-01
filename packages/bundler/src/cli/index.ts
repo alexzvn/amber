@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --disable-warning=DEP0190
 import 'tsx'
 
 import program from './program'
