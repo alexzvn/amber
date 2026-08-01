@@ -16,9 +16,9 @@ jobs:
           bun-version: canary
 
       - name: Build amber package
-        run: cd packages/amber && bun install && bun link @amber.js/core
+        run: cd packages/amber && bun install && bun link
       - name: Build bundler package
-        run: cd packages/bundler && bun install && bun link @amber.js/bundler
+        run: cd packages/bundler && bun install && bun link
       - name: Build create-amber package
         run: cd packages/create-amber && bun install
       - name: Install dependencies
