@@ -2,6 +2,7 @@ import { Command } from 'commander'
 import prompts from 'prompts'
 import { create } from './create'
 import { version, name } from '../package.json'
+import { FRAMEWORKS, FrameworkVariant } from './vite'
 
 const program = new Command()
   .name(name)
@@ -23,8 +24,24 @@ const program = new Command()
       initial: true
     })
 
+    const { framework } = await prompts({
+      type: 'select', name: 'framework',
+      message: 'Select a framework:',
+      choices: FRAMEWORKS.map(item => {
+        return { title: item.color(item.display), value: item.variants }
+      })
+    })
+
+    const { template } = await prompts({
+      type: 'select', name: 'template',
+      message: 'Select a variants:',
+      choices: framework.map((item: FrameworkVariant) => {
+        return { title: item.color(item.display), value: item.name }
+      })
+    })
+
     if (folder) {
-      await create({ folder, devBrowser })
+      await create({ folder, devBrowser, template })
     }
   })
 

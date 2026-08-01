@@ -107,6 +107,7 @@ const transformPackage = (_pkg: string, devBrowser: boolean) => {
 export type CreateAmber = {
   folder: string
   devBrowser: boolean
+  template: string
 }
 
 const getTsconfigPath = async (folder: string) => {
@@ -132,10 +133,12 @@ export const create = async (config: CreateAmber) => {
     process.exit(1)
   }
 
-  const proc = spawn('npm create vite@latest ' + folder, {
+  const argv = ['create', 'vite@latest', '-t', config.template, '--no-interactive', folder]
+
+  const proc = spawn('npm', argv, {
     shell: true,
     env: process.env,
-    stdio: [0, 1, 2]
+    stdio: [0, 1, 2],
   })
 
   await new Promise<number>(resolve => {

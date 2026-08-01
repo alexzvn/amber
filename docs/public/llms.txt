@@ -1,0 +1,37 @@
+# Amber.js
+
+> Meta framework for building Chrome extensions on Manifest V3. Entrypoints are declared as objects in `amber.config.ts`; the toolchain resolves their output paths, generates icons, and writes `manifest.json` as a build artifact. Ships Vite HMR that reaches the service worker and content scripts, plus a typed cross-context messaging and storage runtime.
+
+Amber targets MV3 for Chromium and Safari. Firefox add-ons are not supported.
+
+Packages: `@amber.js/core` (runtime library), `@amber.js/bundler` (build tooling and `amber` CLI), `create-amber` (scaffolder).
+
+An extension runs in up to three isolated contexts — background service worker (no DOM, terminated when idle), content script (page DOM, subset of `chrome.*`), and extension pages (popup/options). Most of the docs are organised around that split.
+
+## Getting started
+
+- [Get Started](https://amber.alexzvn.me/guide/get-started.md): Scaffold, run `amber dev`, load the unpacked extension into Chrome, and produce a store-ready zip.
+- [How Amber Maps to MV3](https://amber.alexzvn.me/guide/mv3.md): The three execution contexts, how the manifest is generated, what lands in `dist/`, and why dev and production builds differ.
+
+## Building
+
+- [`amber.config.ts`](https://amber.alexzvn.me/guide/building/config.md): Reference for the four config fields — `manifest`, `devManifest`, `vite`, `amber`.
+- [Components](https://amber.alexzvn.me/guide/building/components.md): `BackgroundScript`, `ContentScript`, `Page`, and `Icons` — the objects placed inside `manifest`.
+- [Dev Server & HMR](https://amber.alexzvn.me/guide/building/dev-server.md): What `amber dev` injects, what reloads and how, the isolated dev browser, server config and env vars.
+- [Troubleshooting](https://amber.alexzvn.me/guide/building/troubleshooting.md): Amber- and MV3-specific failure modes with the reason each one happens.
+
+## Runtime API
+
+- [Messaging](https://amber.alexzvn.me/guide/api/messaging.md): Typed cross-context events, request/response handlers, and streams; addressing content scripts by tab.
+- [Storage](https://amber.alexzvn.me/guide/api/storage.md): Promise-based `chrome.storage` wrapper with areas, change subscriptions, and reactive items.
+- [DOM & Utilities](https://amber.alexzvn.me/guide/api/dom-utilities.md): Typed `$`/`$$` selectors, concurrency-limited queue, hashing, and misc helpers.
+
+## Shipping
+
+- [Build, Archive & Release](https://amber.alexzvn.me/guide/shipping/build.md): `amber build` and `amber archive` flags, source maps, versioning, GitHub Actions, Chrome Web Store publishing.
+- [Error Reporting with Sentry](https://amber.alexzvn.me/guide/shipping/sentry.md): Why `Sentry.init()` does not work in MV3, and the `BrowserClient` + `Scope` setup per context.
+
+## Optional
+
+- [GitHub repository](https://github.com/alexzvn/amber): Source for all three packages.
+- [README](https://github.com/alexzvn/amber#readme): Quick start and package overview.

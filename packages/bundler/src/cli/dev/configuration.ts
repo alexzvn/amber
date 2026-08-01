@@ -19,6 +19,11 @@ export const resolveConfig = async () => {
 
   let vite: UserConfig = defineConfig({
     plugins: [AmberPlugin(config.manifest, config.amber)],
+
+    optimizeDeps: {
+      exclude: ['@amber.js/bundler/client/worker.esm']
+    },
+
     build: {
       sourcemap: false,
       minify: false,
@@ -35,6 +40,7 @@ export const resolveConfig = async () => {
     server: {
       host: 'localhost',
       port: 5173,
+      cors: { origin: true },
       hmr: {
         host: 'localhost',
         port: 5173

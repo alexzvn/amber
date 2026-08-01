@@ -9,6 +9,8 @@ import LoaderScript from '~/client/__loader?raw'
 import fs from 'fs/promises'
 import { join } from 'path'
 
+const escapeReplacement = (value: string | number | boolean | null) => JSON.stringify(value)
+
 export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
   const get = (id: string) => {
     return [...BackgroundScript.$registers].find(script => {
@@ -17,17 +19,14 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
   }
 
   let port = 5173
+  let wsToken = ''
   let loader = '/entries/__loader.js'
   let server: ViteDevServer|undefined
 
   return {
     name: 'amber:inject-hmr-worker',
 
-    buildStart() {
-      server ??= DevServer.value
-    },
-
-    configResolved() {
+    configResolved(config) {
       if (! amber.bypassCSP) {
         return
       }
@@ -38,6 +37,10 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
 
       manifest.host_permissions?.forEach(host => hosts.add(host))
       manifest.host_permissions = [...hosts]
+    },
+
+    buildStart() {
+      server ??= DevServer.value
     },
 
     configureServer(srv) {
@@ -66,6 +69,10 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
         return { code: magic.toString(), map: magic.generateMap() }
       }
 
+      if (server) {
+        wsToken = server.config.webSocketToken
+      }
+
       if (id.endsWith('/client/worker.esm.mjs')) {
         const script = [... BackgroundScript.$registers][0]
 
@@ -74,6 +81,7 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
           .replace(/__SCRIPT__/g,  script?.file ? `"${script.file}"` : '(void 0)')
           .replace(/VITE_URL/g, `http://localhost:${port}`)
           .replace(/LOADER_SCRIPT/g, loader)
+          .replace(/__WS_TOKEN__/, escapeReplacement(wsToken))
 
         const magic = new MagicString(code)
 

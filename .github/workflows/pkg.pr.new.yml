@@ -15,16 +15,14 @@ jobs:
         with:
           bun-version: canary
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
       - name: Build amber package
-        run: cd packages/amber && bun install --frozen-lockfile
+        run: cd packages/amber && bun install && bun link
       - name: Build bundler package
-        run: cd packages/bundler && bun install --frozen-lockfile
+        run: cd packages/bundler && bun install && bun link
       - name: Build create-amber package
-        run: cd packages/create-amber && bun install --frozen-lockfile
+        run: cd packages/create-amber && bun install
+      - name: Install dependencies
+        run: bun install
 
       - name: Publish packages
         run: bunx pkg-pr-new publish --comment=update --compact 'packages/*'
-

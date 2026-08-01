@@ -2,11 +2,18 @@ import { defineConfig } from 'vitepress'
 import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { fileURLToPath } from 'url'
+import ts from 'typescript'
+import { copyFile, mkdir } from 'fs/promises'
+import { dirname, join } from 'path'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Amber.js",
   description: "Meta framework for building chrome extension MV3",
+
+  // Agent-facing docs (docs/agents/*), research notes (docs/research/*) and the
+  // domain glossary (docs/CONTEXT.md) are repo config, not published pages.
+  srcExclude: ['agents/**', 'research/**', 'CONTEXT.md'],
 
   markdown: {
     theme: {
@@ -15,7 +22,19 @@ export default defineConfig({
     },
     codeTransformers: [
       transformerTwoslash({
-        typesCache: createFileSystemTypesCache()
+        typesCache: createFileSystemTypesCache(),
+        // `^?` queries default to an absolutely-positioned popup that reserves
+        // no height, so it overlaps the code and prose below it. Render them
+        // in the code flow instead.
+        queryRendering: 'popup',
+        twoslashOptions: {
+          compilerOptions: {
+            // @amber.js/bundler ships types via `exports` only, so node10
+            // resolution (twoslash's default) cannot find them.
+            moduleResolution: ts.ModuleResolutionKind.Bundler,
+            resolveJsonModule: true
+          }
+        }
       })
     ],
   },
@@ -30,36 +49,39 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Docs', link: '/markdown-examples' }
+      { text: 'Docs', link: '/guide/get-started' }
     ],
 
     sidebar: [
-      { text: 'Getting Started', link: '/guide/get-started' },
       {
-        text: 'AmberJS Configuration',
+        text: 'Getting Started',
         items: [
-          { text: 'Overview', link: '/guide/bundler/overview' },
-          { text: 'Configuration', link: '/guide/bundler/configuration'  },
-          { text: 'Troubleshoot', link: '/guide/bundler/troubleshoot'  },
+          { text: 'Get Started', link: '/guide/get-started' },
+          { text: 'How Amber Maps to MV3', link: '/guide/mv3' },
         ]
       },
       {
-        text: 'Amber Library',
+        text: 'Building',
         items: [
-          { text: 'Messaging Channel', link: '/guide/libraries/messaging-channel' },
-          { text: 'Storage' },
-          { text: 'Selector' },
-          { text: 'Simple Queue' },
-          { text: 'Hashing' },
-          { text: 'Miscellaneous' }
+          { text: 'amber.config.ts', link: '/guide/building/config' },
+          { text: 'Components', link: '/guide/building/components' },
+          { text: 'Dev Server & HMR', link: '/guide/building/dev-server' },
+          { text: 'Troubleshooting', link: '/guide/building/troubleshooting' },
         ]
       },
       {
-        text: 'Others',
+        text: 'Runtime API',
         items: [
-          { text: 'Setup Github Action' },
-          { text: 'Integrate with Sentry' },
-          { text: 'Deploy Extension To Store' }
+          { text: 'Messaging', link: '/guide/api/messaging' },
+          { text: 'Storage', link: '/guide/api/storage' },
+          { text: 'DOM & Utilities', link: '/guide/api/dom-utilities' },
+        ]
+      },
+      {
+        text: 'Shipping',
+        items: [
+          { text: 'Build, Archive & Release', link: '/guide/shipping/build' },
+          { text: 'Error Reporting with Sentry', link: '/guide/shipping/sentry' },
         ]
       }
     ],
@@ -73,5 +95,15 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024-present Alexzvn'
     }
+  },
+
+  // llms.txt links to `<page>.md`, so ship the markdown sources alongside the
+  // rendered HTML. `pages` already has srcExclude applied.
+  async buildEnd({ srcDir, outDir, pages }) {
+    await Promise.all(pages.map(async page => {
+      const dest = join(outDir, page)
+      await mkdir(dirname(dest), { recursive: true })
+      await copyFile(join(srcDir, page), dest)
+    }))
   },
 })
