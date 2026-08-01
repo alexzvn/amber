@@ -8,6 +8,9 @@ export default defineConfig({
   title: "Amber.js",
   description: "Meta framework for building chrome extension MV3",
 
+  // Agent-facing docs (docs/agents/*) are repo config, not published pages.
+  srcExclude: ['agents/**'],
+
   markdown: {
     theme: {
       light: 'github-light',
