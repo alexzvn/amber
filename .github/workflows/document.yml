@@ -34,17 +34,19 @@ jobs:
           fetch-depth: 0 # Not needed if lastUpdated is not enabled
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Build dependencies
         run: bun run build
-    
+
       - name: Link Dependencies
         run: cd packages/amber && bun link && cd ../bundler && bun link
 
       - name: Install dependencies
-        run: bun i --frozen-lockfile
+        run: bun i
 
       - name: Build with VitePress
         run: bun docs:build
