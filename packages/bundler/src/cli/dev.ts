@@ -20,6 +20,7 @@ const start = async (option: DevOption) => {
 
   DevServer.value = server
   await build({
+    mode: 'development',
     ...vite,
     build: {
       ...vite.build,

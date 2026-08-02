@@ -57,7 +57,9 @@ export const resolveConfig = async () => {
   })
 
   vite = mergeConfig(vite, config.vite);
-  Object.assign(vite.server!.hmr as any, {
+  const server = vite.server?.ws ?? vite.server?.hmr
+
+  Object.assign(server ?? {}, {
     host: vite.server!.host,
     port: vite.server!.port
   })
