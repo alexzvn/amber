@@ -46,7 +46,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
     },
 
     configureServer(_server) {
-      server = _server 
+      server = _server
     },
 
     async buildStart() {
@@ -118,6 +118,8 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
     },
 
     async generateBundle(_options, bundle) {
+      if (server) return
+
       const saveDir = join(outdir, 'scripts')
       await mkdir(saveDir)
 
@@ -134,6 +136,8 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
     },
 
     writeBundle(opt, bundles) {
+      if (server) return
+
       for (const script of ContentScript.$registers) {
         const bundle = bundles[`scripts/_${script.moduleName}.js`] as any
 
