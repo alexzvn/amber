@@ -1,13 +1,10 @@
-import LoadingPage from './loading.html?raw'
-
 // injected during build process
 declare const __HMR_PORT__: number
 declare const __SCRIPT__: string|undefined
-declare const __WS_TOKEN__: string|undefined
 
 const port = __HMR_PORT__
 const background = __SCRIPT__ // current background script
-const token = __WS_TOKEN__
+let token = '__WS_TOKEN__'
 
 type FullReloadEvent = {
   type: 'full-reload'
@@ -47,12 +44,6 @@ const proxy = async (url: URL) => {
     headers: { Referer: chrome.runtime.getURL('/') }
   }).catch(() => undefined)
 
-  if (url.pathname.endsWith('.html') && !res) {
-    return new Response(LoadingPage, {
-      headers: { 'Content-Type': 'text/html' }
-    })
-  }
-
   if (!res || !res.ok) {
     const response = await fetch(chrome.runtime.getURL(url.pathname))
 
@@ -65,7 +56,7 @@ const proxy = async (url: URL) => {
 
   return new Response(res.body, {
     headers: {
-    'Content-Type': res.headers.get('Content-Type') ?? 'text/javascript'
+      'Content-Type': res.headers.get('Content-Type') ?? 'text/javascript'
     }
   })
 }
@@ -85,6 +76,23 @@ const reloadCurrentTab = () => chrome.tabs.query({ active: true }, ([tab]) => {
   tab && tab.id && chrome.tabs.reload(tab.id)
 })
 
+const refreshWSToken = async () => {
+  const matcher = /\bwsToken\s*=\s*(["'])([A-Za-z0-9_-]{12})\1|[?&]token=([A-Za-z0-9_-]{12})/
+
+  return fetch(`http://localhost:${port}/@vite/client`)
+    .then(res => res.text())
+    .then(src => {
+      const match = src.match(matcher) ?? []
+      const _token = match[2] ?? match[3]
+
+      if (! _token) {
+        throw new Error('no token found')
+      }
+
+      return token = _token
+    })
+}
+
 target.addEventListener('connect', async () => {
   const reconnect = () => {
     setTimeout(() => target.dispatchEvent(new Event('connect')), 3000)
@@ -95,6 +103,10 @@ target.addEventListener('connect', async () => {
   if (!ok) {
     return
   }
+
+  await refreshWSToken()
+    .then(() => console.log('[Amber] refreshed websocket token'))
+    .catch(() => console.warn('[Amber] could not get fresh websocket token'))
 
   let socket: WebSocket|undefined = new WebSocket(`ws://localhost:${port}?token=${token}`, 'vite-hmr')
 
@@ -125,10 +137,6 @@ target.addEventListener('connect', async () => {
     if (data.event === 'amber:page.reload') {
       reloadCurrentTab()
     }
-  })
-
-  chrome.tabs.query({ active: true }, ([tab]) => {
-    tab.id
   })
 
   socket.addEventListener('error', () => {
