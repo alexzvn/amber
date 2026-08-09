@@ -1,9 +1,5 @@
-import fs from 'fs/promises'
-import path from 'path'
-import {defineVitePlugin, invokeOnce, mkdir} from '~/helper'
+import {defineVitePlugin, invokeOnce} from '~/helper'
 import type {GeneralManifest} from '~/browsers/manifest.ts'
-import type {ViteDevServer} from "vite"
-import {DevServer} from "~/plugins/BuildEnv.ts"
 import type {AmberOptions} from "~/configure"
 import BackgroundScript from '~/components/BackgroundScript'
 
@@ -26,7 +22,7 @@ const bindAccessibleResource = (manifest: GeneralManifest) => {
   })
 }
 
-const bindBypassSCP = (manifest: GeneralManifest) => {
+const bindBypassCSP = (manifest: GeneralManifest) => {
   const perms = new Set(manifest.permissions || [])
 
   perms.add('declarativeNetRequest')
@@ -43,38 +39,44 @@ const injectBackgroundWorker = (manifest: GeneralManifest) => {
 }
 
 export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
-  let dir: string|undefined = undefined
 
-  bindAccessibleResource(manifest)
-  amber.bypassCSP && bindBypassSCP(manifest)
+  const setup = invokeOnce((port: number) => {
+    manifest.host_permissions ??= []
 
-  const writeManifest = async (outdir?: string) => {
-    const location = outdir ?? dir ?? 'dist'
-    const target = path.join(location, 'manifest.json')
+    manifest.host_permissions.push(`http://localhost:${port}/*`)
+    manifest.web_accessible_resources!.push({
+      matches: ['<all_urls>'],
+      resources: ['/*']
+    })
 
-    await mkdir(location)
+    injectBackgroundWorker(manifest)
 
-    await fs.writeFile(target, JSON.stringify(manifest, null, 2))
-  }
+    amber.bypassCSP && bindBypassCSP(manifest)
+  })
 
   return {
     name: 'amber:manifest-writer',
 
-    configureServer: (server: ViteDevServer) => {
-      const port = server.config.server.port
-  
-      manifest.host_permissions ??= []
-    
-      manifest.host_permissions.push(`http://localhost:${port}/*`)
-      manifest.web_accessible_resources!.push({
-        matches: ['<all_urls>'],
-        resources: ['/*']
-      })
-
-      injectBackgroundWorker(manifest)
+    config() {
+      bindAccessibleResource(manifest)
     },
 
-    buildStart: () => writeManifest(),
-    writeBundle: () => writeManifest()
+    configResolved(config) {
+      if (!config.mode.startsWith('dev')) return
+
+      setup(config.server.port)
+    },
+
+    generateBundle() {
+      if (manifest.host_permissions) {
+        manifest.host_permissions = [...new Set(manifest.host_permissions)]
+      }
+
+      this.emitFile({
+        fileName: 'manifest.json',
+        type: 'asset',
+        source: JSON.stringify(manifest, null, 2)
+      })
+    }
   }
 })
