@@ -2,12 +2,8 @@ import { defineVitePlugin } from '~/helper'
 import BackgroundScript from '~/components/BackgroundScript'
 import MagicString from "magic-string"
 import type {GeneralManifest} from '~/browsers/manifest.ts'
-import type {ViteDevServer} from 'vite'
-import {DevServer} from '~/plugins/BuildEnv.ts'
+import type {ResolvedConfig} from 'vite'
 import type {AmberOptions} from '~/configure'
-import LoaderScript from '~/client/__loader?raw'
-import fs from 'fs/promises'
-import { join } from 'path'
 
 const escapeReplacement = (value: string | number | boolean | null) => JSON.stringify(value)
 
@@ -18,15 +14,14 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
     })
   }
 
-  let port = 5173
-  let wsToken = ''
-  let loader = '/entries/__loader.js'
-  let server: ViteDevServer|undefined
+  let config: ResolvedConfig
 
   return {
     name: 'amber:inject-hmr-worker',
 
-    configResolved(config) {
+    configResolved(_config) {
+      config = _config
+
       if (! amber.bypassCSP) {
         return
       }
@@ -39,49 +34,22 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
       manifest.host_permissions = [...hosts]
     },
 
-    buildStart() {
-      server ??= DevServer.value
-    },
-
-    configureServer(srv) {
-      port = srv.config.server.port || 5173
-      server = srv
-
-      srv.httpServer?.addListener('listening', () => {
-        port = srv.config.server.port || 5173
-      })
-    },
-
-    async writeBundle() {
-      if (server) {
-        const loaderPath = join(server?.config.build.outDir || 'dist', loader)
-        await fs.writeFile(loaderPath, LoaderScript)
-      }
-    },
-
     transform(code, id) {
       const script = get(id)
 
-      if (server && script) {
+      if (config.mode === 'development' && script) {
         const magic = new MagicString(code, { filename: script.path.filename })
         magic.prepend(`import '@amber.js/bundler/client/worker.esm';\n`)
 
         return { code: magic.toString(), map: magic.generateMap() }
       }
 
-      if (server) {
-        wsToken = server.config.webSocketToken
-      }
-
       if (id.endsWith('/client/worker.esm.mjs')) {
         const script = [... BackgroundScript.$registers][0]
 
         code = code
-          .replace(/__HMR_PORT__/g, port.toString())
+          .replace(/__HMR_PORT__/g, config.server.port.toString())
           .replace(/__SCRIPT__/g,  script?.file ? `"${script.file}"` : '(void 0)')
-          .replace(/VITE_URL/g, `http://localhost:${port}`)
-          .replace(/LOADER_SCRIPT/g, loader)
-          .replace(/__WS_TOKEN__/, escapeReplacement(wsToken))
 
         const magic = new MagicString(code)
 
