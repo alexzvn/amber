@@ -102,7 +102,7 @@ export const escapeExecutePath = (path: string) => {
     if (process.platform === 'win32') {
       return path.replace(/\//, '\\')
     }
-  
+
     return path.replace(/\\/g, '/')
   }
 
