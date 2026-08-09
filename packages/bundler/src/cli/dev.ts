@@ -1,10 +1,8 @@
 import { spawn, type ChildProcess } from 'child_process'
 import { createServer, build } from 'vite'
-import { program, cwd } from './program'
+import { program } from './program'
 import BackgroundScript from '~/components/BackgroundScript'
-import {DevServer} from "~/plugins/BuildEnv.ts"
 import { escapeExecutePath } from '../helper'
-import { randomBytes } from 'crypto'
 import * as Browser from './dev/browser'
 import * as Configuration from './dev/configuration'
 
@@ -13,12 +11,10 @@ type DevOption = { devBrowser: boolean }
 
 const start = async (option: DevOption) => {
   const { vite, config } = await Configuration.resolveConfig()
-  const server = await createServer({ ...vite, configFile: false })
   const session = new Configuration.Session()
 
   await session.init()
 
-  DevServer.value = server
   await build({
     mode: 'development',
     ...vite,
@@ -30,9 +26,11 @@ const start = async (option: DevOption) => {
         input: BackgroundScript.map,
       }
     },
-    logLevel: 'silent'
+
+    logLevel: 'warn'
   })
 
+  const server = await createServer({ ...vite, configFile: false })
   await server.listen()
 
   server.printUrls()
