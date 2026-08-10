@@ -1,9 +1,10 @@
 import { throttle as createThrottle } from 'throttle-debounce'
 
 interface SelectorSingle {
-  <const V extends Element>(selector: string): V|null
-  <const K extends keyof HTMLElementTagNameMap>(element: Element, selector: K): HTMLElementTagNameMap[K]|null
-  <const K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K]|null
+  <const K extends keyof HTMLElementTagNameMap>(element: Element, selector: K): HTMLElementTagNameMap[K] | null
+  <const K extends keyof HTMLElementTagNameMap>(selector: K): HTMLElementTagNameMap[K] | null
+  <const V extends HTMLElement>(e: Element, selector: string): V | null
+  <const V extends Element>(selector: string): V | null
 
   any: typeof any
   sequence: typeof sequence
@@ -13,6 +14,7 @@ interface SelectorSingle {
 interface SelectorMultiple {
   <const K extends keyof HTMLElementTagNameMap>(element: Element, selector: K): NodeListOf<HTMLElementTagNameMap[K]>
   <const K extends keyof HTMLElementTagNameMap>(selector: K): NodeListOf<HTMLElementTagNameMap[K]>
+  <const V extends HTMLElement>(e: Element, selector: string): NodeListOf<V>
   <const V extends Element>(selector: string): NodeListOf<V>
 }
 
