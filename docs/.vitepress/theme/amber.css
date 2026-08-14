@@ -291,17 +291,6 @@
   color: #F7F4EE;
 }
 
-.VPNavBar .documate-button {
-  --dm-color-bg-alt: #1B2943;
-  --dm-color-hint: #A7B0C3;
-  border-color: #35425E;
-}
-
-.VPNavBar .documate-button:hover {
-  --dm-color-hint: #F7F4EE;
-  border-color: #26324A;
-}
-
 .VPNavScreen .VPNavScreenMenuLink {
   color: #A7B0C3 !important;
 }
