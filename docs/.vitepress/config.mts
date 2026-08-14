@@ -18,7 +18,9 @@ export default defineConfig({
 
   markdown: {
     theme: {
-      light: 'github-light',
+      // The design shows dark code blocks on the light page, so the light
+      // mode also renders code with the dark theme.
+      light: 'github-dark',
       dark: 'github-dark'
     },
     codeTransformers: [
@@ -49,6 +51,8 @@ export default defineConfig({
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: '/icon.svg',
+    siteTitle: 'amber.js',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/guide/get-started' }
