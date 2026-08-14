@@ -13,6 +13,7 @@ import './amber.css'
 const Extended = {
   ...Theme,
   Layout: h(Theme.Layout, null, {
+    'nav-bar-title-after': () => h('span', { class: 'docs-title' }, 'Documentation'),
     'nav-bar-content-before': () => h(Documate, {
       endpoint: 'https://amber-ai.alexzvn.me/ask',
     }),
