@@ -34,10 +34,6 @@ _Avoid_: admonition, callout box
 The VitePress `srcExclude` entry that keeps `docs/agents/**` and `docs/research/**` out of the published site — agent-facing docs and research notes are repo config, not published pages.
 _Avoid_: ignore list
 
-**Documate**:
-The AI docs assistant for the published site, configured by `documate.json` at the repository root — the config names the `docs/` root, the markdown glob to index, and the backend upload endpoint.
-_Avoid_: chatbot, search
-
 ### Agent-facing docs
 
 **Domain docs**:

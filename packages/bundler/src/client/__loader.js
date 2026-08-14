@@ -20,7 +20,7 @@ window.addEventListener('load', async () => {
   let attempt = 1
 
   do {
-    await fetch(url).then(window.location.reload).catch(() => {})
+    await fetch(url).then(() => window.location.reload()).catch(console.warn)
 
     const timeout = Math.min(100 * Math.pow(2, attempt), 5000)
     info(`Dev server is offline, retries in ${timeout}ms`)

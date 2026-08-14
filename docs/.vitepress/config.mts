@@ -3,6 +3,7 @@ import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { fileURLToPath } from 'url'
 import ts from 'typescript'
+import tailwindcss from '@tailwindcss/vite'
 import { copyFile, mkdir } from 'fs/promises'
 import { dirname, join } from 'path'
 
@@ -17,7 +18,9 @@ export default defineConfig({
 
   markdown: {
     theme: {
-      light: 'github-light',
+      // The design shows dark code blocks on the light page, so the light
+      // mode also renders code with the dark theme.
+      light: 'github-dark',
       dark: 'github-dark'
     },
     codeTransformers: [
@@ -40,6 +43,7 @@ export default defineConfig({
   },
 
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: [{ find: '@components', replacement: fileURLToPath(new URL('./components', import.meta.url)) }]
     }
@@ -47,6 +51,8 @@ export default defineConfig({
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: '/icon.svg',
+    siteTitle: 'amber.js',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/guide/get-started' }

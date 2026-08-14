@@ -1,19 +1,18 @@
 import {defineVitePlugin, mkdir} from '~/helper'
-import type {ViteDevServer} from 'vite'
-import {join, dirname} from 'path'
-import Page from '~/components/Page'
+import type {ResolvedConfig, ViteDevServer} from 'vite'
+import {join, posix} from 'path'
 import ContentScript from '~/components/ContentScript'
 import CSPolyfillDev from '~/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
-import LoadingHTML from '~/client/loading.html?raw'
+
 import fs from "fs/promises"
-import {DevServer} from '~/plugins/BuildEnv.ts'
 import type { AmberOptions } from '../configure'
 import slash from 'slash'
 
 
 export default defineVitePlugin((amber: AmberOptions = {}) => {
   let outdir = 'dist'
+  let config: ResolvedConfig
   let server: ViteDevServer|undefined
 
   return [{
@@ -43,21 +42,20 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
 
     configResolved(cfg) {
       outdir = cfg.build.outDir
+      config = cfg
     },
 
     configureServer(_server) {
-      server = _server 
+      server = _server
     },
 
     async buildStart() {
-      server ??= DevServer.value
-
-      if (! server) {
+      if (config.mode !== 'development') {
         return
       }
 
       await mkdir(join(outdir, 'scripts'))
-      const host = `http://localhost:${server.config.server.port}/`
+      const host = `http://localhost:${config.server.port}/`
 
       for (const script of ContentScript.$registers) {
         if (script.options.format !== 'es' && !server) {
@@ -71,18 +69,6 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
           .replace(/__ALLOW_FULL_RELOAD__/g, enableReload.toString())
 
         await fs.writeFile(join(outdir, 'scripts', script.path.name + '.js'), code)
-      }
-
-      for (const page of Page.$registers) {
-        const saveDir = join(outdir, dirname(page.toString()))
-        await mkdir(saveDir)
-
-        await fs.writeFile(
-          join(saveDir, page.path.filename!),
-          LoadingHTML
-            .replace(/LOADER_SCRIPT/, '/entries/__loader.js')
-            .replace(/VITE_URL/, host)
-        )
       }
     },
 
@@ -117,33 +103,36 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
       return { code: injected.join('\n') }
     },
 
+    /**
+     * Collects the CSS each ContentScript pulled in, so ManifestWriter can
+     * serialize it into `content_scripts[].css`.
+     *
+     * ORDER-SENSITIVE: ManifestWriter emits manifest.json from its own
+     * `generateBundle`, and Rollup runs that hook in plugin-registration order.
+     * This plugin must stay registered *before* ManifestWriter in
+     * `plugins/index.ts`, otherwise the manifest is serialized before the CSS
+     * is attached and the styles silently never reach the built extension.
+     */
     async generateBundle(_options, bundle) {
-      const saveDir = join(outdir, 'scripts')
-      await mkdir(saveDir)
+      if (config.mode.startsWith('dev')) return
 
-      Object.keys(bundle).map(async file => {
-        const script = ContentScript.$registers.find(script => file.endsWith(`scripts/_${script.moduleName}.js`))
-
-        if (! script) {
-          return
-        }
-
-        const code = CSPolyfillProd.replace(/__SCRIPT__/g, `"/scripts/_${script.moduleName}.js"`)
-        await fs.writeFile(join(saveDir, script.path.name + '.js'), code)
-      })
-    },
-
-    writeBundle(opt, bundles) {
       for (const script of ContentScript.$registers) {
-        const bundle = bundles[`scripts/_${script.moduleName}.js`] as any
+        const output = bundle[`scripts/_${script.moduleName}.js`]
 
-        if (!bundle || !bundle.viteMetadata) {
-          return
+        if (! output) continue
+
+        this.emitFile({
+          type: 'prebuilt-chunk',
+          fileName: posix.join('scripts', script.path.name + '.js'),
+          code: CSPolyfillProd.replace(/__SCRIPT__/g, `"/scripts/_${script.moduleName}.js"`),
+        })
+
+        if (output.viteMetadata) {
+          script.options.css ??= []
+          script.options.css.push(...output.viteMetadata.importedCss)
         }
-
-        script.options.css ??= []
-        script.options.css.push(...bundle!.viteMetadata.importedCss)
       }
     }
+
   }]
 })

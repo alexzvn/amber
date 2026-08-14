@@ -1,6 +1,396 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  --font-sans: "Manrope", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* surfaces */
+  --color-canvas: #0a1115;
+  --color-surface: #101b20;
+  --color-surface-raised: #15292e;
+  --color-ink: #102025;
+  --color-paper: #f6f1e8;
+  --color-paper-raised: #fcf9f2;
+
+  /* brand accents */
+  --color-primary: #ff9d1c;
+  --color-primary-hover: #ffb34a;
+  --color-primary-deep: #6e3600;
+  --color-accent: #ffae3d;
+  --color-accent-hover: #ffbf66;
+  --color-accent-deep: #d77500;
+  --color-accent-deep-hover: #7d4200;
+  --color-success: #c9ff61;
+  --color-info: #b6d7ff;
+
+  /* text */
+  --color-muted: #c5ccc7;
+  --color-faint: #7d8983;
+  --color-ink-muted: #53615c;
+
+  /* lines */
+  --color-line: #d7d1c5;
+  --color-line-soft: #ede7db;
+
+  /* terminal traffic lights */
+  --color-dot-red: #ff755f;
+  --color-dot-yellow: #ffbd44;
+  --color-dot-green: #65cc7a;
+}
+
+/*
+ * VitePress default theme — Amber docs look.
+ *
+ * Palette from the pencil docs design:
+ *   ink #0A1020 · surface #101A30 · raised #1B2943 · active #24334F
+ *   border #26324A · border-strong #35425E
+ *   paper #F7F4EE · line #D8D3C9 · body #526176 · label #71809C
+ *   amber #FF9C5A · rust #C85F22 · acid #B8F36B
+ */
 
 :root {
-    --vp-c-brand-1: #ff8000;
-    --vp-c-brand-2: #ffc000;
-    --vp-c-brand-3: #f05d23;
+  --vp-font-family-base: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --vp-layout-max-width: 1440px;
+  --vp-nav-height: 76px;
+  --vp-sidebar-width: 286px;
+
+  /* surfaces */
+  --vp-c-bg: #F7F4EE;
+  --vp-c-bg-alt: #EFE8DA;
+  --vp-c-bg-elv: #FCFAF4;
+  --vp-c-bg-soft: #F1EBDD;
+
+  /* text */
+  --vp-c-text-1: #0A1020;
+  --vp-c-text-2: #526176;
+  --vp-c-text-3: #71809C;
+
+  /* lines */
+  --vp-c-border: #D8D3C9;
+  --vp-c-divider: #D8D3C9;
+  --vp-c-gutter: #E2D6C2;
+
+  /* brand — rust links on paper, amber on dark chrome */
+  --vp-c-brand-1: #C85F22;
+  --vp-c-brand-2: #D2622A;
+  --vp-c-brand-3: #B8521C;
+  --vp-c-brand-soft: #FFF0E6;
+
+  /* custom containers: tip = lime, info = amber, warning/danger = rust */
+  --vp-c-tip-1: #315514;
+  --vp-c-tip-2: #C5E58E;
+  --vp-c-tip-3: #9CB96A;
+  --vp-c-tip-soft: #DDF5B2;
+
+  --vp-c-info-1: #8B421D;
+  --vp-c-info-2: #EDB187;
+  --vp-c-info-3: #F2C29A;
+  --vp-c-info-soft: #FFF0E6;
+
+  --vp-c-warning-1: #6E3600;
+  --vp-c-warning-2: #D77500;
+  --vp-c-warning-3: #E0A36B;
+  --vp-c-warning-soft: #FFE9D2;
+
+  --vp-c-danger-1: #8B211D;
+  --vp-c-danger-2: #D5393E;
+  --vp-c-danger-3: #E8B4A8;
+  --vp-c-danger-soft: #FDEDEA;
+
+  /* code: dark blocks on the light page, per design */
+  --vp-code-block-bg: #101A30;
+  --vp-code-block-color: #F7F4EE;
+  --vp-code-block-divider-color: #35425E;
+  --vp-code-lang-color: #71809C;
+  --vp-code-line-highlight-color: #1B2943;
+  --vp-code-line-number-color: #71809C;
+
+  --vp-code-copy-code-border-color: #35425E;
+  --vp-code-copy-code-bg: #1B2943;
+  --vp-code-copy-code-hover-border-color: #35425E;
+  --vp-code-copy-code-hover-bg: #24334F;
+  --vp-code-copy-code-active-text: #B8F36B;
+
+  --vp-code-tab-divider: #35425E;
+  --vp-code-tab-text-color: #A7B0C3;
+  --vp-code-tab-bg: #101A30;
+  --vp-code-tab-hover-text-color: #F7F4EE;
+  --vp-code-tab-active-text-color: #F7F4EE;
+  --vp-code-tab-active-bar-color: #FF9C5A;
+
+  --vp-code-bg: #EAE1CF;
+  --vp-code-color: #C85F22;
+
+  /* dark chrome in both modes */
+  --vp-nav-bg-color: #0A1020;
+  --vp-nav-screen-bg-color: #101A30;
+  --vp-sidebar-bg-color: #101A30;
+
+  /* twoslash popups follow the dark code blocks */
+  --twoslash-popup-bg: #101A30;
+  --twoslash-popup-color: #F7F4EE;
+  --twoslash-docs-color: #A7B0C3;
+  --twoslash-border-color: #35425E;
+  --twoslash-matched-color: #FF9C5A;
+  --twoslash-unmatched-color: #71809C;
+}
+
+.dark {
+  --vp-c-bg: #0A1020;
+  --vp-c-bg-alt: #101A30;
+  --vp-c-bg-elv: #1B2943;
+  --vp-c-bg-soft: #1B2943;
+
+  --vp-c-text-1: #F7F4EE;
+  --vp-c-text-2: #A7B0C3;
+  --vp-c-text-3: #71809C;
+
+  --vp-c-border: #35425E;
+  --vp-c-divider: #26324A;
+  --vp-c-gutter: #26324A;
+
+  --vp-c-brand-1: #FF9C5A;
+  --vp-c-brand-2: #FFB34A;
+  --vp-c-brand-3: #FF9C5A;
+  --vp-c-brand-soft: #2E2218;
+
+  --vp-c-tip-1: #B8F36B;
+  --vp-c-tip-2: #577B2F;
+  --vp-c-tip-3: #3F5A22;
+  --vp-c-tip-soft: #1F2E14;
+
+  --vp-c-info-1: #FF9C5A;
+  --vp-c-info-2: #7D4A28;
+  --vp-c-info-3: #5C371E;
+  --vp-c-info-soft: #2E2218;
+
+  --vp-c-warning-1: #FFBD44;
+  --vp-c-warning-2: #8A5E1A;
+  --vp-c-warning-3: #5C3E12;
+  --vp-c-warning-soft: #332512;
+
+  --vp-c-danger-1: #FF755F;
+  --vp-c-danger-2: #8B3A2F;
+  --vp-c-danger-3: #5C2A22;
+  --vp-c-danger-soft: #3A1B16;
+
+  --vp-code-block-bg: #101A30;
+  --vp-code-block-color: #F7F4EE;
+  --vp-code-block-divider-color: #35425E;
+  --vp-code-lang-color: #71809C;
+  --vp-code-line-highlight-color: #1B2943;
+  --vp-code-line-number-color: #71809C;
+
+  --vp-code-copy-code-border-color: #35425E;
+  --vp-code-copy-code-bg: #1B2943;
+  --vp-code-copy-code-hover-border-color: #35425E;
+  --vp-code-copy-code-hover-bg: #24334F;
+  --vp-code-copy-code-active-text: #B8F36B;
+
+  --vp-code-tab-divider: #35425E;
+  --vp-code-tab-text-color: #A7B0C3;
+  --vp-code-tab-bg: #101A30;
+  --vp-code-tab-hover-text-color: #F7F4EE;
+  --vp-code-tab-active-text-color: #F7F4EE;
+  --vp-code-tab-active-bar-color: #FF9C5A;
+
+  --vp-code-bg: #1B2943;
+  --vp-code-color: #FF9C5A;
+
+  --vp-nav-bg-color: #0A1020;
+  --vp-nav-screen-bg-color: #101A30;
+  --vp-sidebar-bg-color: #101A30;
+
+  --twoslash-popup-bg: #1B2943;
+  --twoslash-popup-color: #F7F4EE;
+  --twoslash-docs-color: #A7B0C3;
+  --twoslash-border-color: #35425E;
+  --twoslash-matched-color: #FF9C5A;
+  --twoslash-unmatched-color: #71809C;
+}
+
+/* Nav — dark chrome with paper text, per design header */
+.VPNavBar {
+  border-bottom: 1px solid #26324A;
+}
+
+.VPNavBar:not(.home) {
+  background-color: #0A1020 !important;
+}
+
+.VPNav {
+  --vp-c-divider: transparent;
+}
+
+.VPNavBarTitle .title {
+  color: #F7F4EE;
+  font-family: var(--vp-font-family-mono);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.VPNavBarTitle .logo {
+  height: 20px;
+}
+
+.VPNavBarTitle .docs-title {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #A7B0C3;
+}
+
+.VPNavBarTitle .docs-title::before {
+  content: "/";
+  margin-right: 10px;
+  font-family: var(--vp-font-family-mono);
+  font-weight: 400;
+  color: #526176;
+}
+
+.vp-doc div[class*='language-'] {
+  border: 1px solid #35425E;
+}
+
+.VPNavBar .VPNavBarMenuLink {
+  color: #A7B0C3 !important;
+}
+
+.VPNavBar .VPNavBarMenuLink:hover {
+  color: #F7F4EE !important;
+}
+
+.VPNavBar .VPNavBarMenuLink.active {
+  color: #FF9C5A !important;
+}
+
+.VPNavBar .VPSocialLink,
+.VPNavScreen .VPSocialLink {
+  color: #A7B0C3;
+}
+
+.VPNavBar .VPSocialLink:hover,
+.VPNavScreen .VPSocialLink:hover {
+  color: #F7F4EE;
+}
+
+.VPNavBar .VPNavBarHamburger .top,
+.VPNavBar .VPNavBarHamburger .middle,
+.VPNavBar .VPNavBarHamburger .bottom {
+  background-color: #A7B0C3;
+}
+
+.VPNavBarAppearance {
+  color: #A7B0C3;
+}
+
+.VPNavBarAppearance:hover {
+  color: #F7F4EE;
+}
+
+.VPNavScreen .VPNavScreenMenuLink {
+  color: #A7B0C3 !important;
+}
+
+.VPNavScreen .VPNavScreenMenuLink:hover {
+  color: #F7F4EE !important;
+}
+
+.VPNavScreen .VPNavScreenMenuLink.active {
+  color: #FF9C5A !important;
+}
+
+.VPNavScreen .VPNavScreenMenuGroupLink {
+  color: #A7B0C3 !important;
+}
+
+.VPNavScreen .VPNavScreenMenuGroupSection .title,
+.VPNavScreen .VPNavScreenMenuGroupTitle {
+  color: #71809C !important;
+}
+
+.VPNavScreenAppearance {
+  background-color: #1B2943 !important;
+}
+
+.VPNavScreenAppearance p {
+  color: #A7B0C3 !important;
+}
+
+/* Sidebar — dark panel, label-style group titles, amber-less active pill */
+.VPSidebar {
+  border-right: 1px solid #26324A;
+  --vp-c-divider: transparent;
+}
+
+.VPSidebar .VPSidebarItem.level-0 > .item .text {
+  color: #71809C !important;
+  font-family: var(--vp-font-family-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.VPSidebar .VPSidebarItem.level-1 > .item {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.VPSidebar .VPSidebarItem.level-1 > .item .text {
+  color: #A7B0C3 !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.VPSidebar .VPSidebarItem.level-1 > .item .link:hover .text {
+  color: #F7F4EE !important;
+}
+
+.VPSidebar .VPSidebarItem.level-1.is-active > .item {
+  background-color: #24334F;
+}
+
+.VPSidebar .VPSidebarItem.level-1.is-active > .item .link > .text {
+  color: #F7F4EE !important;
+  font-weight: 800;
+}
+
+/* Content — ink headings, muted body, label-style outline title */
+.vp-doc p,
+.vp-doc li {
+  color: var(--vp-c-text-2);
+}
+
+.VPDocAsideOutline .outline-title {
+  color: #71809C;
+  font-family: var(--vp-font-family-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Custom containers — colored body text, per design callouts */
+.custom-block.tip p,
+.custom-block.tip li {
+  color: var(--vp-c-tip-1);
+}
+
+.custom-block.info p,
+.custom-block.info li {
+  color: var(--vp-c-info-1);
+}
+
+.custom-block.warning p,
+.custom-block.warning li {
+  color: var(--vp-c-warning-1);
+}
+
+.custom-block.danger p,
+.custom-block.danger li {
+  color: var(--vp-c-danger-1);
 }

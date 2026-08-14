@@ -40,11 +40,8 @@ export const resolveConfig = async () => {
     server: {
       host: 'localhost',
       port: 5173,
+      strictPort: true,
       cors: { origin: true },
-      hmr: {
-        host: 'localhost',
-        port: 5173
-      },
       watch: {
         ignored: ['**/dist/**', '**/.amber/browser/**']
       },
@@ -57,10 +54,6 @@ export const resolveConfig = async () => {
   })
 
   vite = mergeConfig(vite, config.vite);
-  Object.assign(vite.server!.hmr as any, {
-    host: vite.server!.host,
-    port: vite.server!.port
-  })
 
   return { vite, config }
 }

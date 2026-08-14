@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Amber.js</title>
+  <desc id="desc">A glowing amber gemstone shaped like the letter A</desc>
+  <defs>
+    <linearGradient id="amber" x1="13" y1="8" x2="51" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD75A"/>
+      <stop offset=".45" stop-color="#FF9D00"/>
+      <stop offset="1" stop-color="#F05D23"/>
+    </linearGradient>
+    <linearGradient id="facet" x1="32" y1="10" x2="32" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF3B0" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#FF8000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M32 3 55 16l4 27-18 18H23L5 43l4-27L32 3Z" fill="#24150B"/>
+  <path d="M32 7 51.5 18 55 41.5 39.5 57h-15L9 41.5 12.5 18 32 7Z" fill="url(#amber)"/>
+
+  <path d="m32 7-8.5 18L12.5 18 32 7Zm0 0L40.5 25l11-7L32 7ZM9 41.5 23.5 25l1 32L9 41.5Zm46 0L40.5 25l-1 32L55 41.5Z" fill="url(#facet)"/>
+  <path d="M32 7 23.5 25 9 41.5m23-34.5 8.5 18L55 41.5M23.5 25h17M24.5 57l7.5-13 7.5 13" fill="none" stroke="#7A3900" stroke-opacity=".48" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <path d="M18 46 29.25 17h5.5L46 46h-7l-2.25-6.5h-9.5L25 46h-7Zm11.35-12.5h5.3L32 25l-2.65 8.5Z" fill="#FFFDF8" stroke="#24150B" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="32" cy="10.5" r="2" fill="#FFF8D6"/>
+</svg>
