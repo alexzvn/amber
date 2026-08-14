@@ -3,6 +3,7 @@ import { transformerTwoslash } from '@shikijs/vitepress-twoslash'
 import { createFileSystemTypesCache } from '@shikijs/vitepress-twoslash/cache-fs'
 import { fileURLToPath } from 'url'
 import ts from 'typescript'
+import tailwindcss from '@tailwindcss/vite'
 import { copyFile, mkdir } from 'fs/promises'
 import { dirname, join } from 'path'
 
@@ -40,6 +41,7 @@ export default defineConfig({
   },
 
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: [{ find: '@components', replacement: fileURLToPath(new URL('./components', import.meta.url)) }]
     }

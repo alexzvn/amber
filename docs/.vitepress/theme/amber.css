@@ -1,6 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  --font-sans: "Manrope", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* surfaces */
+  --color-canvas: #0a1115;
+  --color-surface: #101b20;
+  --color-surface-raised: #15292e;
+  --color-ink: #102025;
+  --color-paper: #f6f1e8;
+  --color-paper-raised: #fcf9f2;
+
+  /* brand accents */
+  --color-primary: #ff9d1c;
+  --color-primary-hover: #ffb34a;
+  --color-primary-deep: #6e3600;
+  --color-accent: #ffae3d;
+  --color-accent-hover: #ffbf66;
+  --color-accent-deep: #d77500;
+  --color-accent-deep-hover: #7d4200;
+  --color-success: #c9ff61;
+  --color-info: #b6d7ff;
+
+  /* text */
+  --color-muted: #c5ccc7;
+  --color-faint: #7d8983;
+  --color-ink-muted: #53615c;
+
+  /* lines */
+  --color-line: #d7d1c5;
+  --color-line-soft: #ede7db;
+
+  /* terminal traffic lights */
+  --color-dot-red: #ff755f;
+  --color-dot-yellow: #ffbd44;
+  --color-dot-green: #65cc7a;
+}
 
 :root {
-    --vp-c-brand-1: #ff8000;
-    --vp-c-brand-2: #ffc000;
-    --vp-c-brand-3: #f05d23;
+  --vp-c-brand-1: #ff8000;
+  --vp-c-brand-2: #ffc000;
+  --vp-c-brand-3: #f05d23;
 }

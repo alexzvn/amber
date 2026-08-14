@@ -4,6 +4,7 @@ import Theme from 'vitepress/theme'
 import { h } from 'vue'
 import Documate from '@documate/vue'
 import TwoslashFloatingVue from '@shikijs/vitepress-twoslash/client'
+import LandingPage from '../components/LandingPage.vue'
 
 import '@documate/vue/dist/style.css'
 import '@shikijs/vitepress-twoslash/style.css'
@@ -21,6 +22,7 @@ const Extended = {
 export default {
   extends: Extended,
   enhanceApp({ app }: EnhanceAppContext) {
+    app.component('LandingPage', LandingPage)
     app.use(TwoslashFloatingVue as any)
   }
 }
