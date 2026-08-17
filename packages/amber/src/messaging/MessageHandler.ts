@@ -1,5 +1,5 @@
 import type { AcceptMode, EventKey, HandlerFunc, MessagingPayload, StreamHandlerFunc } from './MessageMisc'
-import { isPayload, MessagingError, OnceSymbol } from './MessageMisc'
+import { isPayload, MessagingError, OnceSymbol, unwrapArgs } from './MessageMisc'
 
 export const registerEvent = (mode: AcceptMode, map: Map<EventKey, Set<HandlerFunc>>) => {
   chrome.runtime.onMessage.addListener((msg, sender) => {
@@ -15,7 +15,7 @@ export const registerEvent = (mode: AcceptMode, map: Map<EventKey, Set<HandlerFu
 
     for (const handler of handlers) {
       try {
-        handler.call({ sender }, ...msg.data as any)
+        handler.call({ sender }, ...unwrapArgs(msg.data))
       } catch (e) {
         console.error(e)
       } finally {
@@ -43,8 +43,10 @@ export const registerHandler = (mode: AcceptMode, map: Map<EventKey, HandlerFunc
 
     asyncCall(async () => {
       try {
+        const args = unwrapArgs(msg.data)
+
         msg.type = 'response'
-        msg.data = await handler.call({ sender }, ...msg.data as any)
+        msg.data = await handler.call({ sender }, ...args)
 
         response(msg)
       } catch (e) {
@@ -80,7 +82,7 @@ export const registerStream = (mode: AcceptMode, map: Map<EventKey, StreamHandle
         : chrome.runtime.sendMessage(data)
     }
 
-    const args = msg.data as any[]
+    const args = unwrapArgs(msg.data)
 
     const stream = new WritableStream({
       start() {

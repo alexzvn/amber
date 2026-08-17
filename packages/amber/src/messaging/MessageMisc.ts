@@ -35,6 +35,26 @@ export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
   return { __EMessage: true, ...data } as any
 }
 
+/**
+ * Chrome messaging JSON round-trips the payload, and JSON turns an `undefined`
+ * array element into `null` while simply dropping an `undefined` object key.
+ * Varargs travel as an array, so each one is boxed to keep `undefined` distinct
+ * from `null` at every position: `['a', undefined]` ships as `[{v:'a'},{}]`.
+ *
+ * Only vararg arrays are boxed. Single-value `data` (`response`, `error`,
+ * `stream:data`) already survives as an object property and must stay raw.
+ * Boxing is shallow and does not make the transport lossless: `undefined` nested
+ * inside an argument still becomes `null`, and a `Date` still arrives as a string.
+ */
+export const wrapArgs = (args: unknown[]): { v: unknown }[] => args.map(v => ({ v }))
+
+export const unwrapArgs = (data: unknown): unknown[] => {
+  // `data` of a vararg payload is always produced by `wrapArgs` on our side of the wire.
+  const boxes = data as { v: unknown }[]
+
+  return boxes.map(box => box.v)
+}
+
 export const isPayload = <D>(payload: any): payload is MessagingPayload<D> => {
   return payload && typeof payload === 'object' && '__EMessage' in payload && payload.__EMessage
 }
