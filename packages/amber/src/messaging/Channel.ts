@@ -1,4 +1,4 @@
-import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
+import { isPayload, makePayload, MessagingError, convertToEvent, wrapArgs } from './MessageMisc'
 import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler, EventKey, HandlerFunc, StreamHandlerFunc, ValueOfStream } from './MessageMisc'
 import type Messaging from './Messaging'
 import type { GenericFunc } from '~/type'
@@ -25,7 +25,7 @@ export class Channel<Target extends Messaging = Messaging> {
     return chrome.runtime.sendMessage(makePayload({
       name: key as string,
       accept: this.target,
-      data: args as any,
+      data: wrapArgs(args),
       type: 'emit'
     }))
   }
@@ -39,7 +39,7 @@ export class Channel<Target extends Messaging = Messaging> {
       name: event as string,
       accept: this.target,
       type: 'request',
-      data: args as any
+      data: wrapArgs(args)
     }))
 
     if (! isPayload(payload)) {
@@ -65,7 +65,7 @@ export class Channel<Target extends Messaging = Messaging> {
   >(event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<ValueOfStreamHandler<Func>>> {
     const payload = makePayload({
       accept: this.target,
-      data: args as any,
+      data: wrapArgs(args),
       name: event as string,
       type: 'stream:request'
     })
@@ -121,7 +121,7 @@ export class ContentChannel<Target extends Messaging = Messaging> {
     return chrome.tabs.sendMessage(tabId, makePayload({
       name: key as string,
       accept: this.target,
-      data: args as any,
+      data: wrapArgs(args),
       type: 'emit'
     }))
   }
@@ -135,7 +135,7 @@ export class ContentChannel<Target extends Messaging = Messaging> {
       name: event as string,
       accept: this.target,
       type: 'request',
-      data: args as any
+      data: wrapArgs(args)
     }))
 
     if (! isPayload(payload)) {
@@ -161,7 +161,7 @@ export class ContentChannel<Target extends Messaging = Messaging> {
   >(tabId: number, event: Key, ...args: ParamOf<Func>): Promise<AsyncReadableStreamEvent<ValueOfStreamHandler<Func>>> {
     const payload = makePayload({
       accept: this.target,
-      data: args as any,
+      data: wrapArgs(args),
       name: event as string,
       type: 'stream:request'
     })
