@@ -25,7 +25,7 @@ const digest = async (algo: string, buffer: DataSource) => {
     buffer = new TextEncoder().encode(buffer)
   }
 
-  return new Uint8Array(await window.crypto.subtle.digest(algo, buffer as BufferSource))
+  return new Uint8Array(await crypto.subtle.digest(algo, buffer as BufferSource))
 }
 
 export const sha1 = (data: DataSource) => digest('SHA-1', data).then(toHex)
