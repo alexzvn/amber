@@ -1,4 +1,4 @@
-import { isPayload, makePayload, MessagingError, convertToEvent } from './MessageMisc'
+import { isPayload, makePayload, MessagingError, convertToEvent, getMode } from './MessageMisc'
 import type { AcceptMode, MessagingPayload, Pair, AsyncReadableStream, ValueOfStreamHandler, EventKey, HandlerFunc, StreamHandlerFunc, ValueOfStream } from './MessageMisc'
 import type Messaging from './Messaging'
 import type { GenericFunc } from '~/type'

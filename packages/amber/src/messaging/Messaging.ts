@@ -25,7 +25,8 @@ export default class Messaging<
    */
   readonly map = {} as MapMessaging
   readonly _channel = {} as MapChannel
-  private static _channel = {} as Record<string, Channel|ContentChannel>
+  private static _channel = {} as Record<string, Channel | ContentChannel>
+  private static _relay = false
 
   public static convertStreamToEvent = convertToEvent
 
@@ -186,5 +187,83 @@ export default class Messaging<
     const value = Messaging._channel['ui'] ??= new Channel('ui')
 
     return value as Channel<M>
+  }
+
+  public static async createRelayCSChannel<M extends Messaging>(tab: chrome.tabs.CreateProperties) {
+    if (getMode() !== 'content') {
+      throw new Error('Content script relay can only be used in the content script')
+    }
+
+    const channel = Messaging.getBackgroundChannel<NonNullable<ReturnType<typeof Messaging.registerContentScriptRelay>>>()
+
+    const { id } = await channel.send('$private.cs.relay.create', tab)
+
+    return Messaging.relayCSChannel<M>(id!)
+  }
+
+  public static relayCSChannel<M extends Messaging>(tab: number) {
+    if (getMode() !== 'content') {
+      throw new Error('Content script relay can only be used in the content script')
+    }
+
+    const channel = Messaging.getBackgroundChannel<NonNullable<ReturnType<typeof Messaging.registerContentScriptRelay>>>()
+    const proxy = new Channel('background')
+
+    Object.defineProperty(proxy, 'send', {
+      value: (key: string, ...args: unknown[]) => channel.send('$private.cs.relay', tab, key, args)
+    })
+
+    Object.defineProperty(proxy, 'emit', {
+      value: (key: string, ...args: unknown[]) => channel.emit('$private.cs.relay', tab, key, args)
+    })
+
+    Object.defineProperty(proxy, 'requestStream', {
+      value: (key: string, ...args: unknown[]) => channel.requestStream('$private.cs.relay', tab, key, args)
+    })
+
+    return proxy as Channel<M>
+  }
+
+  public static registerContentScriptRelay() {
+    if (Messaging._relay) {
+      return
+    }
+
+    if (getMode() !== 'background') {
+      throw new Error('Content script relay can only be registered in the background')
+    }
+
+    Messaging._relay = true
+    const channel = Messaging.getContentChannel()
+
+    return new Messaging()
+      .handle('$private.cs.relay.create', async (opt: chrome.tabs.CreateProperties) => {
+        const tab = await chrome.tabs.create(opt)
+
+        await new Promise<void>(resolve => {
+          const onUpdated = (id: number, info: chrome.tabs.TabChangeInfo) => {
+            if (id === tab.id && info.status === 'complete') {
+              chrome.tabs.onUpdated.removeListener(onUpdated)
+              resolve()
+            }
+          }
+          chrome.tabs.onUpdated.addListener(onUpdated)
+        })
+
+        return tab
+      })
+      .handle('$private.cs.relay', (tab: number, key: string, args: unknown[]) => {
+        return channel.send(tab, key, ...args)
+      })
+      .on('$private.cs.relay', (tab: number, key: string, args: unknown[]) => {
+        channel.emit(tab, key, ...args)
+      })
+      .stream('$private.cs.relay', async function * (tab: number, key: string, args: unknown[]) {
+        const stream = await channel.requestStream(tab, key, ...args)
+
+        for await (const data of stream) {
+          yield data
+        }
+      })
   }
 }
