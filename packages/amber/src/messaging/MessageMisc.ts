@@ -40,11 +40,6 @@ export const makePayload = <D>(data: MakePayload<D>): MessagingPayload<D> => {
  * array element into `null` while simply dropping an `undefined` object key.
  * Varargs travel as an array, so each one is boxed to keep `undefined` distinct
  * from `null` at every position: `['a', undefined]` ships as `[{v:'a'},{}]`.
- *
- * Only vararg arrays are boxed. Single-value `data` (`response`, `error`,
- * `stream:data`) already survives as an object property and must stay raw.
- * Boxing is shallow and does not make the transport lossless: `undefined` nested
- * inside an argument still becomes `null`, and a `Date` still arrives as a string.
  */
 export const wrapArgs = (args: unknown[]): { v: unknown }[] => args.map(v => ({ v }))
 
