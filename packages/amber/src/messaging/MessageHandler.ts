@@ -142,5 +142,4 @@ export const registerStream = (mode: AcceptMode, map: Map<EventKey, StreamHandle
 
     return true
   })
-
 }
