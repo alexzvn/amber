@@ -67,11 +67,11 @@ export const getMode = (): AcceptMode => {
 
 export type Pair<K extends symbol = symbol, V = unknown> = Record<K, V>
 
-type HandlerContext = {
+export type HandlerContext = {
   sender: chrome.runtime.MessageSender
 }
 
-interface StreamContext<E> extends HandlerContext {
+export interface StreamContext<E> extends HandlerContext {
   stream: WritableStreamDefaultWriter<E>
 }
 
