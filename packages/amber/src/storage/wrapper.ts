@@ -17,6 +17,13 @@ type MetaOption = {
   migrations: Record<number, Migration>
 }
 
+export type SubscribeOption = {
+  immediate?: boolean
+}
+
+/** `chrome.storage` holds `undefined` as `null`; map it back at the boundary. */
+const fromStored = <V>(value: V|null|undefined) => value === null ? undefined : value
+
 const unwrap = <T>(data: T): Unwrap<T>|Promise<Unwrap<T>> => {
   if (typeof data !== 'function') {
     return data as Unwrap<T>
@@ -56,7 +63,7 @@ export const storageOf = (storage: StorageLike, metaKey: string) => {
 
   const item = <T, M extends Pair = Pair>(key: string, init: T, meta?: M & Partial<MetaOption>) => {
     type Value = Unwrap<T>
-    type ReturnReset = T extends GenericFunc 
+    type ReturnReset = T extends GenericFunc
       ? ReturnType<T> extends Promise<infer P> ? Promise<P> : Value
       : Value
 
@@ -66,13 +73,13 @@ export const storageOf = (storage: StorageLike, metaKey: string) => {
       const record = await storage.get(key)
 
       if (key in record) {
-        $value = record[key] === null ? undefined : record[key]
+        $value = fromStored(record[key])
       } else {
         $value = await unwrap(init)
-        repo.set(key, $value === undefined ? null : $value)
+        await repo.set(key, $value === undefined ? null : $value)
       }
 
-      repo.watch(key, (item?: Value) => $value = item!)
+      repo.watch(key, (item?: Value) => $value = fromStored(item)!)
 
       if (! meta?.migrations) {
         return
@@ -98,8 +105,30 @@ export const storageOf = (storage: StorageLike, metaKey: string) => {
       return origin.then(write).then(() => origin) as any
     }
 
-    const subscribe = (subscriber: (value: Value, old: Value|undefined) => unknown) => {
-      return repo.watch(key, subscriber)
+    type Subscriber = (value: Value, old: Value|undefined) => unknown
+
+    const subscribe = (subscriber: Subscriber, option?: SubscribeOption): () => void => {
+      const listener = (value: Value, old: Value|undefined) => subscriber(fromStored(value)!, fromStored(old))
+
+      if (! option?.immediate) {
+        const stop = repo.watch(key, listener)
+        return () => { stop() }
+      }
+
+      let stop: (() => unknown)|undefined
+      let cancelled = false
+
+      setup.then(() => {
+        if (cancelled) return
+
+        stop = repo.watch(key, listener)
+        subscriber($value, undefined)
+      })
+
+      return () => {
+        cancelled = true
+        stop?.()
+      }
     }
 
     const size = async () => repo.getByteUsed(key)
