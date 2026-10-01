@@ -1,8 +1,7 @@
 import AdmZip from 'adm-zip'
 import program from './program'
 import { mkdir } from '../helper'
-import { readFile } from 'fs/promises'
-import { createWriteStream } from 'fs'
+import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 
 function formatBytes(bytes: number, decimals = 2) {
@@ -40,7 +39,7 @@ program.command('archive [name]')
     .replaceAll('[version]', pkg.version)
     .replaceAll('[format]', 'zip')
 
-  createWriteStream(join(opt.outDir, filename)).end(buffer)
+  await writeFile(join(opt.outDir, filename), buffer)
 
   const output = [
     `Archive folder`,
