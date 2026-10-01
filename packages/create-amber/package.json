@@ -8,7 +8,8 @@
   "type": "module",
   "scripts": {
     "prepare": "tsup-node",
-    "build": "tsup-node"
+    "build": "tsup-node",
+    "test": "bun test"
   },
   "bin": {
     "create-amber": "index.js"
