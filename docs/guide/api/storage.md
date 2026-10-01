@@ -106,7 +106,7 @@ another context writes the same key.
 | `read()` | Awaits `ready`, then returns the current value. |
 | `write(value)` | Awaits `ready`, then writes. |
 | `reset()` | Restores `init`. |
-| `subscribe(fn)` | Change callback; returns an unsubscribe function. |
+| `subscribe(fn, { immediate? })` | Change callback `(value, old)`; returns an unsubscribe function. With `immediate: true`, also called once with the current value after `ready`. |
 | `size()` | Bytes used by this key. |
 
 > [!IMPORTANT]
@@ -133,7 +133,7 @@ await settings.ready
 
 `chrome.storage` cannot distinguish "key absent" from "key set to `undefined`",
 which would make an item re-run its `init` forever. Amber stores `undefined` as
-`null` and converts it back on read.
+`null` and converts it back on read. Subscribers receive `undefined` too.
 
 ## Sharing state across contexts
 
@@ -160,6 +160,25 @@ enabled.subscribe((value) => {
 
 Declaring the same key with the same default in both contexts is fine and
 intentional — the second one to load finds the value already present.
+
+### Current value plus changes
+
+`subscribe` alone only reports changes. Pass `immediate: true` to also receive
+the current value once the item has loaded, instead of pairing it with `read()`:
+
+```ts twoslash
+import { Storage } from '@amber.js/core'
+// ---cut---
+const enabled = Storage.item('feature.enabled', true)
+
+const stop = enabled.subscribe((value) => {
+  document.body.classList.toggle('feature-on', value)
+}, { immediate: true })
+```
+
+The immediate call is `(value, undefined)`. The first-run write of `init` is not
+delivered again as a change. Calling `stop()` before the item loads cancels the
+immediate call.
 
 For request/response work, or anything needing a return value, use
 [Messaging](./messaging) instead.
