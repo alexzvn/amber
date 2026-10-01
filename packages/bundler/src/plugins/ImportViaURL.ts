@@ -34,7 +34,7 @@ const tab = (source: string, size = 2) => {
 /**
  * compile dts
  */
-const compile = (filepath: string, callback: (dts: string) => unknown) => {
+const compile = (filepath: string) => {
   const extensions = ['.js', '.ts', '.mjs', '.mts', '.cts']
 
   const isCompatible = extensions.some(ext => filepath.endsWith(ext))
@@ -44,7 +44,7 @@ const compile = (filepath: string, callback: (dts: string) => unknown) => {
   ].join('\n')
 
   if (!isCompatible) {
-    return callback(tab(empty, 4))
+    return tab(empty, 4)
   }
 
   const compiler = ts.createProgram({
@@ -61,7 +61,11 @@ const compile = (filepath: string, callback: (dts: string) => unknown) => {
     }
   })
 
-  compiler.emit(undefined, (_, text) => callback(tab(text, 4)))
+  // emit invokes writeFile synchronously; each emitted file overwrites the previous
+  let dts = ''
+  compiler.emit(undefined, (_, text) => { dts = tab(text, 4) })
+
+  return dts
 }
 
 export default defineVitePlugin(async () => {
@@ -102,15 +106,13 @@ export default defineVitePlugin(async () => {
         await fs.writeFile(filepath, new Uint8Array(await response.arrayBuffer()))
         this.info('Downloaded ' + url)
 
-        compile(filepath, (text) => {
-          const declaration = [
-            `declare module ${JSON.stringify(source)} {`,
-            text,
-            `}`
-          ]
+        const declaration = [
+          `declare module ${JSON.stringify(source)} {`,
+          compile(filepath),
+          `}`
+        ]
 
-          fs.writeFile(join(typing, `${target}.d.ts`), declaration.join('\n'))
-        })
+        await fs.writeFile(join(typing, `${target}.d.ts`), declaration.join('\n'))
 
         return `.amber/cache/${target}`
       }
