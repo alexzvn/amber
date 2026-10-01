@@ -1,3 +1,4 @@
 src
 bun.lockb
 tsup.config.ts
+test
