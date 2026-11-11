@@ -111,9 +111,9 @@ Your extension appears in the list and its icon in the toolbar.
 > once.
 
 > [!TIP]
-> Targeting Firefox? The dev server is Chromium-only; build with
-> `amber build --browser firefox` and load `dist/manifest.json` from
-> `about:debugging#/runtime/this-firefox`. See [Firefox](/guide/mv3#firefox).
+> Targeting Firefox? Run `amber dev --browser firefox` and load
+> `dist/manifest.json` from `about:debugging#/runtime/this-firefox`. See
+> [Firefox](/guide/mv3#firefox).
 
 ## 5. Change something and watch it reload
 

@@ -120,8 +120,8 @@ Chrome ignores the key — or the build warns:
 { "browser_specific_settings": { "gecko": { "id": "my-extension@example.com" } } }
 ```
 
-`import.meta.env.AMBER_BROWSER` is `'firefox'` in Firefox builds and
-`'chrome'` otherwise (including `amber dev`), for code that must branch.
+`import.meta.env.AMBER_BROWSER` is `'firefox'` in Firefox builds (including
+`amber dev --browser firefox`) and `'chrome'` otherwise, for code that must branch.
 `@amber.js/core` needs no polyfill: Firefox MV3 supports promises on
 `chrome.*`. Target Firefox 128+ (ESR; also required for `world: 'MAIN'`
 content scripts). On Firefox, a `world: 'MAIN'` content script must use
@@ -130,17 +130,24 @@ import the module from the extension, so the build warns. Note that Firefox lets
 users revoke MV3 host permissions, so check them at runtime instead of assuming
 they were granted at install.
 
-`amber dev` and `--dev-browser` are Chromium-only: hot reload relies on a
-`fetch` proxy in the background service worker, which Firefox event pages lack.
-The Firefox loop is a watch build plus `web-ext`, which reloads on change:
+### Developing on Firefox
 
 ```sh
-amber build --watch --browser firefox
-npx web-ext run --source-dir dist
+amber dev --browser firefox
 ```
 
-Or load `dist/manifest.json` via **Load Temporary Add-on** at
-`about:debugging#/runtime/this-firefox`.
+Load `dist/manifest.json` via **Load Temporary Add-on** at
+`about:debugging#/runtime/this-firefox`. Pages (popup, options) get Vite HMR as
+on Chrome. Content scripts can't hot-swap on Firefox, which only lets them import
+modules from the extension itself, so they are rebuilt to `dist/` and reloaded:
+
+| You change | What happens |
+| --- | --- |
+| A content script's code | The current tab reloads. |
+| Content-script CSS, a `world: 'MAIN'` script, or the background | The extension reloads. The current tab reloads too if a `world: 'MAIN'` script is registered, because its old copy stays in the page. |
+
+`--dev-browser` launches Chromium only, so it can't be combined with
+`--browser firefox`.
 
 ## The rest of the project
 

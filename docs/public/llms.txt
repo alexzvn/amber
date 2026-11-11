@@ -2,7 +2,7 @@
 
 > Meta framework for building Chrome and Firefox extensions on Manifest V3. Entrypoints are declared as objects in `amber.config.ts`; the toolchain resolves their output paths, generates icons, and writes `manifest.json` as a build artifact. Ships Vite HMR that reaches the service worker and content scripts, plus a typed cross-context messaging and storage runtime.
 
-Amber targets MV3 for Chromium and Safari, and Firefox via `amber build --browser firefox` (dev server/HMR is Chromium-only).
+Amber targets MV3 for Chromium and Safari, and Firefox via `--browser firefox` on `amber build` and `amber dev` (on Firefox, content scripts reload instead of hot-swapping).
 
 Packages: `@amber.js/core` (runtime library), `@amber.js/bundler` (build tooling and `amber` CLI), `create-amber` (scaffolder).
 

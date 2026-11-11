@@ -16,11 +16,12 @@ amber dev
 
 | Flag | Effect |
 | --- | --- |
-| `-d`, `--dev-browser` | Launch an isolated Chromium with the extension preloaded. |
+| `-b`, `--browser` | Target browser: `chrome` (default) or `firefox`. |
+| `-d`, `--dev-browser` | Launch an isolated Chromium with the extension preloaded. Chrome only. |
 
 > [!NOTE]
-> The dev server, HMR, and `--dev-browser` are Chromium-only. For Firefox, see
-> [Firefox](/guide/mv3#firefox).
+> On Firefox, content scripts reload instead of hot-swapping. See
+> [Developing on Firefox](/guide/mv3#developing-on-firefox).
 
 ## What a dev build contains that production does not
 
