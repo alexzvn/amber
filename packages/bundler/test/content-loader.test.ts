@@ -22,36 +22,49 @@ const emitLoaders = async (amber?: PluginOptions) => {
   )
 
   const emitted: Record<string, string> = {}
+  const warnings: string[] = []
   await plugin.generateBundle.call({
-    emitFile: (file: { fileName: string, code: string }) => { emitted[file.fileName] = file.code }
+    emitFile: (file: { fileName: string, code: string }) => { emitted[file.fileName] = file.code },
+    warn: (message: string) => warnings.push(message)
   }, {}, bundle)
 
-  return emitted
+  return { emitted, warnings }
 }
 
 describe('ContentModulePolyfill: production loader', () => {
   test('chrome (default) imports the module by extension-root path', async () => {
     new ContentScript('src/content/isolated.ts', { matches: ['<all_urls>'] })
 
-    const emitted = await emitLoaders()
+    const { emitted, warnings } = await emitLoaders()
 
     expect(emitted['scripts/isolated.js']).toContain('import("/scripts/_isolated.js")')
+    expect(warnings).toEqual([])
   })
 
   test('firefox resolves isolated-world modules against the extension origin', async () => {
     new ContentScript('src/content/isolated.ts', { matches: ['<all_urls>'] })
 
-    const emitted = await emitLoaders({ browser: 'firefox' })
+    const { emitted, warnings } = await emitLoaders({ browser: 'firefox' })
 
     expect(emitted['scripts/isolated.js']).toContain('import(chrome.runtime.getURL("/scripts/_isolated.js"))')
+    expect(warnings).toEqual([])
   })
 
-  test('firefox MAIN-world scripts keep the plain path (no chrome.runtime there)', async () => {
+  test('firefox warns that es-format MAIN-world scripts need iife', async () => {
     new ContentScript('src/content/main.ts', { matches: ['<all_urls>'], world: 'MAIN' })
 
-    const emitted = await emitLoaders({ browser: 'firefox' })
+    const { emitted, warnings } = await emitLoaders({ browser: 'firefox' })
 
-    expect(emitted['scripts/main.js']).toContain('import("/scripts/_main.js")')
     expect(emitted['scripts/main.js']).not.toContain('chrome.runtime')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain("format: 'iife'")
+  })
+
+  test('chrome does not warn for MAIN-world scripts', async () => {
+    new ContentScript('src/content/main.ts', { matches: ['<all_urls>'], world: 'MAIN' })
+
+    const { warnings } = await emitLoaders()
+
+    expect(warnings).toEqual([])
   })
 })

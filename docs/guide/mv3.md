@@ -124,8 +124,11 @@ Chrome ignores the key — or the build warns:
 `'chrome'` otherwise (including `amber dev`), for code that must branch.
 `@amber.js/core` needs no polyfill: Firefox MV3 supports promises on
 `chrome.*`. Target Firefox 128+ (ESR; also required for `world: 'MAIN'`
-content scripts). Note that Firefox lets users revoke MV3 host permissions, so
-check them at runtime instead of assuming they were granted at install.
+content scripts). On Firefox, a `world: 'MAIN'` content script must use
+`format: 'iife'`: the `es` loader runs in the page's realm, where it cannot
+import the module from the extension, so the build warns. Note that Firefox lets
+users revoke MV3 host permissions, so check them at runtime instead of assuming
+they were granted at install.
 
 `amber dev` and `--dev-browser` are Chromium-only: hot reload relies on a
 `fetch` proxy in the background service worker, which Firefox event pages lack.

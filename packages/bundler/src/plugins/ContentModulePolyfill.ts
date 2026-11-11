@@ -123,11 +123,17 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
 
         const file = JSON.stringify(`/scripts/_${script.moduleName}.js`)
 
-        // Firefox resolves content-script `import()` specifiers against the page URL;
-        // MAIN-world scripts have no `chrome.runtime`, so they keep the plain path.
-        const specifier = amber.browser === 'firefox' && script.options.world !== 'MAIN'
-          ? `chrome.runtime.getURL(${file})`
-          : file
+        // Firefox resolves content-script `import()` specifiers against the page URL.
+        // MAIN-world scripts have no `chrome.runtime` to build an extension URL, so
+        // the loader cannot reach the module there: they must use `format: 'iife'`.
+        const firefox = amber.browser === 'firefox'
+        const main = script.options.world === 'MAIN'
+
+        if (firefox && main) {
+          this.warn(`content script "${script.file}" runs in world 'MAIN' with format 'es'; Firefox cannot load its module from the page realm. Use format: 'iife'.`)
+        }
+
+        const specifier = firefox && !main ? `chrome.runtime.getURL(${file})` : file
 
         this.emitFile({
           type: 'prebuilt-chunk',
