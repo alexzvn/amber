@@ -11,7 +11,7 @@ The runtime's central object for cross-surface communication. It is the typed re
 _Avoid_: messaging channel, event bus
 
 **AcceptMode**:
-One of `background`, `content`, or `ui` — the three script surfaces of an extension. Every message is addressed to exactly one accept mode, and the runtime routes it to the scripts running in that surface.
+One of `background`, `content`, or `ui` — the three script surfaces of an extension. Every message is addressed to exactly one accept mode, and the runtime routes it to the scripts running in that surface. `background` is the service worker, or on Firefox the event-page background document.
 
 **Channel**:
 A typed, directional messaging endpoint that addresses one surface (`background` or `ui`). It is the extension author's handle for emitting events, sending requests, and requesting streams to scripts in that surface.

@@ -18,6 +18,10 @@ amber dev
 | --- | --- |
 | `-d`, `--dev-browser` | Launch an isolated Chromium with the extension preloaded. |
 
+> [!NOTE]
+> The dev server, HMR, and `--dev-browser` are Chromium-only. For Firefox, see
+> [Firefox](/guide/mv3#firefox).
+
 ## What a dev build contains that production does not
 
 A development build is a thin shell. Amber adds machinery that is entirely

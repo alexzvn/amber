@@ -37,6 +37,11 @@ Serialises to:
 { "service_worker": "entries/background.js", "type": "module" }
 ```
 
+A Firefox build (`amber build --browser firefox`) emits
+`{ "scripts": ["entries/background.js"], "type": "module" }` instead — an
+event page, which unlike the service worker has a DOM. See
+[Firefox](/guide/mv3#firefox).
+
 | Option | Default | Effect |
 | --- | --- | --- |
 | `autoReload` | `true` | Reload the worker when its source changes during `amber dev`. |

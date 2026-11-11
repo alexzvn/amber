@@ -110,6 +110,11 @@ Your extension appears in the list and its icon in the toolbar.
 > server has not finished its first build — wait for it, or run `npm run build`
 > once.
 
+> [!TIP]
+> Targeting Firefox? The dev server is Chromium-only; build with
+> `amber build --browser firefox` and load `dist/manifest.json` from
+> `about:debugging#/runtime/this-firefox`. See [Firefox](/guide/mv3#firefox).
+
 ## 5. Change something and watch it reload
 
 Open `src/content-script.ts`. The scaffold ships a single line:
