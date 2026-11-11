@@ -18,7 +18,11 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
   return [{
     name: 'amber:content-module-polyfill',
 
-    config(cfg) {
+    config(cfg, { mode }) {
+      // Firefox dev builds isolated-world scripts as modules on disk (see `amber dev`),
+      // whatever their format; only MAIN-world iife scripts keep their own iife build.
+      const firefoxDev = amber.browser === 'firefox' && mode.startsWith('dev')
+
       cfg.build ??= {}
       cfg.build.rollupOptions ??= {}
       cfg.build.rollupOptions.output ??= {}
@@ -32,7 +36,7 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
           return chunk.facadeModuleId?.endsWith(script.file)
         })
 
-        if (script?.options.format === 'iife') {
+        if (script?.options.format === 'iife' && !(firefoxDev && script.options.world !== 'MAIN')) {
           return 'scripts/[name].js'
         }
 
@@ -50,7 +54,9 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
     },
 
     async buildStart() {
-      if (config.mode !== 'development') {
+      // Firefox content scripts can only import modules from the extension itself
+      // (bug 1803950), so its dev loaders are emitted by `generateBundle` instead.
+      if (config.mode !== 'development' || amber.browser === 'firefox') {
         return
       }
 
@@ -114,7 +120,7 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
      * is attached and the styles silently never reach the built extension.
      */
     async generateBundle(_options, bundle) {
-      if (config.mode.startsWith('dev')) return
+      if (config.mode.startsWith('dev') && amber.browser !== 'firefox') return
 
       for (const script of ContentScript.$registers) {
         const output = bundle[`scripts/_${script.moduleName}.js`]
@@ -142,8 +148,12 @@ export default defineVitePlugin((amber: PluginOptions = {}) => {
         })
 
         if (output.viteMetadata) {
-          script.options.css ??= []
-          script.options.css.push(...output.viteMetadata.importedCss)
+          const css = script.options.css ??= []
+
+          // watch rebuilds run this hook again; keep each stylesheet once
+          for (const file of output.viteMetadata.importedCss) {
+            css.includes(file) || css.push(file)
+          }
         }
       }
     }

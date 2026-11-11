@@ -46,3 +46,36 @@ export const getMapIIFE = () => {
 
   return inputs
 }
+
+const isMainWorldIIFE = (script: ContentScript) => {
+  return script.options.format === 'iife' && script.options.world === 'MAIN'
+}
+
+/**
+ * Firefox dev watch-build inputs: background scripts plus every content script
+ * that can be loaded as a module from the extension (all but MAIN-world iife).
+ */
+export const getFirefoxDevMapModule = () => {
+  const inputs = { ...BackgroundScript.map }
+
+  for (const script of ContentScript.$registers) {
+    if (! isMainWorldIIFE(script)) {
+      inputs[script.moduleName] = script.file
+    }
+  }
+
+  return inputs
+}
+
+/** Firefox dev: MAIN-world iife content scripts, each needing its own iife build. */
+export const getFirefoxDevMapIIFE = () => {
+  const inputs = {} as Record<string, string>
+
+  for (const script of ContentScript.$registers) {
+    if (isMainWorldIIFE(script)) {
+      inputs[script.moduleName] = script.file
+    }
+  }
+
+  return inputs
+}

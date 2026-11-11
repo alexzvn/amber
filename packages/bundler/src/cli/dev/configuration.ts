@@ -10,19 +10,19 @@ import fs from 'fs/promises'
 import { join } from 'path'
 import { randomBytes } from 'crypto'
 import mitt, { type Emitter } from 'mitt'
+import type { Browser } from '~/configure'
 
-export const resolveConfig = async () => {
+export const resolveConfig = async (browser: Browser = 'chrome') => {
   dotenv.config({ override: true })
 
   const config = await loadAmberConfig()
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   let vite: UserConfig = defineConfig({
-    // `amber dev` is Chrome-only: its HMR relies on a background service worker
-    plugins: [AmberPlugin(config.manifest, { ...config.amber, browser: 'chrome' })],
+    plugins: [AmberPlugin(config.manifest, { ...config.amber, browser })],
 
     define: {
-      'import.meta.env.AMBER_BROWSER': JSON.stringify('chrome')
+      'import.meta.env.AMBER_BROWSER': JSON.stringify(browser)
     },
 
     optimizeDeps: {
@@ -59,6 +59,11 @@ export const resolveConfig = async () => {
   })
 
   vite = mergeConfig(vite, config.vite);
+
+  // Firefox dev pages load modules from the dev server itself, so asset URLs must be absolute.
+  if (browser === 'firefox') {
+    vite.server!.origin ??= `http://localhost:${vite.server!.port}`
+  }
 
   return { vite, config }
 }

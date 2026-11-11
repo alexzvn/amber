@@ -17,7 +17,7 @@ export default (manifest: GeneralManifest, amber: PluginOptions = {}) => [
   ResolveAlias(),
   InjectWorkerHMR(manifest, amber),
   ContentModulePolyfill(amber),
-  HtmlPagePolyfill(),
+  HtmlPagePolyfill(amber),
   ManifestWriter(manifest, amber),
   InlineScriptPolyfill(),
   ImportViaURL(),

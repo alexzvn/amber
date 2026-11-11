@@ -34,6 +34,24 @@ const bindBypassCSP = (manifest: GeneralManifest) => {
   manifest.permissions = [...perms]
 }
 
+// Firefox MV3 default minus `upgrade-insecure-requests`, which would upgrade dev server loads.
+const FIREFOX_PAGES_POLICY = "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+
+/**
+ * Firefox dev pages load their modules straight from the dev server (there is no
+ * service worker to proxy them), so its origin must be in `extension_pages` `script-src`.
+ * Firefox 147+ accepts localhost sources for temporarily loaded add-ons only.
+ */
+const allowDevServerScripts = (manifest: GeneralManifest, origin: string) => {
+  const policy = manifest.content_security_policy?.extension_pages ?? FIREFOX_PAGES_POLICY
+
+  const extension_pages = /\bscript-src\b/.test(policy)
+    ? policy.replace(/\bscript-src\b([^;]*)/, `script-src$1 ${origin}`)
+    : `script-src 'self' ${origin}; ${policy}`
+
+  manifest.content_security_policy = { ...manifest.content_security_policy, extension_pages }
+}
+
 const injectBackgroundWorker = (manifest: GeneralManifest) => {
   if (manifest.background) {
     return
@@ -56,7 +74,10 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: PluginOptions
     injectBackgroundWorker(manifest)
 
     amber.bypassCSP && bindBypassCSP(manifest)
+    amber.browser === 'firefox' && allowDevServerScripts(manifest, `http://localhost:${port}`)
   })
+
+  let dev = false
 
   return {
     name: 'amber:manifest-writer',
@@ -68,6 +89,7 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: PluginOptions
     configResolved(config) {
       if (!config.mode.startsWith('dev')) return
 
+      dev = true
       setup(config.server.port)
     },
 
@@ -88,7 +110,7 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: PluginOptions
 
       const firefox = toFirefoxManifest(JSON.parse(JSON.stringify(manifest)))
 
-      if (!hasGeckoId(firefox) && !warnedGeckoId.has(manifest)) {
+      if (!dev && !hasGeckoId(firefox) && !warnedGeckoId.has(manifest)) {
         warnedGeckoId.add(manifest)
         this.warn('manifest is missing `browser_specific_settings.gecko.id`; addons.mozilla.org requires it to sign Manifest V3 add-ons')
       }

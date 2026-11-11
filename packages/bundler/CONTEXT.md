@@ -62,7 +62,7 @@ The CLI command that starts the Vite dev server for the extension: it resolves t
 The CLI command that produces the distributable extension in the build `outDir` (default `dist/`): two Vite passes — one bundling the module entrypoints (`entries/` entries, `shared/` chunks, `assets/` assets) and one IIFE pass for `iife`-format content scripts. Flags: `--prod`, `--minify`, `--sourcemap`, `--watch`, `--clean`, `--browser`.
 
 **Browser target**:
-The `--browser` option of `build` selecting `chrome` (default) or `firefox` manifest output; exposed to code as `import.meta.env.AMBER_BROWSER`. `dev` always targets `chrome`.
+The `--browser` option of `build` and `dev` selecting `chrome` (default) or `firefox` manifest output; exposed to code as `import.meta.env.AMBER_BROWSER`. `--dev-browser` (Chromium) only combines with `chrome`.
 
 **archive**:
 The CLI command that zips the built `dist/` folder (adm-zip) into the `release/` folder as `[name]-[version].zip`, with a `--level` compression option and an `--outDir` override.
