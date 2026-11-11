@@ -27,7 +27,7 @@ A component that is both a registered entrypoint and a manifest `content_scripts
 _Avoid_: content script (the generic browser concept — here it is the registered entrypoint class)
 
 **BackgroundScript**:
-A component describing the extension's service worker entrypoint. It serializes to the manifest's `background` field (`service_worker: entries/<name>.js`, `type: module`); its `autoReload` option opts the worker into dev HMR full reloads.
+A component describing the extension's service worker entrypoint. It serializes to the manifest's `background` field (`service_worker: entries/<name>.js`, `type: module`; `scripts: [entries/<name>.js]` for the Firefox browser target); its `autoReload` option opts the worker into dev HMR full reloads.
 _Avoid_: service worker (the browser concept it wraps)
 
 **Page**:
@@ -59,7 +59,10 @@ The plugin (`amber:inline-script-polyfill`) that removes inline `<script>` tags 
 The CLI command that starts the Vite dev server for the extension: it resolves the config with `devManifest` merged, runs a warm-up build, serves the welcome page, and — with `--dev-browser` — launches a persistent Chromium profile loaded with the built extension from `dist/`. Restarts happen through a self-respawn loop driven by a dev `Session` (exit code `0xfa`).
 
 **build**:
-The CLI command that produces the distributable extension in the build `outDir` (default `dist/`): two Vite passes — one bundling the module entrypoints (`entries/` entries, `shared/` chunks, `assets/` assets) and one IIFE pass for `iife`-format content scripts. Flags: `--prod`, `--minify`, `--sourcemap`, `--watch`, `--clean`.
+The CLI command that produces the distributable extension in the build `outDir` (default `dist/`): two Vite passes — one bundling the module entrypoints (`entries/` entries, `shared/` chunks, `assets/` assets) and one IIFE pass for `iife`-format content scripts. Flags: `--prod`, `--minify`, `--sourcemap`, `--watch`, `--clean`, `--browser`.
+
+**Browser target**:
+The `--browser` option of `build` selecting `chrome` (default) or `firefox` manifest output; exposed to code as `import.meta.env.AMBER_BROWSER`. `dev` always targets `chrome`.
 
 **archive**:
 The CLI command that zips the built `dist/` folder (adm-zip) into the `release/` folder as `[name]-[version].zip`, with a `--level` compression option and an `--outDir` override.

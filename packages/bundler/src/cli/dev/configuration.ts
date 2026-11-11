@@ -18,7 +18,12 @@ export const resolveConfig = async () => {
   Object.assign(config.manifest, defu(config.manifest, config.devManifest))
 
   let vite: UserConfig = defineConfig({
-    plugins: [AmberPlugin(config.manifest, config.amber)],
+    // `amber dev` is Chrome-only: its HMR relies on a background service worker
+    plugins: [AmberPlugin(config.manifest, { ...config.amber, browser: 'chrome' })],
+
+    define: {
+      'import.meta.env.AMBER_BROWSER': JSON.stringify('chrome')
+    },
 
     optimizeDeps: {
       exclude: ['@amber.js/bundler/client/worker.esm']

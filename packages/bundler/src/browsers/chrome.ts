@@ -431,6 +431,10 @@ export type ChromeBrowserManifest = {
     matches: Matches,
     resources: ('*'|Str)[]
     extension_ids?: string[]
+    /**
+     * Chrome-only; removed from Firefox builds.
+     */
+    use_dynamic_url?: boolean
   }>
   
   /**

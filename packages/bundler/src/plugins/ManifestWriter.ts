@@ -1,7 +1,11 @@
 import {defineVitePlugin, invokeOnce} from '~/helper'
 import type {GeneralManifest} from '~/browsers/manifest.ts'
-import type {AmberOptions} from "~/configure"
+import type {PluginOptions} from "~/configure"
 import BackgroundScript from '~/components/BackgroundScript'
+import {hasGeckoId, toFirefoxManifest} from '~/browsers/firefox'
+
+// Build runs one plugin instance per pass over the same manifest; warn once per manifest.
+const warnedGeckoId = new WeakSet<GeneralManifest>()
 
 const bindAccessibleResource = (manifest: GeneralManifest) => {
   const resources = (manifest.web_accessible_resources ??= [])
@@ -38,7 +42,7 @@ const injectBackgroundWorker = (manifest: GeneralManifest) => {
   manifest.background = new BackgroundScript('@amber.js/bundler/client/worker.esm')
 }
 
-export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
+export default defineVitePlugin((manifest: GeneralManifest, amber: PluginOptions = {}) => {
 
   const setup = invokeOnce((port: number) => {
     manifest.host_permissions ??= []
@@ -72,10 +76,27 @@ export default defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions 
         manifest.host_permissions = [...new Set(manifest.host_permissions)]
       }
 
+      if (amber.browser !== 'firefox') {
+        this.emitFile({
+          fileName: 'manifest.json',
+          type: 'asset',
+          source: JSON.stringify(manifest, null, 2)
+        })
+
+        return
+      }
+
+      const firefox = toFirefoxManifest(JSON.parse(JSON.stringify(manifest)))
+
+      if (!hasGeckoId(firefox) && !warnedGeckoId.has(manifest)) {
+        warnedGeckoId.add(manifest)
+        this.warn('manifest is missing `browser_specific_settings.gecko.id`; addons.mozilla.org requires it to sign Manifest V3 add-ons')
+      }
+
       this.emitFile({
         fileName: 'manifest.json',
         type: 'asset',
-        source: JSON.stringify(manifest, null, 2)
+        source: JSON.stringify(firefox, null, 2)
       })
     }
   }

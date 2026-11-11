@@ -6,11 +6,11 @@ import CSPolyfillDev from '~/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
 
 import fs from "fs/promises"
-import type { AmberOptions } from '../configure'
+import type { PluginOptions } from '../configure'
 import slash from 'slash'
 
 
-export default defineVitePlugin((amber: AmberOptions = {}) => {
+export default defineVitePlugin((amber: PluginOptions = {}) => {
   let outdir = 'dist'
   let config: ResolvedConfig
   let server: ViteDevServer|undefined
@@ -121,10 +121,18 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
 
         if (! output) continue
 
+        const file = JSON.stringify(`/scripts/_${script.moduleName}.js`)
+
+        // Firefox resolves content-script `import()` specifiers against the page URL;
+        // MAIN-world scripts have no `chrome.runtime`, so they keep the plain path.
+        const specifier = amber.browser === 'firefox' && script.options.world !== 'MAIN'
+          ? `chrome.runtime.getURL(${file})`
+          : file
+
         this.emitFile({
           type: 'prebuilt-chunk',
           fileName: posix.join('scripts', script.path.name + '.js'),
-          code: CSPolyfillProd.replace(/__SCRIPT__/g, `"/scripts/_${script.moduleName}.js"`),
+          code: CSPolyfillProd.replace(/__SCRIPT__/g, specifier),
         })
 
         if (output.viteMetadata) {
