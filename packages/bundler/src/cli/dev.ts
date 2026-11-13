@@ -28,14 +28,14 @@ const start = async (option: DevOption) => {
   const watch = (input: Record<string, string>, output?: Rolldown.OutputOptions) => build({
     mode: 'development',
     ...vite,
-    plugins: [...(vite.plugins ?? []), reloads && FirefoxDevReload(reloads.queue)],
+    ...(reloads && { plugins: [...(vite.plugins ?? []), FirefoxDevReload(reloads.queue)] }),
     build: {
       ...vite.build,
       watch: {},
       rollupOptions: {
         ... vite.build!.rollupOptions,
         input,
-        output: { ...vite.build!.rollupOptions!.output as Rolldown.OutputOptions, ...output },
+        ...(output && { output: { ...vite.build!.rollupOptions!.output as Rolldown.OutputOptions, ...output } }),
       }
     },
 
