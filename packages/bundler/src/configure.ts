@@ -25,10 +25,7 @@ export type AmberConfig = {
 
 export type AmberOptions = Partial<AmberConfig>
 
-/**
- * Internal options passed to the Amber Vite plugins by the CLI.
- * `browser` comes from `amber build --browser` and defaults to `'chrome'`.
- */
+/** Options the CLI passes to the Amber Vite plugins; `browser` defaults to `'chrome'`. */
 export type PluginOptions = AmberOptions & { browser?: Browser }
 
 export type ExtensionOptions = {

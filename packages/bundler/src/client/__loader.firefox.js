@@ -1,8 +1,6 @@
-// Firefox dev page loader. Firefox has no background service worker to proxy
-// extension requests to Vite, so this page fetches its own HTML from the dev
-// server and mounts it, loading every script from the dev server origin (allowed
-// by the dev-only `extension_pages` CSP). Vite's client then connects to the dev
-// server from that origin, so HMR works as on any Vite page.
+// Firefox has no background service worker to proxy extension requests to Vite,
+// so this page fetches its HTML from the dev server and loads every script from
+// that origin (allowed by the dev-only `extension_pages` CSP).
 const $ = document.querySelector.bind(document)
 
 const info = (... args) => {
