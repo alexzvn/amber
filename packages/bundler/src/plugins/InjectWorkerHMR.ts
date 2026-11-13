@@ -3,11 +3,11 @@ import BackgroundScript from '~/components/BackgroundScript'
 import MagicString from "magic-string"
 import type {GeneralManifest} from '~/browsers/manifest.ts'
 import type {ResolvedConfig} from 'vite'
-import type {AmberOptions} from '~/configure'
+import type {PluginOptions} from '~/configure'
 
 const escapeReplacement = (value: string | number | boolean | null) => JSON.stringify(value)
 
-export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions = {}) => {
+export default  defineVitePlugin((manifest: GeneralManifest, amber: PluginOptions = {}) => {
   const get = (id: string) => {
     return [...BackgroundScript.$registers].find(script => {
       return id.endsWith(script.file) || script.file === id || script.file.endsWith(id)
@@ -63,6 +63,11 @@ export default  defineVitePlugin((manifest: GeneralManifest, amber: AmberOptions
     },
 
     async handleHotUpdate({ file, server, read }) {
+      // Firefox dev reloads from the background watch build itself (FirefoxDevReload)
+      if (amber.browser === 'firefox') {
+        return
+      }
+
       const graph = server.moduleGraph
       const [module] = (graph.getModulesByFile(file) || new Set)
 

@@ -38,9 +38,10 @@ const channel = new Messaging()
 export type BackgroundChannel = typeof channel
 ```
 
-The instance detects its own context at construction — background if there is
-no `window`, page if the origin is the extension's own, content script
-otherwise. You never declare which one you are in.
+The instance detects its own context at construction — background if it runs in
+the service worker (no `window`) or, on Firefox, the event-page background
+document; page if the origin is the extension's own; content script otherwise.
+You never declare which one you are in.
 
 > [!IMPORTANT]
 > Export the **type**, not the instance. Importing the instance across contexts

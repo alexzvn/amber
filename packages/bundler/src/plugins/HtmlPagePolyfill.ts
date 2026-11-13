@@ -2,10 +2,12 @@ import type { ResolvedConfig } from 'vite'
 import Page from '~/components/Page'
 import { defineVitePlugin } from '~/helper'
 import Loader from '../client/__loader.js?raw'
+import FirefoxLoader from '../client/__loader.firefox.js?raw'
 import LoadingHTML from '~/client/loading.html?raw'
 import { posix } from 'node:path'
+import type { PluginOptions } from '~/configure'
 
-export default defineVitePlugin(() => {
+export default defineVitePlugin((amber: PluginOptions = {}) => {
   let config: ResolvedConfig
 
   return {
@@ -32,7 +34,7 @@ export default defineVitePlugin(() => {
       this.emitFile({
         type: 'prebuilt-chunk',
         fileName: 'entries/__loader.js',
-        code: Loader
+        code: amber.browser === 'firefox' ? FirefoxLoader : Loader
       })
     }
   }

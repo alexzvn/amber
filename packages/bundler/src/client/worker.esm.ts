@@ -113,6 +113,9 @@ target.addEventListener('connect', async () => {
   socket.addEventListener('open', () => {
     console.log('[Amber] dev server connected')
 
+    // lets `amber dev --browser firefox` deliver reloads held while this background restarted
+    socket?.send(JSON.stringify({ type: 'custom', event: 'amber:background.connected' }))
+
     shouldReload && chrome.runtime.reload()
 
     const timer = setInterval(() => {

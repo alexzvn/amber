@@ -24,6 +24,7 @@ from a previous build cannot leak into your package.
 | `-c`, `--clean` | **on** | Remove `dist/` before building. |
 | `-s`, `--sourcemap [mode]` | off | Emit source maps. Pass `hidden` to omit the comment linking to them. |
 | `-w`, `--watch` | off | Rebuild on change, without a dev server. |
+| `-b`, `--browser <browser>` | `chrome` | Target browser: `chrome` or `firefox`. See [Firefox](/guide/mv3#firefox). |
 
 The build runs in two passes: one bundling every ES-format entrypoint together
 so shared code lands in `shared/`, then one pass per `iife` content script,
@@ -145,3 +146,19 @@ no `declarativeNetRequest` permission unless you use it in production.
 Uploads can be automated with the Chrome Web Store API, but that is outside
 Amber — the artifact it produces is a plain zip and works with any of the
 existing publishing actions.
+
+## Publishing to Firefox Add-ons (AMO)
+
+Build with `--browser firefox`, then archive under a distinct name:
+
+```sh
+amber build --prod --browser firefox
+amber archive "[name]-[version]-firefox.[format]"
+```
+
+Both browsers share `dist/`, so build and archive one browser at a time. AMO
+additionally requires:
+
+- `browser_specific_settings.gecko.id` — needed to sign MV3 add-ons.
+- `browser_specific_settings.gecko.data_collection_permissions` — required for
+  new submissions since November 2025.

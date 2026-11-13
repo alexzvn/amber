@@ -72,6 +72,16 @@ export const asStorageArea = (area: FakeStorageArea): chrome.storage.StorageArea
 /** Extension origin shared by the fake `chrome.runtime` and the `withMode` helper below. */
 export const TEST_ORIGIN = 'chrome-extension://test-extension-id'
 
+/** Firefox extension origin (`moz-extension:` URLs report `origin === 'null'`). */
+export const FIREFOX_ORIGIN = 'moz-extension://test-extension-uuid'
+
+export type FakeManifest = {
+  manifest_version: number
+  background?: { service_worker?: string, scripts?: string[], page?: string }
+}
+
+export const DEFAULT_MANIFEST: FakeManifest = { manifest_version: 3, background: { service_worker: 'entries/background.js' } }
+
 /** Mirrors the three arguments a real `chrome.runtime.onMessage` listener receives. */
 type RuntimeSender = { tab?: { id: number } }
 type RuntimeListener = (msg: unknown, sender: RuntimeSender, sendResponse: (v: unknown) => void) => unknown
@@ -79,6 +89,7 @@ type RuntimeListener = (msg: unknown, sender: RuntimeSender, sendResponse: (v: u
 export type FakeMessagingChrome = {
   runtime: {
     getURL: (path: string) => string
+    getManifest: () => FakeManifest
     onMessage: {
       addListener: (fn: RuntimeListener) => void
       removeListener: (fn: RuntimeListener) => void
@@ -102,7 +113,7 @@ export type FakeMessagingChrome = {
  * how a real extension's background/content/ui contexts all ultimately share one
  * `chrome.runtime.onMessage` channel (tab-originated messages just carry `sender.tab`).
  */
-export const createFakeMessagingChrome = (origin: string = TEST_ORIGIN): FakeMessagingChrome => {
+export const createFakeMessagingChrome = (origin: string = TEST_ORIGIN, manifest: FakeManifest = DEFAULT_MANIFEST): FakeMessagingChrome => {
   const listeners = new Set<RuntimeListener>()
 
   const dispatch = (msg: unknown, sender: RuntimeSender): Promise<unknown> => {
@@ -133,6 +144,7 @@ export const createFakeMessagingChrome = (origin: string = TEST_ORIGIN): FakeMes
   return {
     runtime: {
       getURL: (path: string) => `${origin}${path.startsWith('/') ? path : `/${path}`}`,
+      getManifest: () => manifest,
       onMessage: {
         addListener: (fn) => { listeners.add(fn) },
         removeListener: (fn) => { listeners.delete(fn) },
@@ -174,19 +186,25 @@ export const installFakeChrome = (fake: FakeMessagingChrome | { storage: unknown
  * time (`getMode()` in MessageMisc.ts). This runs `build()` with `window` set up
  * to produce the requested surface, then restores whatever was there before.
  */
-export const withMode = <T>(mode: Surface, origin: string, build: () => T): T => {
+export const withMode = <T>(mode: Surface, origin: string, build: () => T): T =>
+  withWindow(mode === 'background' ? undefined : mode === 'ui' ? `${origin}/index.html` : 'https://content-page.example.com/', build)
+
+/** Runs `build()` in a window-bearing Firefox MV3 event-page background document. */
+export const withBackgroundPage = <T>(origin: string, build: () => T): T =>
+  withWindow(`${origin}/_generated_background_page.html`, build)
+
+/** Runs `build()` with `window.location.href` set to `href`, or with no `window` when `href` is undefined. */
+export const withWindow = <T>(href: string | undefined, build: () => T): T => {
   const hadWindow = 'window' in globalThis
   const previous = testGlobal.window
 
-  if (mode === 'background') {
+  if (href === undefined) {
     delete testGlobal.window
   } else {
-    const href = mode === 'ui' ? `${origin}/index.html` : 'https://content-page.example.com/'
     const stub: MinimalWindow = { location: { href } }
     // `window` is the full DOM `Window` type; only `.location.href` is ever read here.
     testGlobal.window = stub as unknown as Window & typeof globalThis
   }
-
   try {
     return build()
   } finally {

@@ -2,6 +2,10 @@ import {type UserConfig} from 'vite'
 import type {GeneralManifest} from '~/browsers/manifest'
 import type {Match, Matches} from '~/browsers/chrome'
 
+export const browsers = ['chrome', 'firefox'] as const
+
+export type Browser = typeof browsers[number]
+
 export type AmberConfig = {
   /**
    * Inject additional script to background worker to
@@ -20,6 +24,9 @@ export type AmberConfig = {
 }
 
 export type AmberOptions = Partial<AmberConfig>
+
+/** Options the CLI passes to the Amber Vite plugins; `browser` defaults to `'chrome'`. */
+export type PluginOptions = AmberOptions & { browser?: Browser }
 
 export type ExtensionOptions = {
   devManifest?: Partial<GeneralManifest>

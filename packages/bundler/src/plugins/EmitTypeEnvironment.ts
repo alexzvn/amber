@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 
 const content = `/// <reference types="vite/client" />
 interface ImportMetaEnv {
+  readonly AMBER_BROWSER: 'chrome' | 'firefox'
   {__CONTENT__}
 }
 

@@ -10,8 +10,8 @@ terms of the three things MV3 actually gives you. Everything past this page
 assumes the vocabulary introduced here.
 
 > [!IMPORTANT]
-> Amber targets **Manifest V3** for Chromium and Safari. Firefox add-ons are
-> not supported.
+> Amber targets **Manifest V3** for Chromium and Safari, and for Firefox via
+> `amber build --browser firefox` — see [Firefox](#firefox).
 
 ## The three execution contexts
 
@@ -95,6 +95,59 @@ An ES-format content script is emitted as `scripts/_<name>.js` and paired with a
 small loader, because Chrome does not support ES modules in content scripts
 directly — Amber polyfills that. An `iife` content script needs no loader and
 is emitted as `scripts/<name>.js`.
+
+## Firefox
+
+```sh
+amber build --browser firefox
+```
+
+`--browser` accepts `chrome` (the default) or `firefox`. The output goes to the
+same `dist/`, so a Firefox build overwrites a Chrome build. For Firefox the
+generated `manifest.json` is adjusted; the Chrome output is unchanged:
+
+- `background.service_worker` becomes `background.scripts: [<same file>]`
+  (`type: module` kept). Firefox runs it as an event page, which has a DOM.
+- `use_dynamic_url` is removed from `web_accessible_resources` entries.
+- `side_panel.default_path` becomes `sidebar_action.default_panel` (unless you
+  set `sidebar_action` yourself); `side_panel` and the `sidePanel` permission
+  are removed.
+
+Firefox requires an add-on ID to sign MV3 add-ons. Add it to your manifest —
+Chrome ignores the key — or the build warns:
+
+```json
+{ "browser_specific_settings": { "gecko": { "id": "my-extension@example.com" } } }
+```
+
+`import.meta.env.AMBER_BROWSER` is `'firefox'` in Firefox builds (including
+`amber dev --browser firefox`) and `'chrome'` otherwise, for code that must branch.
+`@amber.js/core` needs no polyfill: Firefox MV3 supports promises on
+`chrome.*`. Target Firefox 128+ (ESR; also required for `world: 'MAIN'`
+content scripts). On Firefox, a `world: 'MAIN'` content script must use
+`format: 'iife'`: the `es` loader runs in the page's realm, where it cannot
+import the module from the extension, so the build warns. Note that Firefox lets
+users revoke MV3 host permissions, so check them at runtime instead of assuming
+they were granted at install.
+
+### Developing on Firefox
+
+```sh
+amber dev --browser firefox
+```
+
+Load `dist/manifest.json` via **Load Temporary Add-on** at
+`about:debugging#/runtime/this-firefox`. Pages (popup, options) get Vite HMR as
+on Chrome. Content scripts can't hot-swap on Firefox, which only lets them import
+modules from the extension itself, so they are rebuilt to `dist/` and reloaded:
+
+| You change | What happens |
+| --- | --- |
+| A content script's code | The current tab reloads. |
+| Content-script CSS, a `world: 'MAIN'` script, or the background | The extension reloads. The current tab reloads too if a `world: 'MAIN'` script is registered, because its old copy stays in the page. |
+
+`--dev-browser` launches Chromium only, so it can't be combined with
+`--browser firefox`.
 
 ## The rest of the project
 

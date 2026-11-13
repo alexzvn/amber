@@ -6,11 +6,11 @@ import CSPolyfillDev from '~/client/content-script.iife.dev.js?raw'
 import CSPolyfillProd from '~/client/content-script.iife.prod.js?raw'
 
 import fs from "fs/promises"
-import type { AmberOptions } from '../configure'
+import type { PluginOptions } from '../configure'
 import slash from 'slash'
 
 
-export default defineVitePlugin((amber: AmberOptions = {}) => {
+export default defineVitePlugin((amber: PluginOptions = {}) => {
   let outdir = 'dist'
   let config: ResolvedConfig
   let server: ViteDevServer|undefined
@@ -18,7 +18,11 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
   return [{
     name: 'amber:content-module-polyfill',
 
-    config(cfg) {
+    config(cfg, { mode }) {
+      // Firefox dev builds isolated-world scripts as modules on disk (see `amber dev`),
+      // whatever their format; only MAIN-world iife scripts keep their own iife build.
+      const firefoxDev = amber.browser === 'firefox' && mode.startsWith('dev')
+
       cfg.build ??= {}
       cfg.build.rollupOptions ??= {}
       cfg.build.rollupOptions.output ??= {}
@@ -32,7 +36,7 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
           return chunk.facadeModuleId?.endsWith(script.file)
         })
 
-        if (script?.options.format === 'iife') {
+        if (script?.options.format === 'iife' && !(firefoxDev && script.options.world !== 'MAIN')) {
           return 'scripts/[name].js'
         }
 
@@ -50,7 +54,9 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
     },
 
     async buildStart() {
-      if (config.mode !== 'development') {
+      // Firefox content scripts can only import modules from the extension itself
+      // (bug 1803950), so its dev loaders are emitted by `generateBundle` instead.
+      if (config.mode !== 'development' || amber.browser === 'firefox') {
         return
       }
 
@@ -114,22 +120,40 @@ export default defineVitePlugin((amber: AmberOptions = {}) => {
      * is attached and the styles silently never reach the built extension.
      */
     async generateBundle(_options, bundle) {
-      if (config.mode.startsWith('dev')) return
+      if (config.mode.startsWith('dev') && amber.browser !== 'firefox') return
 
       for (const script of ContentScript.$registers) {
         const output = bundle[`scripts/_${script.moduleName}.js`]
 
         if (! output) continue
 
+        const file = JSON.stringify(`/scripts/_${script.moduleName}.js`)
+
+        // Firefox resolves content-script `import()` specifiers against the page URL.
+        // MAIN-world scripts have no `chrome.runtime` to build an extension URL, so
+        // the loader cannot reach the module there: they must use `format: 'iife'`.
+        const firefox = amber.browser === 'firefox'
+        const main = script.options.world === 'MAIN'
+
+        if (firefox && main) {
+          this.warn(`content script "${script.file}" runs in world 'MAIN' with format 'es'; Firefox cannot load its module from the page realm. Use format: 'iife'.`)
+        }
+
+        const specifier = firefox && !main ? `chrome.runtime.getURL(${file})` : file
+
         this.emitFile({
           type: 'prebuilt-chunk',
           fileName: posix.join('scripts', script.path.name + '.js'),
-          code: CSPolyfillProd.replace(/__SCRIPT__/g, `"/scripts/_${script.moduleName}.js"`),
+          code: CSPolyfillProd.replace(/__SCRIPT__/g, specifier),
         })
 
         if (output.viteMetadata) {
-          script.options.css ??= []
-          script.options.css.push(...output.viteMetadata.importedCss)
+          const css = script.options.css ??= []
+
+          // watch rebuilds run this hook again; keep each stylesheet once
+          for (const file of output.viteMetadata.importedCss) {
+            css.includes(file) || css.push(file)
+          }
         }
       }
     }

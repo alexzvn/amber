@@ -10,14 +10,14 @@ import AmberWelcomePage from './AmberWelcomePage'
 import IconProcessor from './IconProcessor'
 
 import type {GeneralManifest} from '~/browsers/manifest.ts'
-import type {AmberOptions} from '~//configure'
+import type {PluginOptions} from '~//configure'
 import HtmlPagePolyfill from './HtmlPagePolyfill'
 
-export default (manifest: GeneralManifest, amber: AmberOptions = {}) => [
+export default (manifest: GeneralManifest, amber: PluginOptions = {}) => [
   ResolveAlias(),
   InjectWorkerHMR(manifest, amber),
   ContentModulePolyfill(amber),
-  HtmlPagePolyfill(),
+  HtmlPagePolyfill(amber),
   ManifestWriter(manifest, amber),
   InlineScriptPolyfill(),
   ImportViaURL(),

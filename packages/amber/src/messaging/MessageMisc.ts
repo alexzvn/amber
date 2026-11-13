@@ -54,6 +54,16 @@ export const isPayload = <D>(payload: any): payload is MessagingPayload<D> => {
   return payload && typeof payload === 'object' && '__EMessage' in payload && payload.__EMessage
 }
 
+const BACKGROUND_DOCUMENT = '/_generated_background_page.html'
+
+const isBackgroundDocument = (current: URL, runtime: URL): boolean => {
+  if (current.protocol !== runtime.protocol || current.host !== runtime.host) return false
+  const { manifest_version, background } = chrome.runtime.getManifest()
+  if (manifest_version !== 3) return false
+  const page = (background as { page?: string } | undefined)?.page
+  return current.pathname === (page ? new URL(page, runtime).pathname : BACKGROUND_DOCUMENT)
+}
+
 export const getMode = (): AcceptMode => {
   if (typeof window === 'undefined') {
     return 'background'
@@ -62,7 +72,14 @@ export const getMode = (): AcceptMode => {
   const runtime = new URL(chrome.runtime.getURL('/'))
   const current = new URL(window.location.href)
 
-  return runtime.origin === current.origin ? 'ui' : 'content'
+  // Firefox MV3 runs the background as an event page that has `window` and the
+  // extension origin, so it must be recognised by its document path.
+  if (isBackgroundDocument(current, runtime)) {
+    return 'background'
+  }
+
+  // Compare protocol + host: `URL.origin` is 'null' for `moz-extension:`.
+  return runtime.protocol === current.protocol && runtime.host === current.host ? 'ui' : 'content'
 }
 
 export type Pair<K extends symbol = symbol, V = unknown> = Record<K, V>

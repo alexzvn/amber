@@ -5,14 +5,17 @@ import { getMapIIFE, getMapModule } from '~/components/'
 import { exists } from '~/helper'
 import { join } from 'path'
 import fs from 'fs/promises'
+import { Option } from 'commander'
+import { browsers, type Browser } from '~/configure'
 
 program.command('build')
-.description('Start process to build browser extension')
+.description('Start process to build browser extension (Chrome by default, or Firefox with --browser firefox)')
 .option('-p, --prod, --production', 'Build extension in production mode')
 .option('-c, --clean', 'Clean dist folder before build', true)
 .option('-m, --minify', 'Minify the source code')
 .option('-s, --sourcemap [mode]', 'Save the source map')
 .option('-w, --watch', 'Enter watch mode')
+.addOption(new Option('-b, --browser <browser>', 'Target browser').choices(browsers).default('chrome'))
 .action(async (options) => {
   process.env.NODE_ENV ??= 'production'
 
@@ -26,9 +29,12 @@ program.command('build')
   const watch = options.watch ? {} : undefined
   const minify = options.prod || options.minify
   const sourcemap: boolean = options.sourcemap ? options.sourcemap : false
+  const browser: Browser = options.browser
+  const define = { 'import.meta.env.AMBER_BROWSER': JSON.stringify(browser) }
 
   const modules: UserConfig = defineConfig({
-    plugins: [AmberPlugin(config.manifest)],
+    plugins: [AmberPlugin(config.manifest, { browser })],
+    define,
     build: {
       sourcemap,
       minify,
@@ -49,7 +55,8 @@ program.command('build')
 
   for (const [mod, name] of Object.entries(getMapIIFE())) {
     const iife: UserConfig = defineConfig({
-      plugins: [AmberPlugin(config.manifest)],
+      plugins: [AmberPlugin(config.manifest, { browser })],
+      define,
       build: {
         sourcemap,
         minify,

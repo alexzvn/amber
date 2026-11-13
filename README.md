@@ -1,8 +1,8 @@
 # Amber.js
 
-A meta framework for building Chrome MV3 extensions. Declare your entrypoints
-in `amber.config.ts` and Amber generates the manifest, bundles each context
-correctly, and gives you hot reload that reaches the service worker.
+A meta framework for building MV3 extensions for Chrome and Firefox. Declare
+your entrypoints in `amber.config.ts` and Amber generates the manifest, bundles
+each context correctly, and gives you hot reload that reaches the service worker.
 
 **[Documentation](https://amber.alexzvn.me)**
 

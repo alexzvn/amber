@@ -1,37 +1,56 @@
 import { spawn, type ChildProcess } from 'child_process'
-import { createServer, build } from 'vite'
+import { createServer, build, type ViteDevServer, type Rolldown } from 'vite'
+import { Option } from 'commander'
 import { program } from './program'
+import { browsers, type Browser as BrowserTarget } from '~/configure'
 import BackgroundScript from '~/components/BackgroundScript'
+import { getFirefoxDevMapIIFE, getFirefoxDevMapModule } from '~/components'
+import FirefoxDevReload, { createReloadQueue } from '~/plugins/FirefoxDevReload'
 import { escapeExecutePath } from '../helper'
 import * as Browser from './dev/browser'
 import * as Configuration from './dev/configuration'
 
 
-type DevOption = { devBrowser: boolean }
+type DevOption = { devBrowser: boolean, browser: BrowserTarget }
 
 const start = async (option: DevOption) => {
-  const { vite, config } = await Configuration.resolveConfig()
+  const { vite, config } = await Configuration.resolveConfig(option.browser)
   const session = new Configuration.Session()
+  const firefox = option.browser === 'firefox'
+
+  let server: ViteDevServer | undefined
+  const reloads = firefox ? createReloadQueue(() => server) : undefined
 
   await session.init()
 
-  await build({
+  // Background scripts are built to disk. Firefox content scripts are too: they can
+  // only import modules from the extension, so they reload instead of hot-swapping.
+  const watch = (input: Record<string, string>, output?: Rolldown.OutputOptions) => build({
     mode: 'development',
     ...vite,
+    ...(reloads && { plugins: [...(vite.plugins ?? []), FirefoxDevReload(reloads.queue)] }),
     build: {
       ...vite.build,
       watch: {},
       rollupOptions: {
         ... vite.build!.rollupOptions,
-        input: BackgroundScript.map,
+        input,
+        ...(output && { output: { ...vite.build!.rollupOptions!.output as Rolldown.OutputOptions, ...output } }),
       }
     },
 
     logLevel: 'warn'
   })
 
-  const server = await createServer({ ...vite, configFile: false })
+  await watch(firefox ? getFirefoxDevMapModule() : BackgroundScript.map)
+
+  for (const [name, file] of Object.entries(firefox ? getFirefoxDevMapIIFE() : {})) {
+    await watch({ [name]: file }, { format: 'iife' })
+  }
+
+  server = await createServer({ ...vite, configFile: false })
   await server.listen()
+  reloads?.listen(server)
 
   server.printUrls()
   server.bindCLIShortcuts({
@@ -117,8 +136,13 @@ const thread = {
 
 program.command('dev')
   .description('Start process to develop browser extension')
-  .option('-d, --dev-browser', 'Enable auto development browser')
+  .option('-d, --dev-browser', 'Enable auto development browser (Chrome only)')
+  .addOption(new Option('-b, --browser <browser>', 'Target browser').choices(browsers).default('chrome'))
   .action(async (option: DevOption) => {
+    if (option.devBrowser && option.browser !== 'chrome') {
+      program.error('--dev-browser launches Chromium; for Firefox, load dist/manifest.json from about:debugging')
+    }
+
     const isMainProcess = !process.env.INTERNAL_DEV_SERVER
 
     process.env.NODE_ENV ??= 'development'
